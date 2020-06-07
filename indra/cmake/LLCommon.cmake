@@ -4,11 +4,13 @@ include(APR)
 include(Boost)
 include(EXPAT)
 include(ZLIB)
+include(Vulkan)
 
 set(LLCOMMON_INCLUDE_DIRS
     ${LIBS_OPEN_DIR}/llcommon
     ${APRUTIL_INCLUDE_DIR}
     ${APR_INCLUDE_DIR}
+    ${Vulkan_INCLUDE_DIRS}
     )
 set(LLCOMMON_SYSTEM_INCLUDE_DIRS
     ${Boost_INCLUDE_DIRS}
