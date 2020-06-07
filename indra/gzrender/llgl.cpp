@@ -636,14 +636,16 @@ bool LLGLManager::initVulkan() {
 		// Create a logical device.
 		if (vkCreateDevice(mSelectedDevice, &createInfo, nullptr, &mLogicalDevice) != VK_SUCCESS) {
 			LL_INFOS("RenderInit") << "Failed to create a logical device." << LL_ENDL;
+			return false;
 		}
 		else {
 			LL_INFOS("RenderInit") << "Logical device initialiation successful." << LL_ENDL;
 		}
 
+		vkGetDeviceQueue(mLogicalDevice, graphicsQueueIdx, 0, &mPrimaryGraphicsQueue);
 	}
 
-	return false;
+	return true;
 }
 
 // return false if unable (or unwilling due to old drivers) to init GL

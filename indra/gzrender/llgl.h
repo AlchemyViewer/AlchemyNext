@@ -177,6 +177,9 @@ private:
 	VkPhysicalDeviceFeatures mSelectedDeviceFeatures;
 	VkPhysicalDeviceMemoryProperties mMemoryProperties;
 	VkDevice mLogicalDevice;
+	VkQueue mPrimaryGraphicsQueue;
+	VkSurfaceKHR mRenderableSurface;
+
 	std::vector<const char*> mInstanceExtensions;
 	std::vector<const char*> mDeviceExtensions;
 	bool initVulkanInstance();
