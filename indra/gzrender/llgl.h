@@ -45,6 +45,8 @@
 #include "llglheaders.h"
 #include "glh/glh_linear.h"
 
+#define USE_SRGB_DECODE 1
+
 extern BOOL gDebugGL;
 extern BOOL gDebugSession;
 extern llofstream gFailLog;

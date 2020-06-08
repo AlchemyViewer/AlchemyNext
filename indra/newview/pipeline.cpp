@@ -8239,13 +8239,13 @@ void LLPipeline::bindDeferredShader(LLGLSLShader& shader, LLRenderTarget* light_
     channel = shader.enableTexture(LLShaderMgr::DEFERRED_DIFFUSE, deferred_target->getUsage());
 	if (channel > -1)
 	{
-        deferred_target->bindTexture(0,channel, LLTexUnit::TFO_POINT);
+        deferred_target->bindTexture(0,channel, LLTexUnit::TFO_POINT, LLTexUnit::TCS_SRGB);
 	}
-
+	
     channel = shader.enableTexture(LLShaderMgr::DEFERRED_SPECULAR, deferred_target->getUsage());
 	if (channel > -1)
 	{
-        deferred_target->bindTexture(1, channel, LLTexUnit::TFO_POINT);
+        deferred_target->bindTexture(1, channel, LLTexUnit::TFO_POINT, LLTexUnit::TCS_SRGB);
 	}
 
     channel = shader.enableTexture(LLShaderMgr::DEFERRED_NORMAL, deferred_target->getUsage());
@@ -8381,6 +8381,7 @@ void LLPipeline::bindDeferredShader(LLGLSLShader& shader, LLRenderTarget* light_
 		{
 			cube_map->enable(channel);
 			cube_map->bind();
+			cube_map->setColorSpace(LLTexUnit::TCS_SRGB);
 			F32* m = gGLModelView;
 						
 			F32 mat[] = { m[0], m[1], m[2],
