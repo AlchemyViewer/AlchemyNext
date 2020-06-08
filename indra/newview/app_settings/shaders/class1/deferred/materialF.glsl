@@ -236,7 +236,7 @@ void main()
 
 #ifdef HAS_SPECULAR_MAP
     vec4 spec = texture2D(specularMap, vary_texcoord2.xy);
-    spec.rgb *= specular_color.rgb;
+    spec.rgb *= srgb_to_linear(specular_color.rgb);
 #else
     vec4 spec = vec4(specular_color.rgb, 1.0);
 #endif
