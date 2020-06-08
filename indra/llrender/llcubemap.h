@@ -45,6 +45,7 @@ public:
 	void initGLData();
 
 	void bind();
+	void setColorSpace(LLTexUnit::eTextureColorSpace space);
 	void enable(S32 stage);
 	
 	void enableTexture(S32 stage);

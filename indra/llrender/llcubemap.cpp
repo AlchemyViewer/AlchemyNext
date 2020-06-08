@@ -79,11 +79,9 @@ void LLCubeMap::initGL()
 			for (int i = 0; i < 6; i++)
 			{
 				mImages[i] = new LLImageGL(RESOLUTION, RESOLUTION, 4, FALSE);
-            #if USE_SRGB_DECODE
                 if (mIssRGB) {
                     mImages[i]->setExplicitFormat(GL_SRGB8_ALPHA8, GL_RGBA);
                 }
-            #endif
 				mImages[i]->setTarget(mTargets[i], LLTexUnit::TT_CUBE_MAP);
 				mRawImages[i] = new LLImageRaw(RESOLUTION, RESOLUTION, 4);
 				mImages[i]->createGLTexture(0, mRawImages[i], texname);
@@ -174,6 +172,10 @@ GLuint LLCubeMap::getGLName()
 void LLCubeMap::bind()
 {
 	gGL.getTexUnit(mTextureStage)->bind(this);
+}
+
+void LLCubeMap::setColorSpace(LLTexUnit::eTextureColorSpace space) {
+	gGL.getTexUnit(mTextureStage)->setTextureColorSpace(space);
 }
 
 void LLCubeMap::enable(S32 stage)
