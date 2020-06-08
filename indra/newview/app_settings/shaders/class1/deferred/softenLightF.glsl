@@ -104,6 +104,8 @@ void main()
         vec3 atten;
     
         calcAtmosphericVars(pos.xyz, light_dir, ambocc, sunlit, amblit, additive, atten, false);
+        additive = srgb_to_linear(additive);
+        amblit = srgb_to_linear(amblit);
 
         color.rgb = amblit;
 
@@ -191,6 +193,6 @@ void main()
     // convert to linear as fullscreen lights need to sum in linear colorspace
     // and will be gamma (re)corrected downstream...
     
-    frag_color.rgb = srgb_to_linear(color.rgb);
+    frag_color.rgb = color.rgb;
     frag_color.a = bloom;
 }

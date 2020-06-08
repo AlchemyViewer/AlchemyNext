@@ -177,8 +177,6 @@ void main()
 	float da = dot(norm, lv);
 		
 	vec3 diff_tex = texture2DRect(diffuseRect, frag.xy).rgb;
-	//light shaders output linear and are gamma corrected later in postDeferredGammaCorrectF.glsl
-    diff_tex.rgb = srgb_to_linear(diff_tex.rgb);
 
 	vec4 spec = texture2DRect(specularRect, frag.xy);
 

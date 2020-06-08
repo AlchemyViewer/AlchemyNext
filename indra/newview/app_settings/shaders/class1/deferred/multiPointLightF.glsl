@@ -78,7 +78,6 @@ void main()
 
 	vec4 spec = texture2DRect(specularRect, frag.xy);
 	vec3 diff = texture2DRect(diffuseRect, frag.xy).rgb;
-    diff.rgb = srgb_to_linear(diff.rgb);
 	
 	float noise = texture2D(noiseMap, frag.xy/128.0).b;
 	vec3 npos = normalize(-pos);

@@ -88,7 +88,6 @@ void main()
     da = pow(da, light_gamma);
     
     vec4 diffuse = texture2DRect(diffuseRect, tc);
-    
     vec4 spec = texture2DRect(specularRect, vary_fragcoord.xy);
 
     vec2 scol_ambocc = texture2DRect(lightMap, vary_fragcoord.xy).rg;
@@ -107,7 +106,8 @@ void main()
         vec3 atten;
     
         calcAtmosphericVars(pos.xyz, light_dir, ambocc, sunlit, amblit, additive, atten, true);
-
+        additive = srgb_to_linear(additive);
+        amblit = srgb_to_linear(amblit);
         color.rgb = amblit;
 
         float ambient = min(abs(dot(norm.xyz, sun_dir.xyz)), 1.0);
@@ -191,10 +191,11 @@ void main()
 //color.rgb = vec3(scol);
 //color.rgb = diffuse_srgb.rgb;
 
-    // convert to linear as fullscreen lights need to sum in linear colorspace
-    // and will be gamma (re)corrected downstream...
+    // This used to "convert" to linear space
+    // This is already in linear space
+    // If it is not in linear space, correct your calculations.
     
-    frag_color.rgb = srgb_to_linear(color.rgb);
+    frag_color.rgb = color.rgb;
     frag_color.a = bloom;
 }
 
