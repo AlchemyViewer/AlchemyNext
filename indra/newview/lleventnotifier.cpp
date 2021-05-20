@@ -163,11 +163,12 @@ bool LLEventNotifier::handleResponse(U32 eventId, const LLSD& notification, cons
 	return true;
 }
 
-bool LLEventNotifier::add(U32 eventId, F64 eventEpoch, const std::string& eventDateStr, const std::string &eventName)
+bool LLEventNotifier::add(const LLEventStruct& event)
 {
-	LLEventNotification *new_enp = new LLEventNotification(eventId, eventEpoch, eventDateStr, eventName);
+	if (mNewEventSignal(event)) return false;
+	LLEventNotification *new_enp = new LLEventNotification(event.eventId, event.eventEpoch, event.eventDateStr, event.eventName);
 	
-	LL_INFOS() << "Add event " << eventName << " id " << eventId << " date " << eventDateStr << LL_ENDL;
+	LL_INFOS() << "Add event " << event.eventName << " id " << event.eventId << " date " << event.eventDateStr << LL_ENDL;
 	if(!new_enp->isValid())
 	{
 		delete new_enp;
@@ -208,7 +209,18 @@ void LLEventNotifier::processEventInfoReply(LLMessageSystem *msg, void **)
 	msg->getString("EventData", "Date", eventd_date);
 	msg->getU32("EventData", "DateUTC", event_time_utc);
 	
-	gEventNotifier.add(event_id, (F64)event_time_utc, eventd_date, event_name);
+	LLEventStruct event(event_id, (F64)event_time_utc, eventd_date, event_name);
+	msg->getString("EventData", "Creator", event.creator);
+	msg->getString("EventData", "Category", event.category);
+	msg->getString("EventData", "Desc", event.desc);
+	msg->getU32("EventData", "Duration", event.duration);
+	msg->getU32("EventData", "Cover", event.cover);
+	msg->getU32("EventData", "Amount", event.amount);
+	msg->getString("EventData", "SimName", event.simName);
+	msg->getVector3d("EventData", "GlobalPos", event.globalPos);
+	msg->getU32("EventData", "EventFlags", event.flags);
+	
+	gEventNotifier.add(event);
 }	
 	
 	
@@ -219,7 +231,8 @@ void LLEventNotifier::load(const LLSD& event_options)
 	{
 		LLSD response = *resp_it;
 
-		add(response["event_id"].asInteger(), response["event_date_ut"], response["event_date"].asString(), response["event_name"].asString());
+		LLEventStruct event(response["event_id"].asInteger(), response["event_date_ut"], response["event_date"].asString(), response["event_name"].asString());
+		add(event);
 	}
 }
 
