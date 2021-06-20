@@ -189,7 +189,7 @@ void LLFloaterDisplayName::onSave()
 	if (display_name_wstr.size() > DISPLAY_NAME_MAX_LENGTH)
 	{
 		LLSD args;
-		args["LENGTH"] = llformat("%d", DISPLAY_NAME_MAX_LENGTH);
+		args["LENGTH"] = fmt::to_string(DISPLAY_NAME_MAX_LENGTH);
 		LLNotificationsUtil::add("SetDisplayNameFailedLength", args);
 		return;
 	}

@@ -86,7 +86,7 @@ void LLFloaterRegionRestarting::refresh()
 	LLStringUtil::format_map_t args;
 	std::string text;
 
-	args["[SECONDS]"] = llformat("%d", sSeconds);
+	args["[SECONDS]"] = fmt::to_string(sSeconds);
 	getChild<LLTextBox>("restart_seconds")->setValue(getString("RestartSeconds", args));
 
 	sSeconds = sSeconds - 1;

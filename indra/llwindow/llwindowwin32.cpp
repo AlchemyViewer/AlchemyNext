@@ -800,8 +800,8 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
 			mFullscreenRefresh = -1;
 
 			std::map<std::string,std::string> args;
-			args["[WIDTH]"] = llformat("%d", width);
-			args["[HEIGHT]"] = llformat ("%d", height);
+			args["[WIDTH]"] = fmt::to_string(width);
+			args["[HEIGHT]"] = fmt::to_string(height);
 			OSMessageBox(mCallbacks->translateString("MBFullScreenErr", args),
 				mCallbacks->translateString("MBError"), OSMB_OK);
 		}

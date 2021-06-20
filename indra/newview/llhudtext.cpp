@@ -573,7 +573,7 @@ void LLHUDText::updateAll()
 //{
 //	mLOD = lod;
 //	//RN: uncomment this to visualize LOD levels
-//	//std::string label = llformat("%d", lod);
+//	//std::string label = fmt::to_string(lod);
 //	//setLabel(label);
 //}
 

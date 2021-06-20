@@ -447,8 +447,8 @@ void LLFloaterAuction::onClickSellToAnyone(void* data)
 		S32 area = parcelp->getArea();
 
 		LLSD args;
-		args["LAND_SIZE"] = llformat("%d", area);
-		args["SALE_PRICE"] = llformat("%d", sale_price);
+		args["LAND_SIZE"] = fmt::to_string(area);
+		args["SALE_PRICE"] = fmt::to_string(sale_price);
 		args["NAME"] = LLTrans::getString("Anyone");
 
 		LLNotification::Params params("ConfirmLandSaleChange");	// Re-use existing dialog

@@ -101,8 +101,8 @@ void LLFloaterWindowSize::initWindowSizeControls()
 	}
 	// ...otherwise, add a new entry with the current window height/width.
 	LLUIString resolution_label = getString("resolution_format");
-	resolution_label.setArg("[RES_X]", llformat("%d", width));
-	resolution_label.setArg("[RES_Y]", llformat("%d", height));
+	resolution_label.setArg("[RES_X]", fmt::to_string(width));
+	resolution_label.setArg("[RES_Y]", fmt::to_string(height));
 	ctrl_window_size->add(resolution_label, ADD_TOP);
 	ctrl_window_size->setCurrentByIndex(0);
 }

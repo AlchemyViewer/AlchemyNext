@@ -283,7 +283,7 @@ bool LLGiveInventory::doGiveInventoryCategory(const LLUUID& to_agent,
 		else
 		{
 			LLSD args;
-			args["COUNT"] = llformat("%d",giveable.countNoCopy());
+			args["COUNT"] = fmt::to_string(giveable.countNoCopy());
 			LLSD payload;
 			payload["agent_id"] = to_agent;
 			payload["folder_id"] = cat->getUUID();

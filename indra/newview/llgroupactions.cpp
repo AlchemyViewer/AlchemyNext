@@ -255,7 +255,7 @@ void LLGroupActions::join(const LLUUID& group_id)
 	{
 		S32 cost = gdatap->mMembershipFee;
 		LLSD args;
-		args["COST"] = llformat("%d", cost);
+		args["COST"] = fmt::to_string(cost);
 		args["NAME"] = gdatap->mName;
 		LLSD payload;
 		payload["group_id"] = group_id;

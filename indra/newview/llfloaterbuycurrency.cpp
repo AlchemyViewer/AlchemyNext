@@ -210,17 +210,17 @@ void LLFloaterBuyCurrencyUI::updateUI()
 		S32 balance = gStatusBar->getBalance();
 		getChildView("balance_label")->setVisible(TRUE);
 		getChildView("balance_amount")->setVisible(TRUE);
-		getChild<LLUICtrl>("balance_amount")->setTextArg("[AMT]", llformat("%d", balance));
+		getChild<LLUICtrl>("balance_amount")->setTextArg("[AMT]", fmt::to_string(balance));
 		
 		S32 buying = mManager.getAmount();
 		getChildView("buying_label")->setVisible(TRUE);
 		getChildView("buying_amount")->setVisible(TRUE);
-		getChild<LLUICtrl>("buying_amount")->setTextArg("[AMT]", llformat("%d", buying));
+		getChild<LLUICtrl>("buying_amount")->setTextArg("[AMT]", fmt::to_string(buying));
 		
 		S32 total = balance + buying;
 		getChildView("total_label")->setVisible(TRUE);
 		getChildView("total_amount")->setVisible(TRUE);
-		getChild<LLUICtrl>("total_amount")->setTextArg("[AMT]", llformat("%d", total));
+		getChild<LLUICtrl>("total_amount")->setTextArg("[AMT]", fmt::to_string(total));
 
 		if (mHasTarget)
 		{

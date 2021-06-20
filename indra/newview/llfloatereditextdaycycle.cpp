@@ -326,21 +326,21 @@ void LLFloaterEditExtDayCycle::onOpen(const LLSD& key)
             hrs = total;
             minutes = total - hrs;
 
-            formatted_label.setArg("[HH]", llformat("%d", hrs.value()));
-            formatted_label.setArg("[MM]", llformat("%d", abs(minutes.value())));
-            getChild<LLTextBox>("p" + llformat("%d", i), true)->setTextArg("[DSC]", formatted_label.getString());
+            formatted_label.setArg("[HH]", fmt::to_string(hrs.value()));
+            formatted_label.setArg("[MM]", fmt::to_string(abs(minutes.value())));
+            getChild<LLTextBox>("p" + fmt::to_string(i), true)->setTextArg("[DSC]", formatted_label.getString());
         }
         hrs = mDayLength;
         minutes = mDayLength - hrs;
-        formatted_label.setArg("[HH]", llformat("%d", hrs.value()));
-        formatted_label.setArg("[MM]", llformat("%d", abs(minutes.value())));
+        formatted_label.setArg("[HH]", fmt::to_string(hrs.value()));
+        formatted_label.setArg("[MM]", fmt::to_string(abs(minutes.value())));
         mCurrentTimeLabel->setTextArg("[DSC]", formatted_label.getString());
     }
     else
     {
         for (int i = 0; i < max_elm; i++)
         {
-            getChild<LLTextBox>("p" + llformat("%d", i), true)->setTextArg("[DSC]", std::string());
+            getChild<LLTextBox>("p" + fmt::to_string(i), true)->setTextArg("[DSC]", std::string());
         }
         mCurrentTimeLabel->setTextArg("[DSC]", std::string());
     }
@@ -350,7 +350,7 @@ void LLFloaterEditExtDayCycle::onOpen(const LLSD& key)
     F32 slider_width = mFramesSlider->getRect().getWidth();
     for (int i = 1; i < max_elm; i++)
     {
-        LLTextBox *pcnt_label = getChild<LLTextBox>("p" + llformat("%d", i), true);
+        LLTextBox *pcnt_label = getChild<LLTextBox>("p" + fmt::to_string(i), true);
         LLRect new_rect = pcnt_label->getRect();
         new_rect.mLeft = label_rect.mLeft + (S32)(slider_width * (F32)i / (F32)(max_elm - 1)) - (S32)(pcnt_label->getTextPixelWidth() / 2);
         pcnt_label->setRect(new_rect);
@@ -1260,8 +1260,8 @@ void LLFloaterEditExtDayCycle::updateTimeAndLabel()
         S32Hours hrs = total;
         S32Minutes minutes = total - hrs;
 
-        formatted_label.setArg("[HH]", llformat("%d", hrs.value()));
-        formatted_label.setArg("[MM]", llformat("%d", abs(minutes.value())));
+        formatted_label.setArg("[HH]", fmt::to_string(hrs.value()));
+        formatted_label.setArg("[MM]", fmt::to_string(abs(minutes.value())));
         mCurrentTimeLabel->setTextArg("[DSC]", formatted_label.getString());
     }
     else

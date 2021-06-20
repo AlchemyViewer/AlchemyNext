@@ -213,8 +213,7 @@ void LLFloaterTelehub::onClickRemoveSpawnPoint()
 	msg->nextBlock("ParamList");
 	msg->addString("Parameter", "spawnpoint remove");
 
-	std::string buffer;
-	buffer = llformat("%d", spawn_index);
+	std::string buffer = fmt::to_string(spawn_index);
 	msg->nextBlock("ParamList");
 	msg->addString("Parameter", buffer);
 

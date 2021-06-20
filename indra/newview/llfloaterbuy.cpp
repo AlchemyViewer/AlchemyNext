@@ -180,7 +180,7 @@ void LLFloaterBuy::show(const LLSaleInfo& sale_info)
 	// Add after columns added so appropriate heights are correct.
 	object_list->addElement(row);
 
-	floater->getChild<LLUICtrl>("buy_text")->setTextArg("[AMOUNT]", llformat("%d", sale_info.getSalePrice()));
+	floater->getChild<LLUICtrl>("buy_text")->setTextArg("[AMOUNT]", fmt::to_string(sale_info.getSalePrice()));
 	floater->getChild<LLUICtrl>("buy_name_text")->setTextArg("[NAME]", owner_name);
 
 	floater->showViews(true);

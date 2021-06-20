@@ -248,7 +248,7 @@ void LLFloaterTopObjects::handleReply(LLMessageSystem *msg, void** data)
 			columns[column_num++]["font"] = "SANSSERIF";
 
 			columns[column_num]["column"] = "URLs";
-			columns[column_num]["value"] = llformat("%d", public_urls);
+			columns[column_num]["value"] = fmt::to_string(public_urls);
 			columns[column_num++]["font"] = "SANSSERIF";
 		}
 		element["columns"] = columns;
@@ -276,8 +276,8 @@ void LLFloaterTopObjects::handleReply(LLMessageSystem *msg, void** data)
 
 		LLUIString format = getString("top_scripts_text");
 		total_memory /= 1024;
-		format.setArg("[MEMORY]", llformat("%ld", total_memory));
-		format.setArg("[COUNT]", llformat("%d", total_count));
+		format.setArg("[MEMORY]", fmt::to_string(total_memory));
+		format.setArg("[COUNT]", fmt::to_string(total_count));
 		format.setArg("[TIME]", llformat("%0.3f", mtotalScore));
 		getChild<LLUICtrl>("title_text")->setValue(LLSD(format));
 		mObjectList->setColumnLabel("URLs", getString("URLs"));
@@ -290,7 +290,7 @@ void LLFloaterTopObjects::handleReply(LLMessageSystem *msg, void** data)
 		mObjectList->setColumnLabel("URLs", "");
 		mObjectList->setColumnLabel("memory", "");
 		LLUIString format = getString("top_colliders_text");
-		format.setArg("[COUNT]", llformat("%d", total_count));
+		format.setArg("[COUNT]", fmt::to_string(total_count));
 		getChild<LLUICtrl>("title_text")->setValue(LLSD(format));
 	}
 

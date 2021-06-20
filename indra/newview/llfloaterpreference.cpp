@@ -2082,7 +2082,7 @@ void LLFloaterPreferenceGraphicsAdvanced::setMaxNonImpostorsText(U32 value, LLTe
 	}
 	else
 	{
-		text_box->setText(llformat("%d", value));
+		text_box->setText(fmt::to_string(value));
 	}
 }
 
@@ -2119,7 +2119,7 @@ void LLAvatarComplexityControls::setText(U32 value, LLTextBox* text_box)
 	}
 	else
 	{
-		text_box->setText(llformat("%d", value));
+		text_box->setText(fmt::to_string(value));
 	}
 }
 

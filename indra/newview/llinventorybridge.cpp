@@ -2636,7 +2636,7 @@ BOOL LLFolderBridge::dragCategoryIntoFolder(LLInventoryCategory* inv_cat,
 				// Can't move 'large' folders into current outfit: MAINT-4086
 				is_movable = FALSE;
 				LLStringUtil::format_map_t args;
-				args["AMOUNT"] = llformat("%d", max_items_to_wear);
+				args["AMOUNT"] = fmt::to_string(max_items_to_wear);
 				tooltip_msg = LLTrans::getString("TooltipTooManyWearables",args);
 			}
 		}
@@ -4603,7 +4603,7 @@ void LLFolderBridge::modifyOutfit(BOOL append)
 	if (items.size() > max_items)
 	{
 		LLSD args;
-		args["AMOUNT"] = llformat("%d", max_items);
+		args["AMOUNT"] = fmt::to_string(max_items);
 		LLNotificationsUtil::add("TooManyWearables", args);
 		return;
 	}
@@ -4673,7 +4673,7 @@ std::string LLMarketplaceFolderBridge::getLabelSuffix() const
     // Listing folder case
     if (LLMarketplaceData::instance().isListed(getUUID()))
     {
-        suffix = llformat("%d",LLMarketplaceData::instance().getListingID(getUUID()));
+        suffix = fmt::to_string(LLMarketplaceData::instance().getListingID(getUUID()));
         if (suffix.empty())
         {
             suffix = LLTrans::getString("MarketplaceNoID");
@@ -4716,7 +4716,7 @@ std::string LLMarketplaceFolderBridge::getLabelSuffix() const
         }
         else
         {
-            suffix +=  "=" + llformat("%d", m_stockCountCache) + ")";
+            suffix +=  "=" + fmt::to_string(m_stockCountCache) + ")";
         }
     }
     // Add updating suffix
@@ -6608,7 +6608,7 @@ bool confirm_attachment_rez(const LLSD& notification, const LLSD& response)
 	if (!gAgentAvatarp->canAttachMoreObjects())
 	{
 		LLSD args;
-		args["MAX_ATTACHMENTS"] = llformat("%d", gAgentAvatarp->getMaxAttachments());
+		args["MAX_ATTACHMENTS"] = fmt::to_string(gAgentAvatarp->getMaxAttachments());
 		LLNotificationsUtil::add("MaxAttachmentsOnOutfit", args);
 		return false;
 	}

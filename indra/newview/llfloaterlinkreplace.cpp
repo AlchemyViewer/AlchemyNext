@@ -111,7 +111,7 @@ void LLFloaterLinkReplace::updateFoundLinks()
 	mRemainingItems = (U32)items.size();
 
 	LLStringUtil::format_map_t args;
-	args["NUM"] = llformat("%d", mRemainingItems);
+	args["NUM"] = fmt::to_string(mRemainingItems);
 	mStatusText->setText(getString("ItemsFound", args));
 }
 
@@ -196,7 +196,7 @@ void LLFloaterLinkReplace::onStartClickedResponse(const LLSD& notification, cons
 				mRemainingItems = (U32)mRemainingInventoryItems.size();
 
 				LLStringUtil::format_map_t args;
-				args["NUM"] = llformat("%d", mRemainingItems);
+				args["NUM"] = fmt::to_string(mRemainingItems);
 				mStatusText->setText(getString("ItemsRemaining", args));
 
 				mStartBtn->setEnabled(FALSE);
@@ -304,7 +304,7 @@ void LLFloaterLinkReplace::decreaseOpenItemCount()
 	else
 	{
 		LLStringUtil::format_map_t args;
-		args["NUM"] = llformat("%d", mRemainingItems);
+		args["NUM"] = fmt::to_string(mRemainingItems);
 		mStatusText->setText(getString("ItemsRemaining", args));
 		LL_DEBUGS() << "Inventory link replace: " << mRemainingItems << " links remaining..." << LL_ENDL;
 	}

@@ -803,8 +803,8 @@ void LLFloaterModelPreview::draw()
 		}
 	}
 
-	childSetTextArg("prim_cost", "[PRIM_COST]", llformat("%d", mModelPreview->mResourceCost));
-	childSetTextArg("description_label", "[TEXTURES]", llformat("%d", mModelPreview->mTextureSet.size()));
+	childSetTextArg("prim_cost", "[PRIM_COST]", fmt::to_string(mModelPreview->mResourceCost));
+	childSetTextArg("description_label", "[TEXTURES]", fmt::to_string(mModelPreview->mTextureSet.size()));
 
     if (!isMinimized() && mModelPreview->lodsReady())
 	{
@@ -1348,8 +1348,8 @@ void LLFloaterModelPreview::clearAvatarTab()
 	}
 
     LLTextBox *joint_total_descr = panel->getChild<LLTextBox>("conflicts_description");
-    joint_total_descr->setTextArg("[CONFLICTS]", llformat("%d", 0));
-    joint_total_descr->setTextArg("[JOINTS_COUNT]", llformat("%d", 0));
+    joint_total_descr->setTextArg("[CONFLICTS]", fmt::to_string(0));
+    joint_total_descr->setTextArg("[JOINTS_COUNT]", fmt::to_string(0));
 
 
     LLTextBox *joint_pos_descr = panel->getChild<LLTextBox>("pos_overrides_descr");
@@ -1487,8 +1487,8 @@ void LLFloaterModelPreview::updateAvatarTab(bool highlight_overrides)
 	}
 
         LLTextBox *joint_conf_descr = panel->getChild<LLTextBox>("conflicts_description");
-        joint_conf_descr->setTextArg("[CONFLICTS]", llformat("%d", conflicts));
-        joint_conf_descr->setTextArg("[JOINTS_COUNT]", llformat("%d", mJointOverrides[display_lod].size()));
+        joint_conf_descr->setTextArg("[CONFLICTS]", fmt::to_string(conflicts));
+        joint_conf_descr->setTextArg("[JOINTS_COUNT]", fmt::to_string(mJointOverrides[display_lod].size()));
 		}
 	}
 
@@ -1793,21 +1793,21 @@ void LLFloaterModelPreview::handleModelPhysicsFeeReceived()
 	childSetTextArg("download_weight", "[ST]", llformat("%0.3f", result["model_streaming_cost"].asReal()));
 	childSetTextArg("server_weight", "[SIM]", llformat("%0.3f", result["simulation_cost"].asReal()));
 	childSetTextArg("physics_weight", "[PH]", llformat("%0.3f", result["physics_cost"].asReal()));
-	childSetTextArg("upload_fee", "[FEE]", llformat("%d", result["upload_price"].asInteger()));
-	childSetTextArg("price_breakdown", "[STREAMING]", llformat("%d", result["upload_price_breakdown"]["mesh_streaming"].asInteger()));
-	childSetTextArg("price_breakdown", "[PHYSICS]", llformat("%d", result["upload_price_breakdown"]["mesh_physics"].asInteger()));
-	childSetTextArg("price_breakdown", "[INSTANCES]", llformat("%d", result["upload_price_breakdown"]["mesh_instance"].asInteger()));
-	childSetTextArg("price_breakdown", "[TEXTURES]", llformat("%d", result["upload_price_breakdown"]["texture"].asInteger()));
-	childSetTextArg("price_breakdown", "[MODEL]", llformat("%d", result["upload_price_breakdown"]["model"].asInteger()));
+	childSetTextArg("upload_fee", "[FEE]", fmt::to_string(result["upload_price"].asInteger()));
+	childSetTextArg("price_breakdown", "[STREAMING]", fmt::to_string(result["upload_price_breakdown"]["mesh_streaming"].asInteger()));
+	childSetTextArg("price_breakdown", "[PHYSICS]", fmt::to_string(result["upload_price_breakdown"]["mesh_physics"].asInteger()));
+	childSetTextArg("price_breakdown", "[INSTANCES]", fmt::to_string(result["upload_price_breakdown"]["mesh_instance"].asInteger()));
+	childSetTextArg("price_breakdown", "[TEXTURES]", fmt::to_string(result["upload_price_breakdown"]["texture"].asInteger()));
+	childSetTextArg("price_breakdown", "[MODEL]", fmt::to_string(result["upload_price_breakdown"]["model"].asInteger()));
 
 	childSetTextArg("physics_breakdown", "[PCH]", llformat("%0.3f", result["model_physics_cost"]["hull"].asReal()));
 	childSetTextArg("physics_breakdown", "[PM]", llformat("%0.3f", result["model_physics_cost"]["mesh"].asReal()));
 	childSetTextArg("physics_breakdown", "[PHU]", llformat("%0.3f", result["model_physics_cost"]["decomposition"].asReal()));
-	childSetTextArg("streaming_breakdown", "[STR_TOTAL]", llformat("%d", result["streaming_cost"].asInteger()));
-	childSetTextArg("streaming_breakdown", "[STR_HIGH]", llformat("%d", result["streaming_params"]["high_lod"].asInteger()));
-	childSetTextArg("streaming_breakdown", "[STR_MED]", llformat("%d", result["streaming_params"]["medium_lod"].asInteger()));
-	childSetTextArg("streaming_breakdown", "[STR_LOW]", llformat("%d", result["streaming_params"]["low_lod"].asInteger()));
-	childSetTextArg("streaming_breakdown", "[STR_LOWEST]", llformat("%d", result["streaming_params"]["lowest_lod"].asInteger()));
+	childSetTextArg("streaming_breakdown", "[STR_TOTAL]", fmt::to_string(result["streaming_cost"].asInteger()));
+	childSetTextArg("streaming_breakdown", "[STR_HIGH]", fmt::to_string(result["streaming_params"]["high_lod"].asInteger()));
+	childSetTextArg("streaming_breakdown", "[STR_MED]", fmt::to_string(result["streaming_params"]["medium_lod"].asInteger()));
+	childSetTextArg("streaming_breakdown", "[STR_LOW]", fmt::to_string(result["streaming_params"]["low_lod"].asInteger()));
+	childSetTextArg("streaming_breakdown", "[STR_LOWEST]", fmt::to_string(result["streaming_params"]["lowest_lod"].asInteger()));
 
 	childSetVisible("upload_fee", true);
 	childSetVisible("price_breakdown", true);
@@ -1826,7 +1826,7 @@ void LLFloaterModelPreview::setModelPhysicsFeeErrorStatus(S32 status, const std:
     if (result.has("upload_price"))
     {
         mModelPhysicsFee = result;
-        childSetTextArg("upload_fee", "[FEE]", llformat("%d", result["upload_price"].asInteger()));
+        childSetTextArg("upload_fee", "[FEE]", fmt::to_string(result["upload_price"].asInteger()));
         childSetVisible("upload_fee", true);
     }
     else

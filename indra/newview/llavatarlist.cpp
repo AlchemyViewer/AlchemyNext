@@ -682,7 +682,7 @@ void LLAvalineListItem::setName(const std::string& name)
 			LL_DEBUGS("Avaline") << "Set name for new avaline caller: " << uuid << ", order: " << order << LL_ENDL;
 		}
 		LLStringUtil::format_map_t args;
-		args["[ORDER]"] = llformat("%u", mAvalineCallersNums[uuid]);
+		args["[ORDER]"] = fmt::to_string(mAvalineCallersNums[uuid]);
 		std::string hidden_name = LLTrans::getString("AvalineCaller", args);
 
 		LL_DEBUGS("Avaline") << "Avaline caller: " << uuid << ", name: " << hidden_name << LL_ENDL;

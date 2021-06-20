@@ -239,7 +239,7 @@ namespace
 	};
 
 	LLSD::String ImplInteger::asString() const
-		{ return llformat("%d", mValue); }
+		{ return fmt::to_string(mValue); }
 
 
 	class ImplReal

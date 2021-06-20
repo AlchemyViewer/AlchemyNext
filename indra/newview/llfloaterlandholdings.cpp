@@ -84,7 +84,7 @@ BOOL LLFloaterLandHoldings::postBuild()
 		element["columns"][0]["font"] = "SANSSERIF";
 
 		LLUIString areastr = getString("area_string");
-		areastr.setArg("[AREA]", llformat("%d", gAgent.mGroups.at(i).mContribution));
+		areastr.setArg("[AREA]", fmt::to_string(gAgent.mGroups.at(i).mContribution));
 		element["columns"][1]["column"] = "area";
 		element["columns"][1]["value"] = areastr;
 		element["columns"][1]["font"] = "SANSSERIF";
@@ -217,7 +217,7 @@ void LLFloaterLandHoldings::processPlacesReply(LLMessageSystem* msg, void**)
 			std::string area;
 			if(billable_area == actual_area)
 			{
-				area = llformat("%d", billable_area);
+				area = fmt::to_string(billable_area);
 			}
 			else
 			{
@@ -326,7 +326,7 @@ void LLFloaterLandHoldings::refreshAggregates()
 	S32 current_area = gStatusBar->getSquareMetersCommitted();
 	S32 available_area = gStatusBar->getSquareMetersLeft();
 
-	getChild<LLUICtrl>("allowed_text")->setTextArg("[AREA]", llformat("%d",allowed_area));
-	getChild<LLUICtrl>("current_text")->setTextArg("[AREA]", llformat("%d",current_area));
-	getChild<LLUICtrl>("available_text")->setTextArg("[AREA]", llformat("%d",available_area));
+	getChild<LLUICtrl>("allowed_text")->setTextArg("[AREA]", fmt::to_string(allowed_area));
+	getChild<LLUICtrl>("current_text")->setTextArg("[AREA]", fmt::to_string(current_area));
+	getChild<LLUICtrl>("available_text")->setTextArg("[AREA]", fmt::to_string(available_area));
 }

@@ -446,7 +446,7 @@ void LLControlAvatar::updateDebugText()
             est_tris += volp->getEstTrianglesMax();
             est_streaming_tris += volp->getEstTrianglesStreamingCost();
             streaming_cost += volp->getStreamingCost();
-            lod_string += llformat("%d",volp->getLOD());
+            lod_string += fmt::to_string(volp->getLOD());
             if (volp && volp->mDrawable)
             {
                 bool is_animated_flag = volp->getExtendedMeshFlags() & LLExtendedMeshParams::ANIMATED_MESH_ENABLED_FLAG;

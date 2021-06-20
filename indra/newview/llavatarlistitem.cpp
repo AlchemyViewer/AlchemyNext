@@ -500,7 +500,7 @@ std::string LLAvatarListItem::formatSeconds(U32 secs)
 	}
 
 	LLStringUtil::format_map_t args;
-	args["[COUNT]"] = llformat("%u", count);
+	args["[COUNT]"] = fmt::to_string(count);
 	return getString(fmt, args);
 }
 

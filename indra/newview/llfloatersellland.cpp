@@ -273,7 +273,7 @@ void LLFloaterSellLandUI::refreshUI()
 	snapshot->setImageAssetID(mParcelSnapshot);
 
 	getChild<LLUICtrl>("info_parcel")->setValue(parcelp->getName());
-	getChild<LLUICtrl>("info_size")->setTextArg("[AREA]", llformat("%d", mParcelActualArea));
+	getChild<LLUICtrl>("info_size")->setTextArg("[AREA]", fmt::to_string(mParcelActualArea));
 
 	std::string price_str = getChild<LLUICtrl>("price")->getValue().asString();
 	bool valid_price = false;
@@ -478,8 +478,8 @@ void LLFloaterSellLandUI::doSellLand(void *userdata)
 	}
 
 	LLSD args;
-	args["LAND_SIZE"] = llformat("%d",area);
-	args["SALE_PRICE"] = llformat("%d",sale_price);
+	args["LAND_SIZE"] = fmt::to_string(area);
+	args["SALE_PRICE"] = fmt::to_string(sale_price);
 	args["NAME"] = authorizedBuyerName;
 
 	LLNotification::Params params("ConfirmLandSaleChange");

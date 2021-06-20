@@ -314,46 +314,46 @@ void LLFloaterTextureFetchDebugger::draw()
 {
 	//total number of fetched textures
 	{
-		getChild<LLUICtrl>("total_num_fetched_label")->setTextArg("[NUM]", llformat("%d", mDebugger->getNumFetchedTextures()));
+		getChild<LLUICtrl>("total_num_fetched_label")->setTextArg("[NUM]", fmt::to_string(mDebugger->getNumFetchedTextures()));
 	}
 
 	//total number of fetching requests
 	{
-		getChild<LLUICtrl>("total_num_fetching_requests_label")->setTextArg("[NUM]", llformat("%d", mDebugger->getNumFetchingRequests()));
+		getChild<LLUICtrl>("total_num_fetching_requests_label")->setTextArg("[NUM]", fmt::to_string(mDebugger->getNumFetchingRequests()));
 	}
 
 	//total number of cache hits
 	{
-		getChild<LLUICtrl>("total_num_cache_hits_label")->setTextArg("[NUM]", llformat("%d", mDebugger->getNumCacheHits()));
+		getChild<LLUICtrl>("total_num_cache_hits_label")->setTextArg("[NUM]", fmt::to_string(mDebugger->getNumCacheHits()));
 	}
 
 	//total number of visible textures
 	{
-		getChild<LLUICtrl>("total_num_visible_tex_label")->setTextArg("[NUM]", llformat("%d", mDebugger->getNumVisibleFetchedTextures()));
+		getChild<LLUICtrl>("total_num_visible_tex_label")->setTextArg("[NUM]", fmt::to_string(mDebugger->getNumVisibleFetchedTextures()));
 	}
 
 	//total number of visible texture fetching requests
 	{
-		getChild<LLUICtrl>("total_num_visible_tex_fetch_req_label")->setTextArg("[NUM]", llformat("%d", mDebugger->getNumVisibleFetchingRequests()));
+		getChild<LLUICtrl>("total_num_visible_tex_fetch_req_label")->setTextArg("[NUM]", fmt::to_string(mDebugger->getNumVisibleFetchingRequests()));
 	}
 
 	//total number of fetched data
 	{
-		getChild<LLUICtrl>("total_fetched_data_label")->setTextArg("[SIZE1]", llformat("%d", mDebugger->getFetchedData() >> 10));		
-		getChild<LLUICtrl>("total_fetched_data_label")->setTextArg("[SIZE2]", llformat("%d", mDebugger->getDecodedData() >> 10));
+		getChild<LLUICtrl>("total_fetched_data_label")->setTextArg("[SIZE1]", fmt::to_string(mDebugger->getFetchedData() >> 10));		
+		getChild<LLUICtrl>("total_fetched_data_label")->setTextArg("[SIZE2]", fmt::to_string(mDebugger->getDecodedData() >> 10));
 		getChild<LLUICtrl>("total_fetched_data_label")->setTextArg("[PIXEL]", llformat("%.3f", mDebugger->getFetchedPixels() / 1000000.f));
 	}
 
 	//total number of visible fetched data
 	{		
-		getChild<LLUICtrl>("total_fetched_vis_data_label")->setTextArg("[SIZE1]", llformat("%d", mDebugger->getVisibleFetchedData() >> 10));		
-		getChild<LLUICtrl>("total_fetched_vis_data_label")->setTextArg("[SIZE2]", llformat("%d", mDebugger->getVisibleDecodedData() >> 10));
+		getChild<LLUICtrl>("total_fetched_vis_data_label")->setTextArg("[SIZE1]", fmt::to_string(mDebugger->getVisibleFetchedData() >> 10));		
+		getChild<LLUICtrl>("total_fetched_vis_data_label")->setTextArg("[SIZE2]", fmt::to_string(mDebugger->getVisibleDecodedData() >> 10));
 	}
 
 	//total number of rendered fetched data
 	{
-		getChild<LLUICtrl>("total_fetched_rendered_data_label")->setTextArg("[SIZE1]", llformat("%d", mDebugger->getRenderedData() >> 10));		
-		getChild<LLUICtrl>("total_fetched_rendered_data_label")->setTextArg("[SIZE2]", llformat("%d", mDebugger->getRenderedDecodedData() >> 10));
+		getChild<LLUICtrl>("total_fetched_rendered_data_label")->setTextArg("[SIZE1]", fmt::to_string(mDebugger->getRenderedData() >> 10));		
+		getChild<LLUICtrl>("total_fetched_rendered_data_label")->setTextArg("[SIZE2]", fmt::to_string(mDebugger->getRenderedDecodedData() >> 10));
 		getChild<LLUICtrl>("total_fetched_rendered_data_label")->setTextArg("[PIXEL]", llformat("%.3f", mDebugger->getRenderedPixels() / 1000000.f));
 	}
 
@@ -422,7 +422,7 @@ void LLFloaterTextureFetchDebugger::draw()
 	else
 	{
 		getChild<LLUICtrl>("total_time_refetch_vis_cache_label")->setTextArg("[TIME]", llformat("%.3f", mDebugger->getRefetchVisCacheTime()));
-		getChild<LLUICtrl>("total_time_refetch_vis_cache_label")->setTextArg("[SIZE]", llformat("%d", mDebugger->getRefetchedVisData() >> 10));
+		getChild<LLUICtrl>("total_time_refetch_vis_cache_label")->setTextArg("[SIZE]", fmt::to_string(mDebugger->getRefetchedVisData() >> 10));
 		getChild<LLUICtrl>("total_time_refetch_vis_cache_label")->setTextArg("[PIXEL]", llformat("%.3f", mDebugger->getRefetchedVisPixels() / 1000000.f));
 	}
 
@@ -436,7 +436,7 @@ void LLFloaterTextureFetchDebugger::draw()
 	else
 	{
 		getChild<LLUICtrl>("total_time_refetch_all_cache_label")->setTextArg("[TIME]", llformat("%.3f", mDebugger->getRefetchAllCacheTime()));
-		getChild<LLUICtrl>("total_time_refetch_all_cache_label")->setTextArg("[SIZE]", llformat("%d", mDebugger->getRefetchedAllData() >> 10));
+		getChild<LLUICtrl>("total_time_refetch_all_cache_label")->setTextArg("[SIZE]", fmt::to_string(mDebugger->getRefetchedAllData() >> 10));
 		getChild<LLUICtrl>("total_time_refetch_all_cache_label")->setTextArg("[PIXEL]", llformat("%.3f", mDebugger->getRefetchedAllPixels() / 1000000.f));
 	}
 
@@ -450,7 +450,7 @@ void LLFloaterTextureFetchDebugger::draw()
 	else
 	{
 		getChild<LLUICtrl>("total_time_refetch_vis_http_label")->setTextArg("[TIME]", llformat("%.3f", mDebugger->getRefetchVisHTTPTime()));
-		getChild<LLUICtrl>("total_time_refetch_vis_http_label")->setTextArg("[SIZE]", llformat("%d", mDebugger->getRefetchedVisData() >> 10));
+		getChild<LLUICtrl>("total_time_refetch_vis_http_label")->setTextArg("[SIZE]", fmt::to_string(mDebugger->getRefetchedVisData() >> 10));
 		getChild<LLUICtrl>("total_time_refetch_vis_http_label")->setTextArg("[PIXEL]", llformat("%.3f", mDebugger->getRefetchedVisPixels() / 1000000.f));
 	}
 
@@ -464,7 +464,7 @@ void LLFloaterTextureFetchDebugger::draw()
 	else
 	{
 		getChild<LLUICtrl>("total_time_refetch_all_http_label")->setTextArg("[TIME]", llformat("%.3f", mDebugger->getRefetchAllHTTPTime()));
-		getChild<LLUICtrl>("total_time_refetch_all_http_label")->setTextArg("[SIZE]", llformat("%d", mDebugger->getRefetchedAllData() >> 10));
+		getChild<LLUICtrl>("total_time_refetch_all_http_label")->setTextArg("[SIZE]", fmt::to_string(mDebugger->getRefetchedAllData() >> 10));
 		getChild<LLUICtrl>("total_time_refetch_all_http_label")->setTextArg("[PIXEL]", llformat("%.3f", mDebugger->getRefetchedAllPixels() / 1000000.f));
 	}
 

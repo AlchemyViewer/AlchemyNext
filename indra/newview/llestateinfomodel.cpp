@@ -203,10 +203,10 @@ void LLEstateInfoModel::commitEstateInfoDataserver()
 	msg->addString("Parameter", getName());
 
 	msg->nextBlock("ParamList");
-	msg->addString("Parameter", llformat("%u", getFlags()));
+	msg->addString("Parameter", fmt::to_string(getFlags()));
 
 	msg->nextBlock("ParamList");
-	msg->addString("Parameter", llformat("%d", (S32) (getSunHour() * 1024.0f)));
+	msg->addString("Parameter", fmt::to_string((S32) (getSunHour() * 1024.0f)));
 
 	gAgent.sendMessage();
 }

@@ -261,7 +261,7 @@ void LLFloaterPay::processPayPriceReply(LLMessageSystem* msg, void **userdata)
 			self->getChildView("pay btn")->setEnabled(TRUE);
 			self->getChildView("amount text")->setVisible(TRUE);
 
-			self->getChild<LLUICtrl>("amount")->setValue(llformat("%d", llabs(price)));
+			self->getChild<LLUICtrl>("amount")->setValue(fmt::to_string(llabs(price)));
 		}
 
 		S32 num_blocks = msg->getNumberOfBlocksFast(_PREHASH_ButtonData);

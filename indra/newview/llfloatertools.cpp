@@ -1204,7 +1204,7 @@ void LLFloaterTools::updateLandImpacts()
 	if (show_mesh_cost)
 	{
 		LLStringUtil::format_map_t remaining_capacity_args;
-		remaining_capacity_args["LAND_CAPACITY"] = llformat("%d", total_capacity - rezzed_prims);
+		remaining_capacity_args["LAND_CAPACITY"] = fmt::to_string(total_capacity - rezzed_prims);
 		remaining_capacity_str = getString("status_remaining_capacity", remaining_capacity_args);
 	}
 

@@ -1400,14 +1400,14 @@ bool LLStringUtil::formatDatetime(std::string& replacement, std::string token,
 	{
 		struct tm * gmt = gmtime (&loc_seconds);
 		LLStringUtil::format_map_t args;
-		args["[MDAY]"] = llformat ("%d", gmt->tm_mday);
+		args["[MDAY]"] = fmt::to_string(gmt->tm_mday);
 		replacement = LLStringOps::sDayFormat;
 		LLStringUtil::format(replacement, args);
 	}
 	else if (code == "%-d")
 	{
 		struct tm * gmt = gmtime (&loc_seconds);
-		replacement = llformat ("%d", gmt->tm_mday); // day of the month without leading zero
+		replacement = fmt::to_string(gmt->tm_mday); // day of the month without leading zero
 	}
 	else if( !LLStringOps::sAM.empty() && !LLStringOps::sPM.empty() && code == "%p" )
 	{

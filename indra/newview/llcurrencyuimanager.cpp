@@ -460,7 +460,7 @@ void LLCurrencyUIManager::Impl::updateUI()
 			}
 			else
 			{
-				lindenAmount->setText(llformat("%d", mUserCurrencyBuy));
+				lindenAmount->setText(fmt::to_string(mUserCurrencyBuy));
 			}
 
 			lindenAmount->selectAll();
@@ -567,7 +567,7 @@ void LLCurrencyUIManager::buy(const std::string& buy_msg)
 	}
 
 	LLUIString msg = buy_msg;
-	msg.setArg("[LINDENS]", llformat("%d", impl.mUserCurrencyBuy));
+	msg.setArg("[LINDENS]", fmt::to_string(impl.mUserCurrencyBuy));
 	msg.setArg("[LOCALAMOUNT]", getLocalEstimate());
 	LLConfirmationManager::confirm(impl.mSiteConfirm,
 								   msg,
