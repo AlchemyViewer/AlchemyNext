@@ -1186,7 +1186,7 @@ void LLPanelGroupMembersSubTab::confirmEjectMembers()
 	else
 	{
 		LLSD args;
-		args["COUNT"] = llformat("%d", selection_count);
+		args["COUNT"] = fmt::to_string(selection_count);
 		LLSD payload;
 		LLNotificationsUtil::add("EjectGroupMembersWarning",
 				 	 	 	 	 args,
@@ -1718,7 +1718,7 @@ void LLPanelGroupMembersSubTab::addMemberToList(LLGroupMemberData* data)
 {
 	if (!data) return;
 	LLUIString donated = getString("donation_area");
-	donated.setArg("[AREA]", llformat("%d", data->getContribution()));
+	donated.setArg("[AREA]", fmt::to_string(data->getContribution()));
 
 	LLNameListCtrl::NameItem item_params;
 	item_params.value = data->getID();
@@ -1881,7 +1881,7 @@ void LLPanelGroupMembersSubTab::confirmBanMembers()
 	else
 	{
 		LLSD args;
-		args["COUNT"] = llformat("%d", selection_count);
+		args["COUNT"] = fmt::to_string(selection_count);
 		LLSD payload;
 		LLNotificationsUtil::add("BanGroupMembersWarning",
 				 	 	 	 	 args,
@@ -3265,8 +3265,8 @@ void LLPanelGroupBanListSubTab::onBanListCompleted(bool isComplete)
 void LLPanelGroupBanListSubTab::setBanCount(U32 ban_count)
 {
 	LLStringUtil::format_map_t args;
-	args["[COUNT]"] = llformat("%d", ban_count);
-	args["[LIMIT]"] = llformat("%d", GB_MAX_BANNED_AGENTS);
+	args["[COUNT]"] = fmt::to_string(ban_count);
+	args["[LIMIT]"] = fmt::to_string(GB_MAX_BANNED_AGENTS);
 	mBanCountText->setText(getString("ban_count_template", args));
 }
 

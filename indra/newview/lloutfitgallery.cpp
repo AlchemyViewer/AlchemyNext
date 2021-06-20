@@ -1201,8 +1201,8 @@ void LLOutfitGallery::uploadOutfitImage(const std::vector<std::string>& filename
 		if ((image_info.getWidth() > max_width) || (image_info.getHeight() > max_height))
 		{
 			LLStringUtil::format_map_t args;
-			args["WIDTH"] = llformat("%d", max_width);
-			args["HEIGHT"] = llformat("%d", max_height);
+			args["WIDTH"] = fmt::to_string(max_width);
+			args["HEIGHT"] = fmt::to_string(max_height);
 
 			image_load_error = LLTrans::getString("outfit_photo_load_dimensions_error", args);
 		}
@@ -1319,8 +1319,8 @@ void LLOutfitGallery::onTexturePickerCommit(LLTextureCtrl::ETexturePickOp op, LL
         if ((width > max_width) || (height > max_height))
         {
             LLStringUtil::format_map_t args;
-            args["WIDTH"] = llformat("%d", max_width);
-            args["HEIGHT"] = llformat("%d", max_height);
+            args["WIDTH"] = fmt::to_string(max_width);
+            args["HEIGHT"] = fmt::to_string(max_height);
 
             image_load_error = LLTrans::getString("outfit_photo_select_dimensions_error", args);
         }

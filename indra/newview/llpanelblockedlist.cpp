@@ -143,8 +143,8 @@ void LLPanelBlockedList::updateButtons()
 	getChildView("unblock_btn")->setEnabled(hasSelected);
 	getChildView("blocked_gear_btn")->setEnabled(hasSelected);
 
-	getChild<LLUICtrl>("block_limit")->setTextArg("[COUNT]", llformat("%d", mBlockedList->getMuteListSize()));
-	getChild<LLUICtrl>("block_limit")->setTextArg("[LIMIT]", llformat("%d", gSavedSettings.getS32("MuteListLimit")));
+	getChild<LLUICtrl>("block_limit")->setTextArg("[COUNT]", fmt::to_string(mBlockedList->getMuteListSize()));
+	getChild<LLUICtrl>("block_limit")->setTextArg("[LIMIT]", fmt::to_string(gSavedSettings.getS32("MuteListLimit")));
 }
 
 void LLPanelBlockedList::unblockItem()

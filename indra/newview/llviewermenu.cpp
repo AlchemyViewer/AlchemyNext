@@ -3914,12 +3914,12 @@ void set_god_level(U8 god_level)
         LLSD args;
 	if(god_level > GOD_NOT)
 	{
-		args["LEVEL"] = llformat("%d",(S32)god_level);
+		args["LEVEL"] = fmt::to_string((S32)god_level);
 		LLNotificationsUtil::add("EnteringGodMode", args);
 	}
 	else
 	{
-		args["LEVEL"] = llformat("%d",(S32)old_god_level);
+		args["LEVEL"] = fmt::to_string((S32)old_god_level);
 		LLNotificationsUtil::add("LeavingGodMode", args);
 	}
 
@@ -5054,7 +5054,7 @@ void handle_buy_or_take()
 		else
 		{
 			LLStringUtil::format_map_t args;
-			args["AMOUNT"] = llformat("%d", total_price);
+			args["AMOUNT"] = fmt::to_string(total_price);
 			LLBuyCurrencyHTML::openCurrencyFloater( LLTrans::getString( "BuyingCosts", args ), total_price );
 		}
 	}
@@ -5198,7 +5198,7 @@ void handle_buy()
 	if (price > 0 && price > gStatusBar->getBalance())
 	{
 		LLStringUtil::format_map_t args;
-		args["AMOUNT"] = llformat("%d", price);
+		args["AMOUNT"] = fmt::to_string(price);
 		LLBuyCurrencyHTML::openCurrencyFloater( LLTrans::getString("this_object_costs", args), price );
 		return;
 	}

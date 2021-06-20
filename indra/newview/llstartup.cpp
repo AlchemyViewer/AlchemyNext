@@ -1398,7 +1398,7 @@ bool idle_startup()
 			if (num_retries > 0)
 			{
 				LLStringUtil::format_map_t args;
-				args["[NUMBER]"] = llformat("%d", num_retries + 1);
+				args["[NUMBER]"] = fmt::to_string(num_retries + 1);
 				set_startup_status(0.4f, LLTrans::getString("LoginRetrySeedCapGrant", args), gAgent.mMOTD.c_str());
 			}
 			else

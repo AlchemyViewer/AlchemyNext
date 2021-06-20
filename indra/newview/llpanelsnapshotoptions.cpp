@@ -90,7 +90,7 @@ void LLPanelSnapshotOptions::onOpen(const LLSD& key)
 void LLPanelSnapshotOptions::updateUploadCost()
 {
 	S32 upload_cost = LLAgentBenefitsMgr::current().getTextureUploadCost();
-	getChild<LLUICtrl>("save_to_inventory_btn")->setLabelArg("[AMOUNT]", llformat("%d", upload_cost));
+	getChild<LLUICtrl>("save_to_inventory_btn")->setLabelArg("[AMOUNT]", fmt::to_string(upload_cost));
 }
 
 void LLPanelSnapshotOptions::openPanel(const std::string& panel_name)

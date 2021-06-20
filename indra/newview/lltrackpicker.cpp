@@ -86,7 +86,7 @@ void LLFloaterTrackPicker::showPicker(const LLSD &args)
     {
         S32 track_id = (*iter)["id"].asInteger();
         bool can_enable = (*iter)["enabled"].asBoolean();
-        LLCheckBoxCtrl *view = getChild<LLCheckBoxCtrl>(RDO_TRACK_PREFIX + llformat("%d", track_id), true);
+        LLCheckBoxCtrl *view = getChild<LLCheckBoxCtrl>(RDO_TRACK_PREFIX + fmt::to_string(track_id), true);
         view->setEnabled(can_enable);
         view->setLabelArg("[ALT]", (*iter).has("altitude") ? ((*iter)["altitude"].asString() + "m") : " ");
 

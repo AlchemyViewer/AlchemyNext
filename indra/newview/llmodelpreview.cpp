@@ -1876,7 +1876,7 @@ void LLModelPreview::updateStatusMessages()
         degenerateIcon->setImage(img);
     }
 
-    mFMP->childSetTextArg("submeshes_info", "[SUBMESHES]", llformat("%d", total_submeshes[LLModel::LOD_HIGH]));
+    mFMP->childSetTextArg("submeshes_info", "[SUBMESHES]", fmt::to_string(total_submeshes[LLModel::LOD_HIGH]));
 
     std::string mesh_status_na = mFMP->getString("mesh_status_na");
 
@@ -1895,8 +1895,8 @@ void LLModelPreview::updateStatusMessages()
 
         if (total_tris[lod] > 0)
         {
-            mFMP->childSetValue(lod_triangles_name[lod], llformat("%d", total_tris[lod]));
-            mFMP->childSetValue(lod_vertices_name[lod], llformat("%d", total_verts[lod]));
+            mFMP->childSetValue(lod_triangles_name[lod], fmt::to_string(total_tris[lod]));
+            mFMP->childSetValue(lod_vertices_name[lod], fmt::to_string(total_verts[lod]));
         }
         else
         {
@@ -2104,7 +2104,7 @@ void LLModelPreview::updateStatusMessages()
 
     if (phys_tris > 0)
     {
-        mFMP->childSetTextArg("physics_triangles", "[TRIANGLES]", llformat("%d", phys_tris));
+        mFMP->childSetTextArg("physics_triangles", "[TRIANGLES]", fmt::to_string(phys_tris));
     }
     else
     {
@@ -2113,8 +2113,8 @@ void LLModelPreview::updateStatusMessages()
 
     if (phys_hulls > 0)
     {
-        mFMP->childSetTextArg("physics_hulls", "[HULLS]", llformat("%d", phys_hulls));
-        mFMP->childSetTextArg("physics_points", "[POINTS]", llformat("%d", phys_points));
+        mFMP->childSetTextArg("physics_hulls", "[HULLS]", fmt::to_string(phys_hulls));
+        mFMP->childSetTextArg("physics_points", "[POINTS]", fmt::to_string(phys_points));
     }
     else
     {

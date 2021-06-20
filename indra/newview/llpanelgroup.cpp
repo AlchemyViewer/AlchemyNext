@@ -321,7 +321,7 @@ void LLPanelGroup::update(LLGroupChange gc)
 			std::string fee_buff;
 			if(gdatap->mMembershipFee)
 			{
-				string_args["[AMOUNT]"] = llformat("%d", gdatap->mMembershipFee);
+				string_args["[AMOUNT]"] = fmt::to_string(gdatap->mMembershipFee);
 				fee_buff = getString("group_join_btn", string_args);
 				
 			}

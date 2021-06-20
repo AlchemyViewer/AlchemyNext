@@ -445,8 +445,8 @@ void LLAvatarTexBar::draw()
 	
 	LLColor4 header_color(1.f, 1.f, 1.f, 0.9f);
 
-	const std::string texture_timeout_str = texture_timeout ? llformat("%d",texture_timeout) : "Disabled";
-	const std::string override_tex_discard_level_str = override_tex_discard_level ? llformat("%d",override_tex_discard_level) : "Disabled";
+	const std::string texture_timeout_str = texture_timeout ? fmt::to_string(texture_timeout) : "Disabled";
+	const std::string override_tex_discard_level_str = override_tex_discard_level ? fmt::to_string(override_tex_discard_level) : "Disabled";
 	std::string header_text = llformat("[ Timeout('AvatarBakedTextureUploadTimeout'):%s ] [ LOD_Override('TextureDiscardLevel'):%s ]", texture_timeout_str.c_str(), override_tex_discard_level_str.c_str());
 	LLFontGL::getFontMonospace()->renderUTF8(header_text, 0, l_offset, v_offset + line_height*line_num,
 											 header_color, LLFontGL::LEFT, LLFontGL::TOP); //, LLFontGL::BOLD, LLFontGL::DROP_SHADOW_SOFT);
@@ -727,11 +727,11 @@ void LLGLTexSizeBar::draw()
 		LLColor4 text_color(1.f, 1.f, 1.f, 0.75f);	
 		std::string text;
 	
-		text = llformat("%d", mTopLoaded) ;
+		text = fmt::to_string(mTopLoaded) ;
 		LLFontGL::getFontMonospace()->renderUTF8(text, 0, mLeft, mBottom + (S32)(mTopLoaded * mScale) + mLineHeight,
 									 text_color, LLFontGL::LEFT, LLFontGL::TOP);
 
-		text = llformat("%d", mTopBound) ;
+		text = fmt::to_string(mTopBound) ;
 		LLFontGL::getFontMonospace()->renderUTF8(text, 0, (mLeft + mRight) / 2, mBottom + (S32)(mTopBound * mScale) + mLineHeight,
 									 text_color, LLFontGL::LEFT, LLFontGL::TOP);
 	}

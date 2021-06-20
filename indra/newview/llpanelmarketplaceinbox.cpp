@@ -243,7 +243,7 @@ std::string LLPanelMarketplaceInbox::getBadgeString() const
 
 		if (item_count)
 		{
-			item_count_str = llformat("%d", item_count);
+			item_count_str = fmt::to_string(item_count);
 		}
 	}
 
@@ -258,7 +258,7 @@ void LLPanelMarketplaceInbox::draw()
 
 	if (item_count > 0)
 	{
-		std::string item_count_str = llformat("%d", item_count);
+		std::string item_count_str = fmt::to_string(item_count);
 
 		LLStringUtil::format_map_t args;
 		args["[NUM]"] = item_count_str;
@@ -270,7 +270,7 @@ void LLPanelMarketplaceInbox::draw()
 
 		if (fresh_item_count > 0)
 		{
-			mFreshCountCtrl->setTextArg("[NUM]", llformat("%d", fresh_item_count));
+			mFreshCountCtrl->setTextArg("[NUM]", fmt::to_string(fresh_item_count));
 		}
 	}
 	else

@@ -745,12 +745,12 @@ void LLSidepanelItemInfo::refreshFromItem(LLViewerInventoryItem* item)
 	{
 		S32 numerical_price;
 		numerical_price = sale_info.getSalePrice();
-		edit_cost->setValue(llformat("%d",numerical_price));
+		edit_cost->setValue(fmt::to_string(numerical_price));
 		combo_sale_type->setValue(sale_info.getSaleType());
 	}
 	else
 	{
-		edit_cost->setValue(llformat("%d",0));
+		edit_cost->setValue(fmt::to_string(0));
 		combo_sale_type->setValue(LLSaleInfo::FS_COPY);
 	}
 }

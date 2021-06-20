@@ -886,8 +886,8 @@ void LLPanelPeople::updateButtons()
 		U32 groups_count = gAgent.mGroups.size();
 		S32 max_groups = LLAgentBenefitsMgr::current().getGroupMembershipLimit();
 		U32 groups_remaining = max_groups > groups_count ? max_groups - groups_count : 0;
-		groups_panel->getChild<LLUICtrl>("groupcount")->setTextArg("[COUNT]", llformat("%d", groups_count));
-		groups_panel->getChild<LLUICtrl>("groupcount")->setTextArg("[REMAINING]", llformat("%d", groups_remaining));
+		groups_panel->getChild<LLUICtrl>("groupcount")->setTextArg("[COUNT]", fmt::to_string(groups_count));
+		groups_panel->getChild<LLUICtrl>("groupcount")->setTextArg("[REMAINING]", fmt::to_string(groups_remaining));
 	}
 	else
 	{

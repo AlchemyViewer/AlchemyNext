@@ -919,7 +919,7 @@ void LLMarketplaceData::getSingleListingCoro(S32 listingId, LLUUID folderId)
     httpHeaders->append("Accept", "application/json");
     httpHeaders->append("Content-Type", "application/json");
 
-    std::string url = getSLMConnectURL("/listing/") + llformat("%d", listingId);
+    std::string url = getSLMConnectURL("/listing/") + fmt::to_string(listingId);
 
     LLSD result = httpAdapter->getJsonAndSuspend(httpRequest, url, httpHeaders);
 
@@ -1063,7 +1063,7 @@ void LLMarketplaceData::updateSLMListingCoro(LLUUID folderId, S32 listingId, LLU
     LLSD postData;
     postData["listing"] = listing;
 
-    std::string url = getSLMConnectURL("/listing/") + llformat("%d", listingId);
+    std::string url = getSLMConnectURL("/listing/") + fmt::to_string(listingId);
     LLSD result = httpAdapter->putJsonAndSuspend(httpRequest, url, postData, httpHeaders);
 
     setUpdating(folderId, false);
@@ -1141,7 +1141,7 @@ void LLMarketplaceData::associateSLMListingCoro(LLUUID folderId, S32 listingId, 
     postData["listing"] = listing;
 
     // Send request
-    std::string url = getSLMConnectURL("/associate_inventory/") + llformat("%d", listingId);
+    std::string url = getSLMConnectURL("/associate_inventory/") + fmt::to_string(listingId);
 
     LLSD result = httpAdapter->putJsonAndSuspend(httpRequest, url, postData, httpHeaders);
 
@@ -1209,7 +1209,7 @@ void LLMarketplaceData::deleteSLMListingCoro(S32 listingId)
     httpHeaders->append("Accept", "application/json");
     httpHeaders->append("Content-Type", "application/json");
 
-    std::string url = getSLMConnectURL("/listing/") + llformat("%d", listingId);
+    std::string url = getSLMConnectURL("/listing/") + fmt::to_string(listingId);
     LLUUID folderId = getListingFolder(listingId);
 
     setUpdating(folderId, true);

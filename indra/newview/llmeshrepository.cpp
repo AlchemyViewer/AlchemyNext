@@ -5337,7 +5337,7 @@ void on_new_single_inventory_upload_complete(
         LLStatusBar::sendMoneyBalanceRequest();
 
         LLSD args;
-        args["AMOUNT"] = llformat("%d", upload_price);
+        args["AMOUNT"] = fmt::to_string(upload_price);
         LLNotificationsUtil::add("UploadPayment", args);
     }
 

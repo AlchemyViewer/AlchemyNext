@@ -107,7 +107,7 @@ void LLPanelGroupCreate::onOpen(const LLSD& key)
     addMembershipRow("Internal");// Present only if you are already in one, needed for testing
 
     S32 cost = LLAgentBenefitsMgr::current().getCreateGroupCost();
-    mCreateButton->setLabelArg("[COST]", llformat("%d", cost));
+    mCreateButton->setLabelArg("[COST]", fmt::to_string(cost));
 }
 
 //static

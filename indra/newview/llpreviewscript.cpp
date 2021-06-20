@@ -704,8 +704,8 @@ void LLScriptEdCore::draw()
 		mEditor->getCurrentLineAndColumn( &line, &column, FALSE );  // don't include wordwrap
 		LLStringUtil::format_map_t args;
 		std::string cursor_pos;
-		args["[LINE]"] = llformat ("%d", line);
-		args["[COLUMN]"] = llformat ("%d", column);
+		args["[LINE]"] = fmt::to_string(line);
+		args["[COLUMN]"] = fmt::to_string(column);
 		cursor_pos = LLTrans::getString("CursorPos", args);
 		getChild<LLUICtrl>("line_col")->setValue(cursor_pos);
 	}

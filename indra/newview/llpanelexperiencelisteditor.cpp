@@ -253,8 +253,8 @@ void LLPanelExperienceListEditor::refreshExperienceCounter()
 	if(mMaxExperienceIDs > 0)
 	{
 		LLStringUtil::format_map_t args;
-		args["[EXPERIENCES]"] = llformat("%d", mItems->getItemCount());
-		args["[MAXEXPERIENCES]"] = llformat("%d", mMaxExperienceIDs);
+		args["[EXPERIENCES]"] = fmt::to_string(mItems->getItemCount());
+		args["[MAXEXPERIENCES]"] = fmt::to_string(mMaxExperienceIDs);
 		getChild<LLTextBox>("text_count")->setText(LLTrans::getString("ExperiencesCounter", args));
 	}
 }

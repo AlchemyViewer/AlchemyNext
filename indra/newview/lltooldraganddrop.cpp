@@ -2230,7 +2230,7 @@ EAcceptance LLToolDragAndDrop::dad3dWearCategory(
 	if (items.size() > max_items)
 	{
 		LLStringUtil::format_map_t args;
-		args["AMOUNT"] = llformat("%d", max_items);
+		args["AMOUNT"] = fmt::to_string(max_items);
 		mCustomMsg = LLTrans::getString("TooltipTooManyWearables",args);
 		return ACCEPT_NO_CUSTOM;
 	}

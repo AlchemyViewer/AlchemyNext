@@ -650,7 +650,7 @@ void LLPanelPlaceProfile::onForSaleBannerClick()
 			if(price - gStatusBar->getBalance() > 0)
 			{
 				LLStringUtil::format_map_t args;
-				args["AMOUNT"] = llformat("%d", price);
+				args["AMOUNT"] = fmt::to_string(price);
 				LLBuyCurrencyHTML::openCurrencyFloater( LLTrans::getString("buying_selected_land", args), price );
 			}
 			else

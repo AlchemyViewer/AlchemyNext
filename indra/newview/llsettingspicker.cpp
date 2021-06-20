@@ -330,7 +330,7 @@ void LLFloaterSettingsPicker::onAssetLoaded(LLUUID asset_id, LLSettingsBase::ptr
         {
             if (!pday->isTrackEmpty(i))
             {
-                formatted_label.setArg("[NUM]", llformat("%d", i));
+                formatted_label.setArg("[NUM]", fmt::to_string(i));
                 track_selection->add(formatted_label.getString(), LLSD::Integer(i), ADD_TOP, true);
             }
         }

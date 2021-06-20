@@ -347,7 +347,7 @@ void LLGroupInviteNotificationListItem::onClickInfoBtn()
 void LLGroupInviteNotificationListItem::setFee(S32 fee)
 {
     LLStringUtil::format_map_t string_args;
-    string_args["[GROUP_FEE]"] = llformat("%d", fee);
+    string_args["[GROUP_FEE]"] = fmt::to_string(fee);
     std::string fee_text = getString("group_fee_text", string_args);
     mSenderOrFeeBox->setValue(fee_text);
     mSenderOrFeeBoxExp->setValue(fee_text);

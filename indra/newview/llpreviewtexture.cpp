@@ -491,8 +491,8 @@ void LLPreviewTexture::updateDimensions()
 
 
 	// Update the width/height display every time
-	getChild<LLUICtrl>("dimensions")->setTextArg("[WIDTH]",  llformat("%d", img_width));
-	getChild<LLUICtrl>("dimensions")->setTextArg("[HEIGHT]", llformat("%d", img_height));
+	getChild<LLUICtrl>("dimensions")->setTextArg("[WIDTH]", fmt::to_string(img_width));
+	getChild<LLUICtrl>("dimensions")->setTextArg("[HEIGHT]", fmt::to_string(img_height));
 
 	mLastHeight = img_height;
 	mLastWidth = img_width;

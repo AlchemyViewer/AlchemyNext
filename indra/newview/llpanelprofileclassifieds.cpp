@@ -726,7 +726,7 @@ void LLPanelProfileClassified::processProperties(void* data, EAvatarProcessorTyp
         mAutoRenewEdit->setValue(auto_renew);
 
         static LLUIString  price_str = getString("l$_price");
-        price_str.setArg("[PRICE]", llformat("%d", c_info->price_for_listing));
+        price_str.setArg("[PRICE]", fmt::to_string(c_info->price_for_listing));
         mPriceText->setValue(LLSD(price_str));
 
         static std::string date_fmt = getString("date_fmt");
@@ -1030,17 +1030,17 @@ void LLPanelProfileClassified::setClickThrough(
 
         static LLUIString ct_str = self->getString("click_through_text_fmt");
 
-        ct_str.setArg("[TELEPORT]", llformat("%d", self->mTeleportClicksNew + self->mTeleportClicksOld));
-        ct_str.setArg("[MAP]",      llformat("%d", self->mMapClicksNew + self->mMapClicksOld));
-        ct_str.setArg("[PROFILE]",  llformat("%d", self->mProfileClicksNew + self->mProfileClicksOld));
+        ct_str.setArg("[TELEPORT]", fmt::to_string(self->mTeleportClicksNew + self->mTeleportClicksOld));
+        ct_str.setArg("[MAP]",      fmt::to_string(self->mMapClicksNew + self->mMapClicksOld));
+        ct_str.setArg("[PROFILE]",  fmt::to_string(self->mProfileClicksNew + self->mProfileClicksOld));
 
         self->getChild<LLUICtrl>("click_through_text")->setValue(ct_str.getString());
         // *HACK: remove this when there is enough room for click stats in the info panel
         self->getChildView("click_through_text")->setToolTip(ct_str.getString());
 
-        LL_INFOS() << "teleport: " << llformat("%d", self->mTeleportClicksNew + self->mTeleportClicksOld)
-                << ", map: "    << llformat("%d", self->mMapClicksNew + self->mMapClicksOld)
-                << ", profile: " << llformat("%d", self->mProfileClicksNew + self->mProfileClicksOld)
+        LL_INFOS() << "teleport: " << fmt::to_string(self->mTeleportClicksNew + self->mTeleportClicksOld)
+                << ", map: "    << fmt::to_string(self->mMapClicksNew + self->mMapClicksOld)
+                << ", profile: " << fmt::to_string(self->mProfileClicksNew + self->mProfileClicksOld)
                 << LL_ENDL;
     }
 }

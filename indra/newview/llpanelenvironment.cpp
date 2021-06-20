@@ -512,7 +512,7 @@ bool LLPanelEnvironmentInfo::setControlsEnabled(bool enabled)
 
     for (U32 idx = 0; idx < ALTITUDE_MARKERS_COUNT; idx++)
     {
-        LLUICtrl* marker = findChild<LLUICtrl>(slider_marker_base + llformat("%u", idx));
+        LLUICtrl* marker = findChild<LLUICtrl>(slider_marker_base + fmt::to_string(idx));
         if (marker)
         {
             static LLColor4 marker_color(0.75f, 0.75f, 0.75f, 1.f);

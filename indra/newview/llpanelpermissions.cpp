@@ -650,7 +650,7 @@ void LLPanelPermissions::refresh()
 		
 		// Don't show a price if none of the items are for sale.
 		if (num_for_sale)
-			getChild<LLUICtrl>("Edit Cost")->setValue(llformat("%d",total_sale_price));
+			getChild<LLUICtrl>("Edit Cost")->setValue(fmt::to_string(total_sale_price));
 		else
 			getChild<LLUICtrl>("Edit Cost")->setValue(LLStringUtil::null);
 

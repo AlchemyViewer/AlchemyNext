@@ -221,15 +221,15 @@ void LLPanelLandInfo::refresh()
 								   &dwell);
 		if(is_public || (is_for_sale && LLViewerParcelMgr::getInstance()->getParcelSelection()->getWholeParcelSelected()))
 		{
-			mTextAreaPrice->setTextArg("[PRICE]", llformat("%d",claim_price));
-			mTextAreaPrice->setTextArg("[AREA]", llformat("%d",area));
+			mTextAreaPrice->setTextArg("[PRICE]", fmt::to_string(claim_price));
+			mTextAreaPrice->setTextArg("[AREA]", fmt::to_string(area));
 			mTextAreaPrice->setVisible(true);
 			mTextArea->setVisible(false);
 		}
 		else
 		{
 			mTextAreaPrice->setVisible(false);
-			mTextArea->setTextArg("[AREA]", llformat("%d",area));
+			mTextArea->setTextArg("[AREA]", fmt::to_string(area));
 			mTextArea->setVisible(true);
 		}
 	}

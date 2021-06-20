@@ -776,7 +776,7 @@ void LLViewerAssetUpload::AssetInventoryUploadCoproc(LLCoreHttpUtil::HttpCorouti
             LLStatusBar::sendMoneyBalanceRequest();
 
             LLSD args;
-            args["AMOUNT"] = llformat("%d", uploadPrice);
+            args["AMOUNT"] = fmt::to_string(uploadPrice);
             LLNotificationsUtil::add("UploadPayment", args);
         }
     }

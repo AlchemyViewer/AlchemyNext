@@ -167,7 +167,7 @@ void LLPanelSnapshotInventoryBase::onSend()
     else
     {
         LLSD args;
-        args["COST"] = llformat("%d", expected_upload_cost);
+        args["COST"] = fmt::to_string(expected_upload_cost);
         LLNotificationsUtil::add("ErrorPhotoCannotAfford", args);
         if (mSnapshotFloater)
         {
@@ -191,7 +191,7 @@ BOOL LLPanelOutfitSnapshotInventory::postBuild()
 // virtual
 void LLPanelOutfitSnapshotInventory::onOpen(const LLSD& key)
 {
-    getChild<LLUICtrl>("hint_lbl")->setTextArg("[UPLOAD_COST]", llformat("%d", LLAgentBenefitsMgr::current().getTextureUploadCost()));
+    getChild<LLUICtrl>("hint_lbl")->setTextArg("[UPLOAD_COST]", fmt::to_string(LLAgentBenefitsMgr::current().getTextureUploadCost()));
     LLPanelSnapshot::onOpen(key);
 }
 

@@ -635,9 +635,9 @@ bool LLSelectMgr::linkObjects()
 	if (object_count > MAX_CHILDREN_PER_TASK + 1)
 	{
 		LLSD args;
-		args["COUNT"] = llformat("%d", object_count);
+		args["COUNT"] = fmt::to_string(object_count);
 		int max = MAX_CHILDREN_PER_TASK+1;
-		args["MAX"] = llformat("%d", max);
+		args["MAX"] = fmt::to_string(max);
 		LLNotificationsUtil::add("UnableToLinkObjects", args);
 		return true;
 	}
@@ -2583,7 +2583,7 @@ void LLSelectMgr::logDetachRequest(LLSelectNode* node, void *)
 // static
 void LLSelectMgr::packObjectIDAsParam(LLSelectNode* node, void *)
 {
-	std::string buf = llformat("%u", node->getObject()->getLocalID());
+	std::string buf = fmt::to_string(node->getObject()->getLocalID());
 	gMessageSystem->nextBlock("ParamList");
 	gMessageSystem->addString("Parameter", buf);
 }
