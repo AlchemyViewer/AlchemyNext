@@ -143,17 +143,42 @@ void LLNameValue::init(const char *name, const char *data, const char *type, con
 	else if (!strcmp(mStringType, "F32"))
 	{
 		mType = NVT_F32;
-		mNameValueReference.f32 = new F32((F32)atof(data));
+		F32 temp;
+		if (absl::SimpleAtof(data, &temp))
+		{
+			mNameValueReference.f32 = new F32(temp);
+		}
+		else
+		{
+			mNameValueReference.f32 = new F32(0.f);
+		}
 	}
 	else if (!strcmp(mStringType, "S32"))
 	{
 		mType = NVT_S32;
-		mNameValueReference.s32 = new S32(atoi(data));
+		S32 temp = 0;
+		if(absl::SimpleAtoi(data, &temp))
+		{
+			mNameValueReference.s32 = new S32(temp);
+		}
+		else
+		{
+			mNameValueReference.s32 = new S32(0);
+		}
+
 	}
 	else if (!strcmp(mStringType, "U64"))
 	{
 		mType = NVT_U64;
-		mNameValueReference.u64 = new U64(str_to_U64(ll_safe_string(data)));
+		U64 temp;
+		if(absl::SimpleAtoi(data, &temp))
+		{
+			mNameValueReference.u64 = new U64(temp);
+		}
+		else
+		{
+			mNameValueReference.u64 = new U64(0ULL);
+		}
 	}
 	else if (!strcmp(mStringType, "VEC3"))
 	{
@@ -184,7 +209,15 @@ void LLNameValue::init(const char *name, const char *data, const char *type, con
 	else if (!strcmp(mStringType, "U32"))
 	{
 		mType = NVT_U32;
-		mNameValueReference.u32 = new U32(atoi(data));
+		U32 temp;
+		if (absl::SimpleAtoi(data, &temp))
+		{
+			mNameValueReference.u32 = new U32(temp);
+		}
+		else
+		{
+			mNameValueReference.u32 = new U32(0);
+		}
 	}
 	else if(!strcmp(mStringType, (const char*)NameValueTypeStrings[NVT_ASSET]))
 	{
@@ -923,9 +956,7 @@ std::string LLNameValue::printData() const
 		break;
 	case NVT_U64:
 		{
-			char u64_string[U64_BUFFER_LEN];	/* Flawfinder: ignore */
-			U64_to_str(*mNameValueReference.u64, u64_string, sizeof(u64_string));
-			buffer = u64_string;
+			buffer = fmt::format(FMT_STRING("{:d}"), *mNameValueReference.u64);
 		}
 		break;
 	case NVT_VEC3:
@@ -956,11 +987,7 @@ std::ostream&		operator<<(std::ostream& s, const LLNameValue &a)
 		s << *(a.mNameValueReference.u32);
 		break;
 	case NVT_U64:
-		{
-			char u64_string[U64_BUFFER_LEN];	/* Flawfinder: ignore */
-			U64_to_str(*a.mNameValueReference.u64, u64_string, sizeof(u64_string));
-			s << u64_string;
-		}
+		s << *(a.mNameValueReference.u64);
 		break;
 	case NVT_VEC3:
 		s << *(a.mNameValueReference.vec3);

@@ -2579,78 +2579,63 @@ void LLMessageSystem::stopLogging()
 void LLMessageSystem::summarizeLogs(std::ostream& str)
 {
  	std::string buffer;
-	std::string tmp_str;
 	F32 run_time = mMessageSystemTimer.getElapsedTimeF32();
 	str << "START MESSAGE LOG SUMMARY" << std::endl;
-	buffer = llformat( "Run time: %12.3f seconds", run_time);
+	buffer = fmt::format(FMT_STRING("Run time: {:12.3f} seconds"), run_time);
 
 	// Incoming
 	str << buffer << std::endl << "Incoming:" << std::endl;
-	tmp_str = U64_to_str(mTotalBytesIn);
-	buffer = llformat( "Total bytes received:      %20s (%5.2f kbits per second)", tmp_str.c_str(), ((F32)mTotalBytesIn * 0.008f) / run_time);
+	buffer = fmt::format(FMT_STRING("Total bytes received:      {:>20s} ({:5.2f} kbits per second)"), fmt::to_string(mTotalBytesIn), ((F32)mTotalBytesIn * 0.008f) / run_time);
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(mPacketsIn);
-	buffer = llformat( "Total packets received:    %20s (%5.2f packets per second)", tmp_str.c_str(), ((F32) mPacketsIn / run_time));
+	buffer = fmt::format(FMT_STRING("Total packets received:    {:>20s} ({:5.2f} packets per second)"), fmt::to_string(mPacketsIn), ((F32) mPacketsIn / run_time));
 	str << buffer << std::endl;
-	buffer = llformat( "Average packet size:       %20.0f bytes", (F32)mTotalBytesIn / (F32)mPacketsIn);
+	buffer = fmt::format(FMT_STRING("Average packet size:       {:>20.0f} bytes"), (F32)mTotalBytesIn / (F32)mPacketsIn);
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(mReliablePacketsIn);
-	buffer = llformat( "Total reliable packets:    %20s (%5.2f%%)", tmp_str.c_str(), 100.f * ((F32) mReliablePacketsIn)/((F32) mPacketsIn + 1));
+	buffer = fmt::format(FMT_STRING("Total reliable packets:    {:>20s} ({:5.2f}%)"), fmt::to_string(mReliablePacketsIn), 100.f * ((F32) mReliablePacketsIn)/((F32) mPacketsIn + 1));
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(mCompressedPacketsIn);
-	buffer = llformat( "Total compressed packets:  %20s (%5.2f%%)", tmp_str.c_str(), 100.f * ((F32) mCompressedPacketsIn)/((F32) mPacketsIn + 1));
+	buffer = fmt::format(FMT_STRING("Total compressed packets:  {:>20s} ({:5.2f}%)"), fmt::to_string(mCompressedPacketsIn), 100.f * ((F32) mCompressedPacketsIn)/((F32) mPacketsIn + 1));
 	str << buffer << std::endl;
 	S64 savings = mUncompressedBytesIn - mCompressedBytesIn;
-	tmp_str = U64_to_str(savings);
-	buffer = llformat( "Total compression savings: %20s bytes", tmp_str.c_str());
+	buffer = fmt::format(FMT_STRING("Total compression savings: {:>20s} bytes"), fmt::to_string(savings));
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(savings/(mCompressedPacketsIn +1));
-	buffer = llformat( "Avg comp packet savings:   %20s (%5.2f : 1)", tmp_str.c_str(), ((F32) mUncompressedBytesIn)/((F32) mCompressedBytesIn+1));
+	buffer = fmt::format(FMT_STRING("Avg comp packet savings:   {:>20s} ({:5.2f} : 1)"), fmt::to_string(savings / (mCompressedPacketsIn + 1)), ((F32) mUncompressedBytesIn)/((F32) mCompressedBytesIn+1));
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(savings/(mPacketsIn+1));
-	buffer = llformat( "Avg overall comp savings:  %20s (%5.2f : 1)", tmp_str.c_str(), ((F32) mTotalBytesIn + (F32) savings)/((F32) mTotalBytesIn + 1.f));
+	buffer = fmt::format(FMT_STRING("Avg overall comp savings:  {:>20s} ({:5.2f} : 1)"), fmt::to_string(savings / (mPacketsIn + 1)), ((F32) mTotalBytesIn + (F32) savings)/((F32) mTotalBytesIn + 1.f));
 
 	// Outgoing
 	str << buffer << std::endl << std::endl << "Outgoing:" << std::endl;
-	tmp_str = U64_to_str(mTotalBytesOut);
-	buffer = llformat( "Total bytes sent:          %20s (%5.2f kbits per second)", tmp_str.c_str(), ((F32)mTotalBytesOut * 0.008f) / run_time );
+	buffer = fmt::format(FMT_STRING("Total bytes sent:          {:>20s} ({:5.2f} kbits per second)"), fmt::to_string(mTotalBytesOut), ((F32)mTotalBytesOut * 0.008f) / run_time );
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(mPacketsOut);
-	buffer = llformat( "Total packets sent:        %20s (%5.2f packets per second)", tmp_str.c_str(), ((F32)mPacketsOut / run_time));
+	buffer = fmt::format(FMT_STRING("Total packets sent:        {:>20s} ({:5.2f} packets per second)"), fmt::to_string(mPacketsOut), ((F32)mPacketsOut / run_time));
 	str << buffer << std::endl;
-	buffer = llformat( "Average packet size:       %20.0f bytes", (F32)mTotalBytesOut / (F32)mPacketsOut);
+	buffer = fmt::format(FMT_STRING("Average packet size:       {:>20.0f} bytes"), (F32)mTotalBytesOut / (F32)mPacketsOut);
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(mReliablePacketsOut);
-	buffer = llformat( "Total reliable packets:    %20s (%5.2f%%)", tmp_str.c_str(), 100.f * ((F32) mReliablePacketsOut)/((F32) mPacketsOut + 1));
+	buffer = fmt::format(FMT_STRING("Total reliable packets:    {:>20s} ({:5.2f}%)"), fmt::to_string(mReliablePacketsOut), 100.f * ((F32) mReliablePacketsOut)/((F32) mPacketsOut + 1));
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(mCompressedPacketsOut);
-	buffer = llformat( "Total compressed packets:  %20s (%5.2f%%)", tmp_str.c_str(), 100.f * ((F32) mCompressedPacketsOut)/((F32) mPacketsOut + 1));
+	buffer = fmt::format(FMT_STRING("Total compressed packets:  {:>20s} ({:5.2f}%)"), fmt::to_string(mCompressedPacketsOut), 100.f * ((F32) mCompressedPacketsOut)/((F32) mPacketsOut + 1));
 	str << buffer << std::endl;
 	savings = mUncompressedBytesOut - mCompressedBytesOut;
-	tmp_str = U64_to_str(savings);
-	buffer = llformat( "Total compression savings: %20s bytes", tmp_str.c_str());
+	buffer = fmt::format(FMT_STRING("Total compression savings: {:>20s} bytes"), fmt::to_string(savings));
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(savings/(mCompressedPacketsOut +1));
-	buffer = llformat( "Avg comp packet savings:   %20s (%5.2f : 1)", tmp_str.c_str(), ((F32) mUncompressedBytesOut)/((F32) mCompressedBytesOut+1));
+	buffer = fmt::format(FMT_STRING("Avg comp packet savings:   {:>20s} ({:5.2f} : 1)"), fmt::to_string(savings / (mCompressedPacketsOut + 1)), ((F32) mUncompressedBytesOut)/((F32) mCompressedBytesOut+1));
 	str << buffer << std::endl;
-	tmp_str = U64_to_str(savings/(mPacketsOut+1));
-	buffer = llformat( "Avg overall comp savings:  %20s (%5.2f : 1)", tmp_str.c_str(), ((F32) mTotalBytesOut + (F32) savings)/((F32) mTotalBytesOut + 1.f));
+	buffer = fmt::format(FMT_STRING("Avg overall comp savings:  {:>20s} ({:5.2f} : 1)"), fmt::to_string(savings / (mPacketsOut + 1)), ((F32) mTotalBytesOut + (F32) savings)/((F32) mTotalBytesOut + 1.f));
 	str << buffer << std::endl << std::endl;
-	buffer = llformat( "SendPacket failures:       %20d", mSendPacketFailureCount);
+	buffer = fmt::format(FMT_STRING("SendPacket failures:       {:>20d}"), mSendPacketFailureCount);
 	str << buffer << std::endl;
-	buffer = llformat( "Dropped packets:           %20d", mDroppedPackets);
+	buffer = fmt::format(FMT_STRING("Dropped packets:           {:>20d}"), mDroppedPackets);
 	str << buffer << std::endl;
-	buffer = llformat( "Resent packets:            %20d", mResentPackets);
+	buffer = fmt::format(FMT_STRING("Resent packets:            {:>20d}"), mResentPackets);
 	str << buffer << std::endl;
-	buffer = llformat( "Failed reliable resends:   %20d", mFailedResendPackets);
+	buffer = fmt::format(FMT_STRING("Failed reliable resends:   {:>20d}"), mFailedResendPackets);
 	str << buffer << std::endl;
-	buffer = llformat( "Off-circuit rejected packets: %17d", mOffCircuitPackets);
+	buffer = fmt::format(FMT_STRING("Off-circuit rejected packets: {:>17d}"), mOffCircuitPackets);
 	str << buffer << std::endl;
-	buffer = llformat( "On-circuit invalid packets:   %17d", mInvalidOnCircuitPackets);
+	buffer = fmt::format(FMT_STRING("On-circuit invalid packets:   {:>17d}"), mInvalidOnCircuitPackets);
 	str << buffer << std::endl << std::endl;
 
 	str << "Decoding: " << std::endl;
-	buffer = llformat( "%35s%10s%10s%10s%10s", "Message", "Count", "Time", "Max", "Avg");
+	buffer = fmt::format(FMT_STRING("{:35s}{:10s}{:10s}{:10s}{:10s}"), "Message", "Count", "Time", "Max", "Avg");
 	str << buffer << std:: endl;	
 	F32 avg;
 	for (message_template_name_map_t::const_iterator iter = mMessageTemplates.begin(),
@@ -2661,7 +2646,7 @@ void LLMessageSystem::summarizeLogs(std::ostream& str)
 		if(mt->mTotalDecoded > 0)
 		{
 			avg = mt->mTotalDecodeTime / (F32)mt->mTotalDecoded;
-			buffer = llformat( "%35s%10u%10f%10f%10f", mt->mName, mt->mTotalDecoded, mt->mTotalDecodeTime, mt->mMaxDecodeTimePerMsg, avg);
+			buffer = fmt::format(FMT_STRING("{:35s}{:10d}{:10f}{:10f}{:10f}"), mt->mName, mt->mTotalDecoded, mt->mTotalDecodeTime, mt->mMaxDecodeTimePerMsg, avg);
 			str << buffer << std::endl;
 		}
 	}

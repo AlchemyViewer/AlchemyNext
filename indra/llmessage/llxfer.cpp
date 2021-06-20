@@ -363,7 +363,7 @@ void LLXfer::abort (S32 result_code)
 
 std::string LLXfer::getFileName() 
 {
-	return U64_to_str(mID);
+	return fmt::to_string(mID);
 }
 
 ///////////////////////////////////////////////////////////
