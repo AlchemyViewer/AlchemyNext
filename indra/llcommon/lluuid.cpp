@@ -154,31 +154,7 @@ U32 janky_fast_random_seeded_bytes(U32 seed, U32 val)
 // Common to all UUID implementations
 void LLUUID::toString(std::string& out) const
 {
-	out = fmt::format(FMT_COMPILE("{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}"),
-		(U8)(mData[0]),
-		(U8)(mData[1]),
-		(U8)(mData[2]),
-		(U8)(mData[3]),
-		(U8)(mData[4]),
-		(U8)(mData[5]),
-		(U8)(mData[6]),
-		(U8)(mData[7]),
-		(U8)(mData[8]),
-		(U8)(mData[9]),
-		(U8)(mData[10]),
-		(U8)(mData[11]),
-		(U8)(mData[12]),
-		(U8)(mData[13]),
-		(U8)(mData[14]),
-		(U8)(mData[15]));
-}
-
-// *TODO: deprecate
-void LLUUID::toString(char *out) const
-{
-	std::string buffer;
-	toString(buffer);
-	strcpy(out,buffer.c_str()); /* Flawfinder: ignore */
+	out = asString();
 }
 
 void LLUUID::toCompressedString(std::string& out) const
@@ -203,9 +179,23 @@ std::string LLUUID::getString() const
 
 std::string LLUUID::asString() const
 {
-	std::string str;
-	toString(str);
-	return str;
+	return fmt::format(FMT_COMPILE("{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}"),
+		(U8)(mData[0]),
+		(U8)(mData[1]),
+		(U8)(mData[2]),
+		(U8)(mData[3]),
+		(U8)(mData[4]),
+		(U8)(mData[5]),
+		(U8)(mData[6]),
+		(U8)(mData[7]),
+		(U8)(mData[8]),
+		(U8)(mData[9]),
+		(U8)(mData[10]),
+		(U8)(mData[11]),
+		(U8)(mData[12]),
+		(U8)(mData[13]),
+		(U8)(mData[14]),
+		(U8)(mData[15]));
 }
 
 BOOL LLUUID::set(const char* in_string, BOOL emit)
@@ -416,9 +406,7 @@ LLUUID LLUUID::combine(const LLUUID &other) const
 
 std::ostream& operator<<(std::ostream& s, const LLUUID &uuid)
 {
-	std::string uuid_str;
-	uuid.toString(uuid_str);
-	s << uuid_str;
+	s << uuid.asString();
 	return s;
 }
 

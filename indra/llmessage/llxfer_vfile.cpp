@@ -66,10 +66,7 @@ void LLXfer_VFile::init (const LLUUID &local_id, LLAssetType::EType type)
 
 	mVFile = NULL;
 
-	std::string id_string;
-	mLocalID.toString(id_string);
-
-	mName = llformat("VFile %s:%s", id_string.c_str(), LLAssetType::lookup(mType));
+	mName = fmt::format(FMT_COMPILE("VFile {:s}:{:s}"), mLocalID.asString(), LLAssetType::lookup(mType));
 }
 	
 ///////////////////////////////////////////////////////////

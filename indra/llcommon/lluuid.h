@@ -195,9 +195,7 @@ public:
 			const absl::FormatConversionSpec& spec,
 			absl::FormatSink* s) {
 		if (spec.conversion_char() == absl::FormatConversionChar::s) {
-			std::string uuid_str;
-			id.toString(uuid_str);
-			s->Append(uuid_str);
+			s->Append(id.asString());
 		}
 		return { true };
 	}
@@ -218,7 +216,6 @@ public:
 	friend LL_COMMON_API std::ostream&	 operator<<(std::ostream& s, const LLUUID &uuid);
 	friend LL_COMMON_API std::istream&	 operator>>(std::istream& s, LLUUID &uuid);
 
-	void toString(char *out) const;		// Does not allocate memory, needs 36 characters (including \0)
 	void toString(std::string& out) const;
 	void toCompressedString(char *out) const;	// Does not allocate memory, needs 17 characters (including \0)
 	void toCompressedString(std::string& out) const;

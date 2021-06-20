@@ -1378,10 +1378,8 @@ void LLAssetStorage::legacyGetDataCallback(const LLUUID &uuid,
         LLFileSystem file(uuid, type);
         if (file.open())
         {
-            std::string uuid_str;
-
-            uuid.toString(uuid_str);
-            filename = llformat("%s.%s", gDirUtilp->getExpandedFilename(LL_PATH_CACHE, uuid_str).c_str(), LLAssetType::lookup(type));
+            std::string uuid_str = uuid.asString();
+            filename = fmt::format(FMT_STRING("{:s}.{:s}"), gDirUtilp->getExpandedFilename(LL_PATH_CACHE, uuid_str), LLAssetType::lookup(type));
 
             LLUniqueFile fp = LLFile::fopen(filename, "wb");     /* Flawfinder: ignore */
             if (fp)

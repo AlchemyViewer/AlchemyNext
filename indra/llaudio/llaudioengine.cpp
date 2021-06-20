@@ -1004,11 +1004,9 @@ void LLAudioEngine::cleanupAudioSource(LLAudioSource *asp)
 
 bool LLAudioEngine::hasDecodedFile(const LLUUID &uuid)
 {
-	std::string uuid_str;
-	uuid.toString(uuid_str);
+	std::string uuid_str = uuid.asString();
 
-	std::string wav_path;
-	wav_path = gDirUtilp->getExpandedFilename(LL_PATH_CACHE,uuid_str);
+	std::string wav_path = gDirUtilp->getExpandedFilename(LL_PATH_CACHE,uuid_str);
 	wav_path += ".dsf";
 
 	if (LLFile::isfile(wav_path))
