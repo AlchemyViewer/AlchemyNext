@@ -539,22 +539,22 @@ void LLManip::renderTickValue(const LLVector3& pos, F32 value, const std::string
 	{
 		if (fractional_portion == 0)
 		{
-			val_string = llformat("-%d%s", lltrunc(llabs(val_to_print)), suffix.c_str());
+			val_string = fmt::format(FMT_COMPILE("-{:d}{:s}"), lltrunc(llabs(val_to_print)), suffix);
 		}
 		else
 		{
-			val_string = llformat("-%d", lltrunc(llabs(val_to_print)));
+			val_string = fmt::format(FMT_COMPILE("-{:d}"), lltrunc(llabs(val_to_print)));
 		}
 	}
 	else
 	{
 		if (fractional_portion == 0)
 		{
-			val_string = llformat("%d%s", lltrunc(llabs(val_to_print)), suffix.c_str());
+			val_string = fmt::format(FMT_COMPILE("{:d}{:s}"), lltrunc(llabs(val_to_print)), suffix);
 		}
 		else
 		{
-			val_string = llformat("%d", lltrunc(val_to_print));
+			val_string = fmt::format(FMT_COMPILE("{:d}"), lltrunc(val_to_print));
 		}
 	}
 
@@ -574,7 +574,7 @@ void LLManip::renderTickValue(const LLVector3& pos, F32 value, const std::string
 
 		if (fractional_portion != 0)
 		{
-			fraction_string = llformat("%c%02d%s", LLResMgr::getInstance()->getDecimalPoint(), fractional_portion, suffix.c_str());
+			fraction_string = fmt::format(FMT_COMPILE("{:c}{:02d}{:s}"), LLResMgr::getInstance()->getDecimalPoint(), fractional_portion, suffix);
 
 			hud_render_utf8text(val_string, render_pos, *big_fontp, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW, -1.f * big_fontp->getWidthF32(val_string), 3.f, color, hud_selection);
 			hud_render_utf8text(fraction_string, render_pos, *small_fontp, LLFontGL::NORMAL, LLFontGL::DROP_SHADOW, 1.f, 3.f, color, hud_selection);

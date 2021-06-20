@@ -389,7 +389,7 @@ void RlvFloaterBehaviours::refreshAll()
 			{
 				const RlvBehaviourModifierValue& modValue = pBhvrModifier->getValue();
 				if (typeid(float) == modValue.type())
-					sdModifierColumns[1]["value"] = llformat("%f", boost::get<float>(modValue));
+					sdModifierColumns[1]["value"] = fmt::format(FMT_STRING("{:f}"), boost::get<float>(modValue));
 				else if (typeid(int) == modValue.type())
 					sdModifierColumns[1]["value"] = fmt::to_string(boost::get<int>(modValue));
 				else if (typeid(bool) == modValue.type())

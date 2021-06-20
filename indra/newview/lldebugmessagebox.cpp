@@ -251,15 +251,15 @@ void LLDebugVarMessageBox::draw()
 	switch(mVarType)
 	{
 	  case VAR_TYPE_F32:
-		text = llformat("%.3f", *((F32*)mVarData));
+		text = fmt::format(FMT_COMPILE("{:.3f}"), *((F32*)mVarData));
 		break;
 	  case VAR_TYPE_S32:
-		text = llformat("%d", *((S32*)mVarData));
+		text = fmt::format(FMT_COMPILE("{:d}"), *((S32*)mVarData));
 		break;
 	  case VAR_TYPE_VEC3:
 	  {
 		  LLVector3* vec_p = (LLVector3*)mVarData;
-		  text= llformat("%.3f %.3f %.3f", vec_p->mV[VX], vec_p->mV[VY], vec_p->mV[VZ]);
+		  text = fmt::format(FMT_COMPILE("{:.3f} {:.3f} {:.3f}"), vec_p->mV[VX], vec_p->mV[VY], vec_p->mV[VZ]);
 		  break;
 	  }
 	  default:

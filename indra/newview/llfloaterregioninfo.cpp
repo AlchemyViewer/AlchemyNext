@@ -1035,34 +1035,32 @@ BOOL LLPanelRegionGeneralInfo::sendUpdate()
 		strings_t strings;
 		std::string buffer;
 
-		buffer = llformat("%s", (getChild<LLUICtrl>("block_terraform_check")->getValue().asBoolean() ? "Y" : "N"));
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:s}"), (getChild<LLUICtrl>("block_terraform_check")->getValue().asBoolean() ? "Y" : "N"));
+		strings.emplace_back(std::move(buffer));
 
-		buffer = llformat("%s", (getChild<LLUICtrl>("block_fly_check")->getValue().asBoolean() ? "Y" : "N"));
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:s}"), (getChild<LLUICtrl>("block_fly_check")->getValue().asBoolean() ? "Y" : "N"));
+		strings.emplace_back(std::move(buffer));
 
-		buffer = llformat("%s", (getChild<LLUICtrl>("allow_damage_check")->getValue().asBoolean() ? "Y" : "N"));
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:s}"), (getChild<LLUICtrl>("allow_damage_check")->getValue().asBoolean() ? "Y" : "N"));
+		strings.emplace_back(std::move(buffer));
 
-		buffer = llformat("%s", (getChild<LLUICtrl>("allow_land_resell_check")->getValue().asBoolean() ? "Y" : "N"));
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:s}"), (getChild<LLUICtrl>("allow_land_resell_check")->getValue().asBoolean() ? "Y" : "N"));
+		strings.emplace_back(std::move(buffer));
 
-		F32 value = (F32)getChild<LLUICtrl>("agent_limit_spin")->getValue().asReal();
-		buffer = llformat("%f", value);
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:f}"), (F32)getChild<LLUICtrl>("agent_limit_spin")->getValue().asReal());
+		strings.emplace_back(std::move(buffer));
 
-		value = (F32)getChild<LLUICtrl>("object_bonus_spin")->getValue().asReal();
-		buffer = llformat("%f", value);
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:f}"), (F32)getChild<LLUICtrl>("object_bonus_spin")->getValue().asReal());
+		strings.emplace_back(std::move(buffer));
 
 		buffer = fmt::to_string(getChild<LLUICtrl>("access_combo")->getValue().asInteger());
-		strings.push_back(strings_t::value_type(buffer));
+		strings.emplace_back(std::move(buffer));
 
-		buffer = llformat("%s", (getChild<LLUICtrl>("restrict_pushobject")->getValue().asBoolean() ? "Y" : "N"));
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:s}"), (getChild<LLUICtrl>("restrict_pushobject")->getValue().asBoolean() ? "Y" : "N"));
+		strings.emplace_back(std::move(buffer));
 
-		buffer = llformat("%s", (getChild<LLUICtrl>("allow_parcel_changes_check")->getValue().asBoolean() ? "Y" : "N"));
-		strings.push_back(strings_t::value_type(buffer));
+		buffer = fmt::format(FMT_STRING("{:s}"), (getChild<LLUICtrl>("allow_parcel_changes_check")->getValue().asBoolean() ? "Y" : "N"));
+		strings.emplace_back(std::move(buffer));
 
 		LLUUID invoice(LLFloaterRegionInfo::getLastInvoice());
 		sendEstateOwnerMessage(gMessageSystem, "setregioninfo", invoice, strings);

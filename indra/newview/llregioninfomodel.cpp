@@ -75,7 +75,6 @@ boost::signals2::connection LLRegionInfoModel::setUpdateCallback(const update_si
 
 void LLRegionInfoModel::sendRegionTerrain(const LLUUID& invoice) const
 {
-	std::string buffer;
 	std::vector<std::string> strings;
 
 	// ==========================================
@@ -96,24 +95,15 @@ void LLRegionInfoModel::sendRegionTerrain(const LLUUID& invoice) const
 	BOOL estate_fixed_sun = false;
 	F32 estate_sun_hour = 0.f;
 
-	buffer = llformat("%f", mWaterHeight);
-	strings.push_back(buffer);
-	buffer = llformat("%f", mTerrainRaiseLimit);
-	strings.push_back(buffer);
-	buffer = llformat("%f", mTerrainLowerLimit);
-	strings.push_back(buffer);
-	buffer = llformat("%s", (mUseEstateSun ? "Y" : "N"));
-	strings.push_back(buffer);
-	buffer = llformat("%s", (getUseFixedSun() ? "Y" : "N"));
-	strings.push_back(buffer);
-	buffer = llformat("%f", mSunHour);
-	strings.push_back(buffer);
-	buffer = llformat("%s", (estate_global_time ? "Y" : "N") );
-	strings.push_back(buffer);
-	buffer = llformat("%s", (estate_fixed_sun ? "Y" : "N") );
-	strings.push_back(buffer);
-	buffer = llformat("%f", estate_sun_hour);
-	strings.push_back(buffer);
+	strings.emplace_back(fmt::format(FMT_STRING("{:f}"), mWaterHeight));
+	strings.emplace_back(fmt::format(FMT_STRING("{:f}"), mTerrainRaiseLimit));
+	strings.emplace_back(fmt::format(FMT_STRING("{:f}"), mTerrainLowerLimit));
+	strings.emplace_back(fmt::format(FMT_STRING("{:s}"), (mUseEstateSun ? "Y" : "N")));
+	strings.emplace_back(fmt::format(FMT_STRING("{:s}"), (getUseFixedSun() ? "Y" : "N")));
+	strings.emplace_back(fmt::format(FMT_STRING("{:f}"), mSunHour));
+	strings.emplace_back(fmt::format(FMT_STRING("{:s}"), (estate_global_time ? "Y" : "N")));
+	strings.emplace_back(fmt::format(FMT_STRING("{:s}"), (estate_fixed_sun ? "Y" : "N")));
+	strings.emplace_back(fmt::format(FMT_STRING("{:f}"), estate_sun_hour));
 
 	sendEstateOwnerMessage(gMessageSystem, "setregionterrain", invoice, strings);
 }
