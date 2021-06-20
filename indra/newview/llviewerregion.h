@@ -198,7 +198,7 @@ public:
 
 	void setSimAccess(U8 sim_access)			{ mSimAccess = sim_access; }
 	U8 getSimAccess() const						{ return mSimAccess; }
-	const std::string getSimAccessString() const;
+	const std::string& getSimAccessString() const;
 	
 	// Homestead-related getters; there are no setters as nobody should be
 	// setting them other than the individual message handler which is a member

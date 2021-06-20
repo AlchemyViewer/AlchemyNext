@@ -934,7 +934,7 @@ void LLLocationInputCtrl::refreshHealth()
 		S32 health = gStatusBar->getHealth();
 		if (health != last_health)
 		{
-			std::string text = llformat("%d%%", health);
+			std::string text = fmt::format(FMT_COMPILE("{:d}%"), health);
 			mDamageText->setText(text);
 			last_health = health;
 		}

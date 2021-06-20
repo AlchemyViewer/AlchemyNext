@@ -122,33 +122,33 @@ BOOL LLAgentUI::buildLocationString(std::string& str, ELocationFormat fmt,const 
 		switch (fmt)
 		{
 		case LOCATION_FORMAT_LANDMARK:
-			buffer = llformat("%.100s", region_name.c_str());
+			buffer = fmt::format(FMT_COMPILE("{:.100s}"), region_name);
 			break;
 		case LOCATION_FORMAT_NORMAL:
-			buffer = llformat("%s", region_name.c_str());
+			buffer = fmt::format(FMT_COMPILE("{:s}"), region_name);
 			break;
 		case LOCATION_FORMAT_NORMAL_COORDS:
-			buffer = llformat("%s (%d, %d, %d)",
-				region_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s} ({:d}, {:d}, {:d})"),
+				region_name,
 				pos_x, pos_y, pos_z);
 			break;
 		case LOCATION_FORMAT_NO_COORDS:
-			buffer = llformat("%s%s%s",
-				region_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s}{:s}{:s}"),
+				region_name,
 				sim_access_string.empty() ? "" : " - ",
-				sim_access_string.c_str());
+				sim_access_string);
 			break;
 		case LOCATION_FORMAT_NO_MATURITY:
-			buffer = llformat("%s (%d, %d, %d)",
-				region_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s} ({:d}, {:d}, {:d})"),
+				region_name,
 				pos_x, pos_y, pos_z);
 			break;
 		case LOCATION_FORMAT_FULL:
-			buffer = llformat("%s (%d, %d, %d)%s%s",
-				region_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s} ({:d}, {:d}, {:d}){:s}{:s}"),
+				region_name,
 				pos_x, pos_y, pos_z,
 				sim_access_string.empty() ? "" : " - ",
-				sim_access_string.c_str());
+				sim_access_string);
 			break;
 		}
 	}
@@ -158,36 +158,36 @@ BOOL LLAgentUI::buildLocationString(std::string& str, ELocationFormat fmt,const 
 		switch (fmt)
 		{
 		case LOCATION_FORMAT_LANDMARK:
-			buffer = llformat("%.100s", parcel_name.c_str());
+			buffer = fmt::format(FMT_COMPILE("{:.100s}"), parcel_name);
 			break;
 		case LOCATION_FORMAT_NORMAL:
-			buffer = llformat("%s, %s", parcel_name.c_str(), region_name.c_str());
+			buffer = fmt::format(FMT_COMPILE("{:s}, {:s}"), parcel_name, region_name);
 			break;
 		case LOCATION_FORMAT_NORMAL_COORDS:
-			buffer = llformat("%s (%d, %d, %d)",
-				parcel_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s} ({:d}, {:d}, {:d})"),
+				parcel_name,
 				pos_x, pos_y, pos_z);
 			break;
 		case LOCATION_FORMAT_NO_MATURITY:
-			buffer = llformat("%s, %s (%d, %d, %d)",
-				parcel_name.c_str(),
-				region_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s}, {:s} ({:d}, {:d}, {:d})"),
+				parcel_name,
+				region_name,
 				pos_x, pos_y, pos_z);
 			break;
 		case LOCATION_FORMAT_NO_COORDS:
-			buffer = llformat("%s, %s%s%s",
-							  parcel_name.c_str(),
-							  region_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s}, {:s}{:s}{:s}"),
+							  parcel_name,
+							  region_name,
 							  sim_access_string.empty() ? "" : " - ",
-							  sim_access_string.c_str());
+							  sim_access_string);
 				break;
 		case LOCATION_FORMAT_FULL:
-			buffer = llformat("%s, %s (%d, %d, %d)%s%s",
-				parcel_name.c_str(),
-				region_name.c_str(),
+			buffer = fmt::format(FMT_COMPILE("{:s}, {:s} ({:d}, {:d}, {:d}){:s}{:s}"),
+				parcel_name,
+				region_name,
 				pos_x, pos_y, pos_z,
 				sim_access_string.empty() ? "" : " - ",
-				sim_access_string.c_str());
+				sim_access_string);
 			break;
 		}
 	}

@@ -867,7 +867,7 @@ BOOL LLViewerRegion::canManageEstate() const
 		|| gAgent.getID() == getOwner();
 }
 
-const std::string LLViewerRegion::getSimAccessString() const
+const std::string& LLViewerRegion::getSimAccessString() const
 {
 	return accessToString(mSimAccess);
 }
