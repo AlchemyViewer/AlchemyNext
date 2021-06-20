@@ -84,10 +84,7 @@ void LLStatGraph::draw()
 
 	if (mUpdateTimer.getElapsedTimeF32() > 0.5f)
 	{
-		std::string format_str;
-		std::string tmp_str;
-		format_str = llformat("%%s%%.%df%%s", mPrecision);
-		tmp_str = llformat(format_str.c_str(), mLabel.c_str(), mValue, mUnits.c_str());
+		std::string tmp_str = fmt::format(FMT_COMPILE("{:s}{:.{}f}{:s}"), mLabel, mValue, mPrecision, mUnits);
 		setToolTip(tmp_str);
 
 		mUpdateTimer.reset();

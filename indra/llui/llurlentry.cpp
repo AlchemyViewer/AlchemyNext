@@ -1063,8 +1063,8 @@ void LLUrlEntryParcel::processParcelInfo(const LLParcelData& parcel_data)
 		S32 region_y = ll_round(parcel_data.global_y) % REGION_WIDTH_UNITS;
 		S32 region_z = ll_round(parcel_data.global_z);
 
-		label = llformat("%s (%d, %d, %d)",
-				parcel_data.sim_name.c_str(), region_x, region_y, region_z);
+		label = fmt::format(FMT_STRING("{:s} ({:d}, {:d}, {:d})"),
+				parcel_data.sim_name, region_x, region_y, region_z);
 	}
 
 	for (std::set<LLUrlEntryParcel*>::iterator iter = sParcelInfoObservers.begin();

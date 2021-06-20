@@ -341,8 +341,7 @@ void LLSpinCtrl::updateEditor()
 //		displayed_value = 0.f;
 //	}
 
-	std::string format = llformat("%%.%df", mPrecision);
-	std::string text = llformat(format.c_str(), displayed_value);
+	std::string text = fmt::format(FMT_STRING("{:.{}f}"), displayed_value, mPrecision);
 	mEditor->setText( text );
 }
 

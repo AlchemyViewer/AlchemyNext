@@ -266,8 +266,7 @@ void LLSliderCtrl::updateText()
 		// Don't display very small negative values as -0.000
 		F32 displayed_value = (F32)(floor(getValueF32() * pow(10.0, (F64)mPrecision) + 0.5) / pow(10.0, (F64)mPrecision));
 
-		std::string format = llformat("%%.%df", mPrecision);
-		std::string text = llformat(format.c_str(), displayed_value);
+		std::string text = fmt::format(FMT_STRING("{:.{}f}"), displayed_value, mPrecision);
 		if( mEditor )
 		{
 			// Setting editor text here to "" before using actual text is here because if text which

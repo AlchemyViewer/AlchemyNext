@@ -619,7 +619,7 @@ void LLStatBar::drawLabelAndValue( F32 value, std::string &label, LLRect &bar_re
 		LLFontGL::LEFT, LLFontGL::TOP);
 
 	std::string value_str	= !llisnan(value)
-							? llformat("%10.*f %s", decimal_digits, value, label.c_str())
+							? fmt::format(FMT_COMPILE("{:10.{}f} {:s}"), value, decimal_digits, label)
 							: LLTrans::getString("na");
 
 	// Draw the current value.
@@ -690,7 +690,7 @@ void LLStatBar::drawTicks( F32 min, F32 max, F32 value_scale, LLRect &bar_rect )
 			{
 				decimal_digits = 0;
 			}
-			std::string tick_label = llformat("%.*f", decimal_digits, tick_value);
+			std::string tick_label = fmt::format(FMT_COMPILE(":.{}f"), tick_value, decimal_digits);
 			S32 tick_label_width = LLFontGL::getFontMonospace()->getWidth(tick_label);
 			if (mOrientation == HORIZONTAL)
 			{
