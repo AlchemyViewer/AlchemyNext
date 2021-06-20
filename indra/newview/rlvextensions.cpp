@@ -162,11 +162,11 @@ std::string RlvExtGetSet::onGetDebug(std::string strSetting)
 				switch (pSetting->type())
 				{
 					case TYPE_U32:
-						return llformat("%u", gSavedSettings.getU32(strSetting));
+						return fmt::to_string(gSavedSettings.getU32(strSetting));
 					case TYPE_S32:
-						return llformat("%d", gSavedSettings.getS32(strSetting));
+						return fmt::to_string(gSavedSettings.getS32(strSetting));
 					case TYPE_BOOLEAN:
-						return llformat("%d", gSavedSettings.getBOOL(strSetting));
+						return fmt::to_string(gSavedSettings.getBOOL(strSetting));
 					default:
 						RLV_ERRS << "Unexpected debug setting type" << LL_ENDL;
 						break;
@@ -195,7 +195,7 @@ std::string RlvExtGetSet::onGetPseudoDebug(const std::string& strSetting)
 		else
 		{
 			if (isAgentAvatarValid())
-				return llformat("%d", (gAgentAvatarp->getSex() == SEX_MALE)); // [See LLFloaterCustomize::LLFloaterCustomize()]
+				return fmt::to_string((gAgentAvatarp->getSex() == SEX_MALE)); // [See LLFloaterCustomize::LLFloaterCustomize()]
 		}
 	}
 	else if ("AspectRatio" == strSetting)

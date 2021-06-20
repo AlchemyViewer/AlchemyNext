@@ -1312,7 +1312,7 @@ std::string get_debug_object_lod_text(LLVOVolume *rootp)
 {
     std::string cam_dist_string = "";
     cam_dist_string += LLStringOps::getReadableNumber(rootp->mLODDistance) +  " ";
-    std::string lod_string = llformat("%d",rootp->getLOD());
+    std::string lod_string = fmt::to_string(rootp->getLOD());
     F32 lod_radius = rootp->mLODRadius;
     S32 cam_dist_count = 0;
     LLViewerObject::const_child_list_t& child_list = rootp->getChildren();
@@ -1323,7 +1323,7 @@ std::string get_debug_object_lod_text(LLVOVolume *rootp)
         LLVOVolume *volp = childp ? childp->asVolume() : nullptr;
         if (volp)
         {
-            lod_string += llformat("%d",volp->getLOD());
+            lod_string += fmt::to_string(volp->getLOD());
             if (volp->isRiggedMesh())
             {
                 // Rigged/animatable mesh. This is computed from the
@@ -1489,7 +1489,7 @@ BOOL LLVOVolume::calcLOD()
 		mDrawable->getFace(0))
 	{
         // This is a debug display for LODs. Please don't put the texture index here.
-        setDebugText(llformat("%d", cur_detail));
+        setDebugText(fmt::to_string(cur_detail));
 	}
 
 	if (cur_detail != mLOD)
@@ -5242,7 +5242,7 @@ void LLVolumeGeometryManager::registerFace(LLSpatialGroup* group, LLFace* facep,
 		model_mat = &(drawable->getRegion()->mRenderMatrix);
 	}
 
-	//drawable->getVObj()->setDebugText(llformat("%d", drawable->isState(LLDrawable::ANIMATED_CHILD)));
+	//drawable->getVObj()->setDebugText(fmt::to_string(drawable->isState(LLDrawable::ANIMATED_CHILD)));
 
 	U8 bump = (type == LLRenderPass::PASS_BUMP || type == LLRenderPass::PASS_POST_BUMP) ? facep->getTextureEntry()->getBumpmap() : 0;
 	U8 shiny = facep->getTextureEntry()->getShiny();

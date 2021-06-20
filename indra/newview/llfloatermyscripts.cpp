@@ -1,4 +1,4 @@
-/** 
+/**
  * @file llfloatermyscripts.cpp
  * @brief LLFloaterMyScripts class implementation.
  *
@@ -168,12 +168,12 @@ void LLFloaterMyScripts::setAttachmentDetails(LLSD content)
 
 			element["id"] = task_id;
 			element["columns"][0]["column"] = "size";
-			element["columns"][0]["value"] = llformat("%d", size);
+			element["columns"][0]["value"] = fmt::to_string(size);
 			element["columns"][0]["font"] = "SANSSERIF";
 			element["columns"][0]["halign"] = LLFontGL::RIGHT;
 
 			element["columns"][1]["column"] = "urls";
-			element["columns"][1]["value"] = llformat("%d", urls);
+			element["columns"][1]["value"] = fmt::to_string(urls);
 			element["columns"][1]["font"] = "SANSSERIF";
 			element["columns"][1]["halign"] = LLFontGL::RIGHT;
 			
@@ -254,15 +254,15 @@ void LLFloaterMyScripts::setAttachmentSummary(LLSD content)
 	if((mAttachmentMemoryUsed >= 0) && (mAttachmentMemoryMax >= 0))
 	{
 		LLStringUtil::format_map_t args_attachment_memory;
-		args_attachment_memory["[COUNT]"] = llformat ("%d", mAttachmentMemoryUsed);
+		args_attachment_memory["[COUNT]"] = fmt::to_string(mAttachmentMemoryUsed);
 		std::string translate_message = "ScriptLimitsMemoryUsedSimple";
 
 		if (0 < mAttachmentMemoryMax)
 		{
 			S32 attachment_memory_available = mAttachmentMemoryMax - mAttachmentMemoryUsed;
 
-			args_attachment_memory["[MAX]"] = llformat ("%d", mAttachmentMemoryMax);
-			args_attachment_memory["[AVAILABLE]"] = llformat ("%d", attachment_memory_available);
+			args_attachment_memory["[MAX]"] = fmt::to_string(mAttachmentMemoryMax);
+			args_attachment_memory["[AVAILABLE]"] = fmt::to_string(attachment_memory_available);
 			translate_message = "ScriptLimitsMemoryUsed";
 		}
 
@@ -274,9 +274,9 @@ void LLFloaterMyScripts::setAttachmentSummary(LLSD content)
 		S32 attachment_urls_available = mAttachmentURLsMax - mAttachmentURLsUsed;
 
 		LLStringUtil::format_map_t args_attachment_urls;
-		args_attachment_urls["[COUNT]"] = llformat ("%d", mAttachmentURLsUsed);
-		args_attachment_urls["[MAX]"] = llformat ("%d", mAttachmentURLsMax);
-		args_attachment_urls["[AVAILABLE]"] = llformat ("%d", attachment_urls_available);
+		args_attachment_urls["[COUNT]"] = fmt::to_string(mAttachmentURLsUsed);
+		args_attachment_urls["[MAX]"] = fmt::to_string(mAttachmentURLsMax);
+		args_attachment_urls["[AVAILABLE]"] = fmt::to_string(attachment_urls_available);
 		std::string msg_attachment_urls = LLTrans::getString("ScriptLimitsURLsUsed", args_attachment_urls);
 		getChild<LLUICtrl>("urls_used")->setValue(LLSD(msg_attachment_urls));
 	}

@@ -391,7 +391,7 @@ void RlvFloaterBehaviours::refreshAll()
 				if (typeid(float) == modValue.type())
 					sdModifierColumns[1]["value"] = llformat("%f", boost::get<float>(modValue));
 				else if (typeid(int) == modValue.type())
-					sdModifierColumns[1]["value"] = llformat("%d", boost::get<int>(modValue));
+					sdModifierColumns[1]["value"] = fmt::to_string(boost::get<int>(modValue));
 				else if (typeid(bool) == modValue.type())
 					sdModifierColumns[1]["value"] = (boost::get<bool>(modValue)) ? "true" : "false";
 				else if (typeid(LLUUID) == modValue.type())

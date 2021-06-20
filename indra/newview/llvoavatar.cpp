@@ -786,8 +786,8 @@ void LLVOAvatar::debugAvatarRezTime(std::string notification_name, std::string c
 	if (ALControlCache::DebugAvatarRezTime)
 	{
 		LLSD args;
-		args["EXISTENCE"] = llformat("%d",(U32)mDebugExistenceTimer.getElapsedTimeF32());
-		args["TIME"] = llformat("%d",(U32)mRuthDebugTimer.getElapsedTimeF32());
+		args["EXISTENCE"] = fmt::to_string((U32)mDebugExistenceTimer.getElapsedTimeF32());
+		args["TIME"] = fmt::to_string((U32)mRuthDebugTimer.getElapsedTimeF32());
 		args["NAME"] = getFullname();
 		LLNotificationsUtil::add(notification_name,args);
 	}

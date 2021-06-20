@@ -414,7 +414,7 @@ void give_money(const LLUUID& uuid, LLViewerRegion* region, S32 amount, BOOL is_
 	else
 	{
 		LLStringUtil::format_map_t args;
-		args["AMOUNT"] = llformat("%d", amount);
+		args["AMOUNT"] = fmt::to_string(amount);
 		LLBuyCurrencyHTML::openCurrencyFloater( LLTrans::getString("giving", args), amount );
 	}
 }
@@ -811,7 +811,7 @@ void send_join_group_response(LLUUID group_id, LLUUID transaction_id, bool accep
         // If there is a fee to join this group, make
         // sure the user is sure they want to join.
             LLSD args;
-            args["COST"] = llformat("%d", fee);
+            args["COST"] = fmt::to_string(fee);
             // Set the fee for next time to 0, so that we don't keep
             // asking about a fee.
             LLSD next_payload = payload;
@@ -5038,7 +5038,7 @@ static void process_money_balance_reply_extended(LLMessageSystem* msg)
 	
 	LLStringUtil::format_map_t args;
 	args["REASON"] = reason; // could be empty
-	args["AMOUNT"] = llformat("%d", amount);
+	args["AMOUNT"] = fmt::to_string(amount);
 	
 	// Need to delay until name looked up, so need to know whether or not
 	// is group

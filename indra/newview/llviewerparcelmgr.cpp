@@ -2189,7 +2189,7 @@ void LLViewerParcelMgr::deedLandToGroup()
 	std::string group_name;
 	gCacheName->getGroupName(mCurrentParcel->getGroupID(), group_name);
 	LLSD args;
-	args["AREA"] = llformat("%d", mCurrentParcel->getArea());
+	args["AREA"] = fmt::to_string(mCurrentParcel->getArea());
 	args["GROUP_NAME"] = group_name;
 	if(mCurrentParcel->getContributeWithDeed())
 	{
@@ -2273,7 +2273,7 @@ void LLViewerParcelMgr::startReleaseLand()
 
 	// Compute claim price
 	LLSD args;
-	args["AREA"] = llformat("%d",mCurrentParcel->getArea());
+	args["AREA"] = fmt::to_string(mCurrentParcel->getArea());
 	LLNotificationsUtil::add("ReleaseLandWarning", args, LLSD(), releaseAlertCB);
 }
 

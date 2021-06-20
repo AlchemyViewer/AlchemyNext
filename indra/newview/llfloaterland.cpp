@@ -698,7 +698,7 @@ void LLPanelLandGeneral::refresh()
 			else if(parcel->getAuctionID())
 			{
 				mTextSalePending->setText(getString("auction_id_text"));
-				mTextSalePending->setTextArg("[ID]", llformat("%u", parcel->getAuctionID()));
+				mTextSalePending->setTextArg("[ID]", fmt::to_string(parcel->getAuctionID()));
 				mTextSalePending->setEnabled(TRUE);
 			}
 			else
@@ -795,7 +795,7 @@ void LLPanelLandGeneral::refresh()
 								 &dwell);
 		// Area
 		LLUIString price = getString("area_size_text");
-		price.setArg("[AREA]", llformat("%d",area));    
+		price.setArg("[AREA]", fmt::to_string(area));
 		mTextPriceLabel->setText(getString("area_text"));
 		mTextPrice->setText(price.getString());
 
@@ -1054,7 +1054,7 @@ void LLPanelLandGeneral::onClickBuyPass(void* data)
 	F32 pass_hours = parcel->getPassHours();
 
 	std::string cost, time;
-	cost = llformat("%d", pass_price);
+	cost = fmt::to_string(pass_price);
 	time = llformat("%.2f", pass_hours);
 
 	LLSD args;
@@ -1303,15 +1303,16 @@ void LLPanelLandObjects::refresh()
 
 	if (!parcel || gDisconnected)
 	{
-		mSWTotalObjects->setTextArg("[COUNT]", llformat("%d", 0));
-		mSWTotalObjects->setTextArg("[TOTAL]", llformat("%d", 0));
-		mSWTotalObjects->setTextArg("[AVAILABLE]", llformat("%d", 0));
-		mObjectContribution->setTextArg("[COUNT]", llformat("%d", 0));
-		mTotalObjects->setTextArg("[COUNT]", llformat("%d", 0));
-		mOwnerObjects->setTextArg("[COUNT]", llformat("%d", 0));
-		mGroupObjects->setTextArg("[COUNT]", llformat("%d", 0));
-		mOtherObjects->setTextArg("[COUNT]", llformat("%d", 0));
-		mSelectedObjects->setTextArg("[COUNT]", llformat("%d", 0));
+		std::string zero_str = fmt::to_string(0);
+		mSWTotalObjects->setTextArg("[COUNT]", zero_str);
+		mSWTotalObjects->setTextArg("[TOTAL]", zero_str);
+		mSWTotalObjects->setTextArg("[AVAILABLE]", zero_str);
+		mObjectContribution->setTextArg("[COUNT]", zero_str);
+		mTotalObjects->setTextArg("[COUNT]", zero_str);
+		mOwnerObjects->setTextArg("[COUNT]", zero_str);
+		mGroupObjects->setTextArg("[COUNT]", zero_str);
+		mOtherObjects->setTextArg("[COUNT]", zero_str);
+		mSelectedObjects->setTextArg("[COUNT]", zero_str);
 	}
 	else
 	{
@@ -1349,23 +1350,23 @@ void LLPanelLandObjects::refresh()
 		if (sw_total > sw_max)
 		{
 			mSWTotalObjects->setText(getString("objects_deleted_text"));
-			mSWTotalObjects->setTextArg("[DELETED]", llformat("%d", sw_total - sw_max));
+			mSWTotalObjects->setTextArg("[DELETED]", fmt::to_string(sw_total - sw_max));
 		}
 		else
 		{
 			mSWTotalObjects->setText(getString("objects_available_text"));
-			mSWTotalObjects->setTextArg("[AVAILABLE]", llformat("%d", sw_max - sw_total));
+			mSWTotalObjects->setTextArg("[AVAILABLE]", fmt::to_string(sw_max - sw_total));
 		}
-		mSWTotalObjects->setTextArg("[COUNT]", llformat("%d", sw_total));
-		mSWTotalObjects->setTextArg("[MAX]", llformat("%d", sw_max));
+		mSWTotalObjects->setTextArg("[COUNT]", fmt::to_string(sw_total));
+		mSWTotalObjects->setTextArg("[MAX]", fmt::to_string(sw_max));
 
-		mObjectContribution->setTextArg("[COUNT]", llformat("%d", max));
-		mTotalObjects->setTextArg("[COUNT]", llformat("%d", total));
-		mOwnerObjects->setTextArg("[COUNT]", llformat("%d", owned));
-		mGroupObjects->setTextArg("[COUNT]", llformat("%d", group));
-		mOtherObjects->setTextArg("[COUNT]", llformat("%d", other));
-		mSelectedObjects->setTextArg("[COUNT]", llformat("%d", selected));
-		mCleanOtherObjectsTime->setText(llformat("%d", mOtherTime));
+		mObjectContribution->setTextArg("[COUNT]", fmt::to_string(max));
+		mTotalObjects->setTextArg("[COUNT]", fmt::to_string(total));
+		mOwnerObjects->setTextArg("[COUNT]", fmt::to_string(owned));
+		mGroupObjects->setTextArg("[COUNT]", fmt::to_string(group));
+		mOtherObjects->setTextArg("[COUNT]", fmt::to_string(other));
+		mSelectedObjects->setTextArg("[COUNT]", fmt::to_string(selected));
+		mCleanOtherObjectsTime->setText(fmt::to_string(mOtherTime));
 
 		BOOL can_return_owned = LLViewerParcelMgr::isParcelModifiableByAgent(parcel, GP_LAND_RETURN_GROUP_OWNED);
 		BOOL can_return_group_set = LLViewerParcelMgr::isParcelModifiableByAgent(parcel, GP_LAND_RETURN_GROUP_SET);
@@ -1585,7 +1586,7 @@ void LLPanelLandObjects::onClickReturnOwnerList(void* userdata)
 
 	LLSD args;
 	args["NAME"] = self->mSelectedName;
-	args["N"] = llformat("%d",self->mSelectedCount);
+	args["N"] = fmt::to_string(self->mSelectedCount);
 	if (self->mSelectedIsGroup)
 	{
 		LLNotificationsUtil::add("ReturnObjectsDeededToGroup", args, LLSD(), boost::bind(&LLPanelLandObjects::callbackReturnOwnerList, self, _1, _2));	
@@ -1702,7 +1703,7 @@ void LLPanelLandObjects::processParcelObjectOwnersReply(LLMessageSystem *msg, vo
 		LLAvatarNameCache::get(owner_id, &av_name);
 		item_params.columns.add().value(av_name.getCompleteName()).font(FONT).column("name");
 
-		object_count_str = llformat("%d", object_count);
+		object_count_str = fmt::to_string(object_count);
 		item_params.columns.add().value(object_count_str).font(FONT).column("count");
 		item_params.columns.add().value(LLDate((time_t)most_recent_time)).font(FONT).column("mostrecent").type("date");
 
@@ -1803,7 +1804,7 @@ void LLPanelLandObjects::onClickReturnOwnerObjects(void* userdata)
 	LLUUID owner_id = parcel->getOwnerID();
 	
 	LLSD args;
-	args["N"] = llformat("%d",owned);
+	args["N"] = fmt::to_string(owned);
 
 	if (owner_id == gAgent.getID())
 	{
@@ -1830,7 +1831,7 @@ void LLPanelLandObjects::onClickReturnGroupObjects(void* userdata)
 	
 	LLSD args;
 	args["NAME"] = group_name;
-	args["N"] = llformat("%d", parcel->getGroupPrimCount());
+	args["N"] = fmt::to_string(parcel->getGroupPrimCount());
 
 	// create and show confirmation textbox
 	LLNotificationsUtil::add("ReturnObjectsDeededToGroup", args, LLSD(), boost::bind(&LLPanelLandObjects::callbackReturnGroupObjects, panelp, _1, _2));
@@ -1850,7 +1851,7 @@ void LLPanelLandObjects::onClickReturnOtherObjects(void* userdata)
 	send_parcel_select_objects(parcel->getLocalID(), RT_OTHER);
 
 	LLSD args;
-	args["N"] = llformat("%d", other);
+	args["N"] = fmt::to_string(other);
 	
 	if (parcel->getIsGroupOwned())
 	{
@@ -2511,11 +2512,11 @@ void LLPanelLandAccess::refresh()
 			mListAccess->clearSortOrder();
 			mListAccess->deleteAllItems();
 			S32 count = parcel->mAccessList.size();
-			getChild<LLUICtrl>("AllowedText")->setTextArg("[COUNT]", llformat("%d",count));
-			getChild<LLUICtrl>("AllowedText")->setTextArg("[MAX]", llformat("%d",PARCEL_MAX_ACCESS_LIST));
+			getChild<LLUICtrl>("AllowedText")->setTextArg("[COUNT]", fmt::to_string(count));
+			getChild<LLUICtrl>("AllowedText")->setTextArg("[MAX]", fmt::to_string(PARCEL_MAX_ACCESS_LIST));
 
-			getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[LISTED]"), llformat("%d",count));
-			getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[MAX]"), llformat("%d",PARCEL_MAX_ACCESS_LIST));
+			getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[LISTED]"), fmt::to_string(count));
+			getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[MAX]"), fmt::to_string(PARCEL_MAX_ACCESS_LIST));
 
 			for (LLAccessEntry::map::const_iterator cit = parcel->mAccessList.begin();
 				 cit != parcel->mAccessList.end(); ++cit)
@@ -2531,7 +2532,7 @@ void LLPanelLandAccess::refresh()
 					prefix.assign(" (");
 					if (seconds >= 120)
 					{
-						args["[MINUTES]"] = llformat("%d", (seconds/60));
+						args["[MINUTES]"] = fmt::to_string((seconds/60));
 						std::string buf = parent_floater->getString ("Minutes", args);
 						prefix.append(buf);
 					}
@@ -2541,7 +2542,7 @@ void LLPanelLandAccess::refresh()
 					}
 					else
 					{
-						args["[SECONDS]"] = llformat("%d", seconds);
+						args["[SECONDS]"] = fmt::to_string(seconds);
 						std::string buf = parent_floater->getString ("Seconds", args);
 						prefix.append(buf);
 					}
@@ -2559,11 +2560,11 @@ void LLPanelLandAccess::refresh()
 			mListBanned->clearSortOrder();
 			mListBanned->deleteAllItems();
 			S32 count = parcel->mBanList.size();
-			getChild<LLUICtrl>("BanCheck")->setTextArg("[COUNT]", llformat("%d",count));
-			getChild<LLUICtrl>("BanCheck")->setTextArg("[MAX]", llformat("%d",PARCEL_MAX_ACCESS_LIST));
+			getChild<LLUICtrl>("BanCheck")->setTextArg("[COUNT]", fmt::to_string(count));
+			getChild<LLUICtrl>("BanCheck")->setTextArg("[MAX]", fmt::to_string(PARCEL_MAX_ACCESS_LIST));
 
-			getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[LISTED]"), llformat("%d",count));
-			getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[MAX]"), llformat("%d",PARCEL_MAX_ACCESS_LIST));
+			getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[LISTED]"), fmt::to_string(count));
+			getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[MAX]"), fmt::to_string(PARCEL_MAX_ACCESS_LIST));
 
 			for (LLAccessEntry::map::const_iterator cit = parcel->mBanList.begin();
 				 cit != parcel->mBanList.end(); ++cit)
@@ -2579,7 +2580,7 @@ void LLPanelLandAccess::refresh()
 
 					if (seconds >= 7200)
 					{
-						args["[HOURS]"] = llformat("%d", (seconds / 3600));
+						args["[HOURS]"] = fmt::to_string((seconds / 3600));
 						duration = parent_floater->getString("Hours", args);
 					}
 					else if (seconds >= 3600)
@@ -2588,7 +2589,7 @@ void LLPanelLandAccess::refresh()
 					}
 					else if (seconds >= 120)
 					{
-						args["[MINUTES]"] = llformat("%d", (seconds / 60));
+						args["[MINUTES]"] = fmt::to_string((seconds / 60));
 						duration = parent_floater->getString("Minutes", args);
 					}
 					else if (seconds >= 60)
@@ -2597,7 +2598,7 @@ void LLPanelLandAccess::refresh()
 					}
 					else
 					{
-						args["[SECONDS]"] = llformat("%d", seconds);
+						args["[SECONDS]"] = fmt::to_string(seconds);
 						duration = parent_floater->getString("Seconds", args);
 					}
 				}
@@ -2664,10 +2665,11 @@ void LLPanelLandAccess::refresh()
 		getChild<LLUICtrl>("PassCheck")->setValue(FALSE);
 		getChild<LLUICtrl>("PriceSpin")->setValue((F32)PARCEL_PASS_PRICE_DEFAULT);
 		getChild<LLUICtrl>("HoursSpin")->setValue(PARCEL_PASS_HOURS_DEFAULT );
-		getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[LISTED]"), llformat("%d",0));
-		getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[MAX]"), llformat("%d",0));
-		getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[LISTED]"), llformat("%d",0));
-		getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[MAX]"), llformat("%d",0));
+		std::string zero_str = fmt::to_string(0);
+		getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[LISTED]"), zero_str);
+		getChild<LLUICtrl>("AccessList")->setToolTipArg(LLStringExplicit("[MAX]"), zero_str);
+		getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[LISTED]"), zero_str);
+		getChild<LLUICtrl>("BannedList")->setToolTipArg(LLStringExplicit("[MAX]"), zero_str);
 	}	
 }
 

@@ -117,7 +117,7 @@ void LLFloaterObjectWeights::onWeightsUpdate(const SelectionCost& selection_cost
 	mSelectedServerWeight->setText(llformat("%.1f", selection_cost.mSimulationCost));
 
 	S32 render_cost = LLSelectMgr::getInstance()->getSelection()->getSelectedObjectRenderCost();
-	mSelectedDisplayWeight->setText(llformat("%d", render_cost));
+	mSelectedDisplayWeight->setText(fmt::to_string(render_cost));
 
 	toggleWeightsLoadingIndicators(false);
 }
@@ -154,9 +154,9 @@ void LLFloaterObjectWeights::updateLandImpacts(const LLParcel* parcel)
 			total_capacity = llmin(total_capacity, max_tasks_per_region);
 		}
 
-		mRezzedOnLand->setText(llformat("%d", rezzed_prims));
-		mRemainingCapacity->setText(llformat("%d", total_capacity - rezzed_prims));
-		mTotalCapacity->setText(llformat("%d", total_capacity));
+		mRezzedOnLand->setText(fmt::to_string(rezzed_prims));
+		mRemainingCapacity->setText(fmt::to_string(total_capacity - rezzed_prims));
+		mTotalCapacity->setText(fmt::to_string(total_capacity));
 
 		toggleLandImpactsLoadingIndicators(false);
 	}
@@ -176,8 +176,8 @@ void LLFloaterObjectWeights::refresh()
 		S32 link_count = sel_mgr->getSelection()->getRootObjectCount();
 		F32 prim_equiv = sel_mgr->getSelection()->getSelectedLinksetCost();
 
-		mSelectedObjects->setText(llformat("%d", link_count));
-		mSelectedPrims->setText(llformat("%d", prim_count));
+		mSelectedObjects->setText(fmt::to_string(link_count));
+		mSelectedPrims->setText(fmt::to_string(prim_count));
 		mSelectedOnLand->setText(llformat("%.1d", (S32)prim_equiv));
 
 		LLCrossParcelFunctor func;

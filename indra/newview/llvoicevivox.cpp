@@ -6462,7 +6462,7 @@ void LLVivoxVoiceClient::expireVoiceFonts()
 	if (will_expire)
 	{
 		S32Seconds seconds(gSavedSettings.getS32("VoiceEffectExpiryWarningTime"));
-		args["INTERVAL"] = llformat("%d", LLUnit<S32, LLUnits::Days>(seconds).value());
+		args["INTERVAL"] = fmt::to_string(LLUnit<S32, LLUnits::Days>(seconds).value());
 
 		LLNotificationsUtil::add("VoiceEffectsWillExpire", args);
 	}

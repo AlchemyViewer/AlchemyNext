@@ -175,8 +175,8 @@ void LLFloaterOutfitPhotoPreview::updateDimensions()
 		mUpdateDimensions = TRUE;
 	}
 	
-	getChild<LLUICtrl>("dimensions")->setTextArg("[WIDTH]",  llformat("%d", mImage->getFullWidth()));
-	getChild<LLUICtrl>("dimensions")->setTextArg("[HEIGHT]", llformat("%d", mImage->getFullHeight()));
+	getChild<LLUICtrl>("dimensions")->setTextArg("[WIDTH]", fmt::to_string(mImage->getFullWidth()));
+	getChild<LLUICtrl>("dimensions")->setTextArg("[HEIGHT]", fmt::to_string(mImage->getFullHeight()));
 
 	if ((mImage->getFullWidth() <= MAX_OUTFIT_PHOTO_WIDTH) && (mImage->getFullHeight() <= MAX_OUTFIT_PHOTO_HEIGHT))
 	{
@@ -187,8 +187,8 @@ void LLFloaterOutfitPhotoPreview::updateDimensions()
 	{
 		mExceedLimits = TRUE;
 		LLStringUtil::format_map_t args;
-		args["MAX_WIDTH"] = llformat("%d", MAX_OUTFIT_PHOTO_WIDTH);
-		args["MAX_HEIGHT"] = llformat("%d", MAX_OUTFIT_PHOTO_HEIGHT);
+		args["MAX_WIDTH"] = fmt::to_string(MAX_OUTFIT_PHOTO_WIDTH);
+		args["MAX_HEIGHT"] = fmt::to_string(MAX_OUTFIT_PHOTO_HEIGHT);
 		std::string label = getString("exceed_limits", args);
 		getChild<LLUICtrl>("notification")->setValue(label);
 		getChild<LLUICtrl>("notification")->setColor(LLColor4::yellow);

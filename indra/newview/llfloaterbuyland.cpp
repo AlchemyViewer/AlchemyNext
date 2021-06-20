@@ -1022,8 +1022,8 @@ void LLFloaterBuyLandUI::refreshUI()
 			getChild<LLUICtrl>("info_parcel")->setValue(mParcelLocation);
 
 			LLStringUtil::format_map_t string_args;
-			string_args["[AMOUNT]"] = llformat("%d", mParcelActualArea);
-			string_args["[AMOUNT2]"] = llformat("%d", mParcelSupportedObjects);
+			string_args["[AMOUNT]"] = fmt::to_string(mParcelActualArea);
+			string_args["[AMOUNT2]"] = fmt::to_string(mParcelSupportedObjects);
 		
 			getChild<LLUICtrl>("info_size")->setValue(getString("meters_supports_object", string_args));
 
@@ -1034,7 +1034,7 @@ void LLFloaterBuyLandUI::refreshUI()
 			}
 
 			LLStringUtil::format_map_t info_price_args;
-			info_price_args["[PRICE]"] = llformat("%d", mParcelPrice);
+			info_price_args["[PRICE]"] = fmt::to_string(mParcelPrice);
 			info_price_args["[PRICE_PER_SQM]"] = llformat("%.1f", cost_per_sqm);
 			if (mParcelSoldWithObjects)
 			{
@@ -1160,7 +1160,7 @@ void LLFloaterBuyLandUI::refreshUI()
 		else
 		{
 			LLStringUtil::format_map_t string_args;
-			string_args["[BUYER]"] = llformat("%d", mAgentCommittedTier);
+			string_args["[BUYER]"] = fmt::to_string(mAgentCommittedTier);
 			message += getString("land_holdings", string_args);
 		}
 		
@@ -1223,7 +1223,7 @@ void LLFloaterBuyLandUI::refreshUI()
 					: LLViewChildren::BADGE_OK);
 			
 		LLStringUtil::format_map_t string_args;
-		string_args["[AMOUNT]"] = llformat("%d", mParcelPrice);
+		string_args["[AMOUNT]"] = fmt::to_string(mParcelPrice);
 		string_args["[SELLER]"] = mParcelSellerName;
 		getChild<LLUICtrl>("purchase_action")->setValue(getString("pay_to_for_land", string_args));
 		getChildView("purchase_action")->setVisible( mParcelValid);
@@ -1233,15 +1233,15 @@ void LLFloaterBuyLandUI::refreshUI()
 		if (haveEnough)
 		{
 			LLStringUtil::format_map_t string_args;
-			string_args["[AMOUNT]"] = llformat("%d", mAgentCashBalance);
+			string_args["[AMOUNT]"] = fmt::to_string(mAgentCashBalance);
 
 			getChild<LLUICtrl>("currency_reason")->setValue(getString("have_enough_lindens", string_args));
 		}
 		else
 		{
 			LLStringUtil::format_map_t string_args;
-			string_args["[AMOUNT]"] = llformat("%d", mAgentCashBalance);
-			string_args["[AMOUNT2]"] = llformat("%d", mParcelPrice - mAgentCashBalance);
+			string_args["[AMOUNT]"] = fmt::to_string(mAgentCashBalance);
+			string_args["[AMOUNT2]"] = fmt::to_string(mParcelPrice - mAgentCashBalance);
 			
 			getChild<LLUICtrl>("currency_reason")->setValue(getString("not_enough_lindens", string_args));
 
@@ -1251,7 +1251,7 @@ void LLFloaterBuyLandUI::refreshUI()
 		if (willHaveEnough)
 		{
 			LLStringUtil::format_map_t string_args;
-			string_args["[AMOUNT]"] = llformat("%d", finalBalance);
+			string_args["[AMOUNT]"] = fmt::to_string(finalBalance);
 
 			getChild<LLUICtrl>("currency_balance")->setValue(getString("balance_left", string_args));
 
@@ -1259,7 +1259,7 @@ void LLFloaterBuyLandUI::refreshUI()
 		else
 		{
 			LLStringUtil::format_map_t string_args;
-			string_args["[AMOUNT]"] = llformat("%d", mParcelPrice - mAgentCashBalance);
+			string_args["[AMOUNT]"] = fmt::to_string(mParcelPrice - mAgentCashBalance);
 	
 			getChild<LLUICtrl>("currency_balance")->setValue(getString("balance_needed", string_args));
 			
@@ -1270,7 +1270,7 @@ void LLFloaterBuyLandUI::refreshUI()
 		bool showRemoveContribution = mParcelIsGroupLand
 							&& (mParcelGroupContribution > 0);
 		getChildView("remove_contribution")->setLabelArg("[AMOUNT]",
-							llformat("%d", minContribution));
+							fmt::to_string(minContribution));
 		getChildView("remove_contribution")->setVisible( showRemoveContribution);
 
 		getChildView("step_3")->setVisible(TRUE);
@@ -1323,14 +1323,14 @@ void LLFloaterBuyLandUI::startBuyPreConfirm()
 	if (mCurrency.getAmount() > 0)
 	{
 		LLStringUtil::format_map_t string_args;
-		string_args["[AMOUNT]"] = llformat("%d", mCurrency.getAmount());
+		string_args["[AMOUNT]"] = fmt::to_string(mCurrency.getAmount());
 		string_args["[LOCAL_AMOUNT]"] = mCurrency.getLocalEstimate();
 		
 		action += getString("buy_for_US", string_args);
 	}
 
 	LLStringUtil::format_map_t string_args;
-	string_args["[AMOUNT]"] = llformat("%d", mParcelPrice);
+	string_args["[AMOUNT]"] = fmt::to_string(mParcelPrice);
 	string_args["[SELLER]"] = mParcelSellerName;
 	action += getString("pay_to_for_land", string_args);
 		

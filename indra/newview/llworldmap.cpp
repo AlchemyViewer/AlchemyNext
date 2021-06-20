@@ -522,8 +522,8 @@ bool LLWorldMap::insertItem(U32 x_world, U32 y_world, std::string& name, LLUUID&
 		{
 			static LLUIString tooltip_fmt = LLTrans::getString("worldmap_item_tooltip_format");
 
-			tooltip_fmt.setArg("[AREA]",  llformat("%d", extra));
-			tooltip_fmt.setArg("[PRICE]", llformat("%d", extra2));
+			tooltip_fmt.setArg("[AREA]",  fmt::to_string(extra));
+			tooltip_fmt.setArg("[PRICE]", fmt::to_string(extra2));
 
 			// Check for division by zero
 			if (extra != 0)

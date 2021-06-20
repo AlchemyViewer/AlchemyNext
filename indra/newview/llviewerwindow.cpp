@@ -5860,8 +5860,8 @@ BOOL LLViewerWindow::changeDisplaySettings(LLCoordScreen size, BOOL disable_vsyn
 	if (!result_first_try)
 	{
 		LLSD args;
-		args["RESX"] = llformat("%d",size.mX);
-		args["RESY"] = llformat("%d",size.mY);
+		args["RESX"] = fmt::to_string(size.mX);
+		args["RESY"] = fmt::to_string(size.mY);
 		LLNotificationsUtil::add("ResolutionSwitchFail", args);
 		size = old_size; // for reshape below
 	}

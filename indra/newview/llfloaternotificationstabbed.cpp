@@ -251,7 +251,7 @@ LLFloaterNotificationsTabbed* LLFloaterNotificationsTabbed::getInstance(const LL
 void LLFloaterNotificationsTabbed::updateNotificationCounter(S32 panelIndex, S32 counterValue, std::string stringName)
 {
     LLStringUtil::format_map_t string_args;
-    string_args["[COUNT]"] = llformat("%d", counterValue);
+    string_args["[COUNT]"] = fmt::to_string(counterValue);
     std::string label = getString(stringName, string_args);
     mNotificationsTabContainer->setPanelTitle(panelIndex, label);
 }

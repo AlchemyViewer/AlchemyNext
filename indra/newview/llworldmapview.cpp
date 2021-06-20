@@ -1105,7 +1105,7 @@ BOOL LLWorldMapView::handleToolTip( S32 x, S32 y, MASK mask )
 			if (agent_count > 0)
 			{
 				LLStringUtil::format_map_t string_args;
-				string_args["[NUMBER]"] = llformat("%d", agent_count);
+				string_args["[NUMBER]"] = fmt::to_string(agent_count);
 				message += '\n';
 				message += getString((agent_count == 1 ? "world_map_person" : "world_map_people") , string_args);
 			}

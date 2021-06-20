@@ -1055,7 +1055,7 @@ BOOL LLPanelRegionGeneralInfo::sendUpdate()
 		buffer = llformat("%f", value);
 		strings.push_back(strings_t::value_type(buffer));
 
-		buffer = llformat("%d", getChild<LLUICtrl>("access_combo")->getValue().asInteger());
+		buffer = fmt::to_string(getChild<LLUICtrl>("access_combo")->getValue().asInteger());
 		strings.push_back(strings_t::value_type(buffer));
 
 		buffer = llformat("%s", (getChild<LLUICtrl>("restrict_pushobject")->getValue().asBoolean() ? "Y" : "N"));
@@ -1205,7 +1205,7 @@ bool LLPanelRegionDebugInfo::callbackReturn(const LLSD& notification, const LLSD
 		{
 			// send as estate message - routed by spaceserver to all regions in estate
 			strings_t strings;
-			strings.push_back(llformat("%d", flags));
+			strings.push_back(fmt::to_string(flags));
 			strings.push_back(target_avatar.asString());
 
 			LLUUID invoice(LLFloaterRegionInfo::getLastInvoice());
@@ -1320,7 +1320,7 @@ BOOL LLPanelRegionTerrainInfo::validateTextureSizes()
 		{
 			LLSD args;
 			args["TEXTURE_NUM"] = i+1;
-			args["TEXTURE_BIT_DEPTH"] = llformat("%d",components * 8);
+			args["TEXTURE_BIT_DEPTH"] = fmt::to_string(components * 8);
 			LLNotificationsUtil::add("InvalidTerrainBitDepth", args);
 			return FALSE;
 		}
@@ -2599,7 +2599,7 @@ void LLPanelRegionExperiences::sendEstateExperienceDelta(U32 flags, const LLUUID
 {
 	strings_t str(3, std::string());
 	gAgent.getID().toString(str[0]);
-	str[1] = llformat("%u", flags);
+	str[1] = fmt::to_string(flags);
 	experience_id.toString(str[2]);
 
 	LLPanelRegionExperiences* panel = LLFloaterRegionInfo::getPanelExperiences();
@@ -2858,7 +2858,7 @@ void LLPanelEstateAccess::onClickAddAllowedAgent()
 		//args
 
 		LLSD args;
-		args["MAX_AGENTS"] = llformat("%d", ESTATE_MAX_ACCESS_IDS);
+		args["MAX_AGENTS"] = fmt::to_string(ESTATE_MAX_ACCESS_IDS);
 		LLNotificationsUtil::add("MaxAllowedAgentOnRegion", args);
 		return;
 	}
@@ -2877,7 +2877,7 @@ void LLPanelEstateAccess::onClickAddAllowedGroup()
 	if (list->getItemCount() >= ESTATE_MAX_ACCESS_IDS)
 	{
 		LLSD args;
-		args["MAX_GROUPS"] = llformat("%d", ESTATE_MAX_ACCESS_IDS);
+		args["MAX_GROUPS"] = fmt::to_string(ESTATE_MAX_ACCESS_IDS);
 		LLNotificationsUtil::add("MaxAllowedGroupsOnRegion", args);
 		return;
 	}
@@ -2929,7 +2929,7 @@ void LLPanelEstateAccess::onClickAddBannedAgent()
 	if (list->getItemCount() >= ESTATE_MAX_ACCESS_IDS)
 	{
 		LLSD args;
-		args["MAX_BANNED"] = llformat("%d", ESTATE_MAX_ACCESS_IDS);
+		args["MAX_BANNED"] = fmt::to_string(ESTATE_MAX_ACCESS_IDS);
 		LLNotificationsUtil::add("MaxBannedAgentsOnRegion", args);
 		return;
 	}
@@ -2964,7 +2964,7 @@ void LLPanelEstateAccess::onClickAddEstateManager()
 	if (list->getItemCount() >= ESTATE_MAX_MANAGERS)
 	{	// Tell user they can't add more managers
 		LLSD args;
-		args["MAX_MANAGER"] = llformat("%d", ESTATE_MAX_MANAGERS);
+		args["MAX_MANAGER"] = fmt::to_string(ESTATE_MAX_MANAGERS);
 		LLNotificationsUtil::add("MaxManagersOnRegion", args);
 	}
 	else
@@ -3116,10 +3116,10 @@ void LLPanelEstateAccess::accessAddCore3(const uuid_vec_t& ids, std::vector<LLAv
 		if (ids.size() + currentCount > ESTATE_MAX_ACCESS_IDS)
 		{
 			LLSD args;
-			args["NUM_ADDED"] = llformat("%d", ids.size());
-			args["MAX_AGENTS"] = llformat("%d", ESTATE_MAX_ACCESS_IDS);
+			args["NUM_ADDED"] = fmt::to_string(ids.size());
+			args["MAX_AGENTS"] = fmt::to_string(ESTATE_MAX_ACCESS_IDS);
 			args["LIST_TYPE"] = LLTrans::getString("RegionInfoListTypeAllowedAgents");
-			args["NUM_EXCESS"] = llformat("%d", (ids.size() + currentCount) - ESTATE_MAX_ACCESS_IDS);
+			args["NUM_EXCESS"] = fmt::to_string((ids.size() + currentCount) - ESTATE_MAX_ACCESS_IDS);
 			LLNotificationsUtil::add("MaxAgentOnRegionBatch", args);
 			delete change_info;
 			return;
@@ -3170,10 +3170,10 @@ void LLPanelEstateAccess::accessAddCore3(const uuid_vec_t& ids, std::vector<LLAv
 		if (ids.size() + currentCount > ESTATE_MAX_ACCESS_IDS)
 		{
 			LLSD args;
-			args["NUM_ADDED"] = llformat("%d", ids.size());
-			args["MAX_AGENTS"] = llformat("%d", ESTATE_MAX_ACCESS_IDS);
+			args["NUM_ADDED"] = fmt::to_string(ids.size());
+			args["MAX_AGENTS"] = fmt::to_string(ESTATE_MAX_ACCESS_IDS);
 			args["LIST_TYPE"] = LLTrans::getString("RegionInfoListTypeBannedAgents");
-			args["NUM_EXCESS"] = llformat("%d", (ids.size() + currentCount) - ESTATE_MAX_ACCESS_IDS);
+			args["NUM_EXCESS"] = fmt::to_string((ids.size() + currentCount) - ESTATE_MAX_ACCESS_IDS);
 			LLNotificationsUtil::add("MaxAgentOnRegionBatch", args);
 			delete change_info;
 			return;
@@ -3413,7 +3413,7 @@ bool LLPanelEstateAccess::accessCoreConfirm(const LLSD& notification, const LLSD
 	if (listed_names > MAX_LISTED_NAMES)
 	{
 		LLSD args;
-		args["EXTRA_COUNT"] = llformat("%d", listed_names - MAX_LISTED_NAMES);
+		args["EXTRA_COUNT"] = fmt::to_string(listed_names - MAX_LISTED_NAMES);
 		names += " " + LLTrans::getString("AndNMore", args);
 	}
 
@@ -3488,7 +3488,7 @@ void LLPanelEstateAccess::sendEstateAccessDelta(U32 flags, const LLUUID& agent_o
 	msg->nextBlock("ParamList");
 	msg->addString("Parameter", buf);
 
-	buf = llformat("%u", flags);
+	buf = fmt::to_string(flags);
 	msg->nextBlock("ParamList");
 	msg->addString("Parameter", buf);
 
@@ -3532,8 +3532,8 @@ void LLPanelEstateAccess::requestEstateGetAccessCoro(std::string url)
 	if (allowed_agent_name_list && result.has("AllowedAgents"))
 	{
 		LLStringUtil::format_map_t args;
-		args["[ALLOWEDAGENTS]"] = llformat("%d", result["AllowedAgents"].size());
-		args["[MAXACCESS]"] = llformat("%d", ESTATE_MAX_ACCESS_IDS);
+		args["[ALLOWEDAGENTS]"] = fmt::to_string(result["AllowedAgents"].size());
+		args["[MAXACCESS]"] = fmt::to_string(ESTATE_MAX_ACCESS_IDS);
 		std::string msg = LLTrans::getString("RegionInfoAllowedResidents", args);
 		panel->getChild<LLUICtrl>("allow_resident_label")->setValue(LLSD(msg));
 
@@ -3551,8 +3551,8 @@ void LLPanelEstateAccess::requestEstateGetAccessCoro(std::string url)
 	if (banned_agent_name_list && result.has("BannedAgents"))
 	{
 		LLStringUtil::format_map_t args;
-		args["[BANNEDAGENTS]"] = llformat("%d", result["BannedAgents"].size());
-		args["[MAXBANNED]"] = llformat("%d", ESTATE_MAX_ACCESS_IDS);
+		args["[BANNEDAGENTS]"] = fmt::to_string(result["BannedAgents"].size());
+		args["[MAXBANNED]"] = fmt::to_string(ESTATE_MAX_ACCESS_IDS);
 		std::string msg = LLTrans::getString("RegionInfoBannedResidents", args);
 		panel->getChild<LLUICtrl>("ban_resident_label")->setValue(LLSD(msg));
 
@@ -3594,8 +3594,8 @@ void LLPanelEstateAccess::requestEstateGetAccessCoro(std::string url)
 	if (allowed_group_name_list && result.has("AllowedGroups"))
 	{
 		LLStringUtil::format_map_t args;
-		args["[ALLOWEDGROUPS]"] = llformat("%d", result["AllowedGroups"].size());
-		args["[MAXACCESS]"] = llformat("%d", ESTATE_MAX_GROUP_IDS);
+		args["[ALLOWEDGROUPS]"] = fmt::to_string(result["AllowedGroups"].size());
+		args["[MAXACCESS]"] = fmt::to_string(ESTATE_MAX_GROUP_IDS);
 		std::string msg = LLTrans::getString("RegionInfoAllowedGroups", args);
 		panel->getChild<LLUICtrl>("allow_group_label")->setValue(LLSD(msg));
 
@@ -3613,8 +3613,8 @@ void LLPanelEstateAccess::requestEstateGetAccessCoro(std::string url)
 	if (estate_manager_name_list && result.has("Managers"))
 	{
 		LLStringUtil::format_map_t args;
-		args["[ESTATEMANAGERS]"] = llformat("%d", result["Managers"].size());
-		args["[MAXMANAGERS]"] = llformat("%d", ESTATE_MAX_MANAGERS);
+		args["[ESTATEMANAGERS]"] = fmt::to_string(result["Managers"].size());
+		args["[MAXMANAGERS]"] = fmt::to_string(ESTATE_MAX_MANAGERS);
 		std::string msg = LLTrans::getString("RegionInfoEstateManagers", args);
 		panel->getChild<LLUICtrl>("estate_manager_label")->setValue(LLSD(msg));
 

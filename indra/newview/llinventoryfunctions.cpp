@@ -1231,7 +1231,7 @@ bool can_move_item_to_marketplace(const LLInventoryCategory* root_folder, LLInve
         {
             LLStringUtil::format_map_t args;
             U32 amount = gSavedSettings.getU32("InventoryOutboxMaxItemCount");
-            args["[AMOUNT]"] = llformat("%d",amount);
+            args["[AMOUNT]"] = fmt::to_string(amount);
             tooltip_msg = LLTrans::getString("TooltipOutboxTooManyObjects", args);
             accept = false;
         }
@@ -1239,7 +1239,7 @@ bool can_move_item_to_marketplace(const LLInventoryCategory* root_folder, LLInve
         {
             LLStringUtil::format_map_t args;
             U32 amount = gSavedSettings.getU32("InventoryOutboxMaxStockItemCount");
-            args["[AMOUNT]"] = llformat("%d",amount);
+            args["[AMOUNT]"] = fmt::to_string(amount);
             tooltip_msg = LLTrans::getString("TooltipOutboxTooManyStockItems", args);
             accept = false;
         }
@@ -1247,7 +1247,7 @@ bool can_move_item_to_marketplace(const LLInventoryCategory* root_folder, LLInve
         {
             LLStringUtil::format_map_t args;
             U32 amount = gSavedSettings.getU32("InventoryOutboxMaxFolderCount");
-            args["[AMOUNT]"] = llformat("%d",amount);
+            args["[AMOUNT]"] = fmt::to_string(amount);
             tooltip_msg = LLTrans::getString("TooltipOutboxTooManyFolders", args);
             accept = false;
         }
@@ -1278,7 +1278,7 @@ bool can_move_folder_to_marketplace(const LLInventoryCategory* root_folder, LLIn
     {
         LLStringUtil::format_map_t args;
         U32 amount = gSavedSettings.getU32("InventoryOutboxMaxFolderDepth");
-        args["[AMOUNT]"] = llformat("%d",amount);
+        args["[AMOUNT]"] = fmt::to_string(amount);
         tooltip_msg = LLTrans::getString("TooltipOutboxFolderLevels", args);
         accept = false;
     }
@@ -1324,7 +1324,7 @@ bool can_move_folder_to_marketplace(const LLInventoryCategory* root_folder, LLIn
         {
             LLStringUtil::format_map_t args;
             U32 amount = gSavedSettings.getU32("InventoryOutboxMaxFolderCount");
-            args["[AMOUNT]"] = llformat("%d",amount);
+            args["[AMOUNT]"] = fmt::to_string(amount);
             tooltip_msg = LLTrans::getString("TooltipOutboxTooManyFolders", args);
             accept = false;
         }
@@ -1332,7 +1332,7 @@ bool can_move_folder_to_marketplace(const LLInventoryCategory* root_folder, LLIn
         {
             LLStringUtil::format_map_t args;
             U32 amount = gSavedSettings.getU32("InventoryOutboxMaxItemCount");
-            args["[AMOUNT]"] = llformat("%d",amount);
+            args["[AMOUNT]"] = fmt::to_string(amount);
             tooltip_msg = LLTrans::getString("TooltipOutboxTooManyObjects", args);
             accept = false;
         }
@@ -1340,7 +1340,7 @@ bool can_move_folder_to_marketplace(const LLInventoryCategory* root_folder, LLIn
         {
             LLStringUtil::format_map_t args;
             U32 amount = gSavedSettings.getU32("InventoryOutboxMaxStockItemCount");
-            args["[AMOUNT]"] = llformat("%d",amount);
+            args["[AMOUNT]"] = fmt::to_string(amount);
             tooltip_msg = LLTrans::getString("TooltipOutboxTooManyStockItems", args);
             accept = false;
         }

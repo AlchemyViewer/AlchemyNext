@@ -240,8 +240,8 @@ void LLViewerTexLayerSetBuffer::doUpdate()
 		const BOOL highest_lod = layer_set->isLocalTextureDataFinal();
 		const std::string lod_str = highest_lod ? "HighRes" : "LowRes";
 		LLSD args;
-		args["EXISTENCE"] = llformat("%d",(U32)layer_set->getAvatar()->debugGetExistenceTimeElapsedF32());
-		args["TIME"] = llformat("%d",(U32)mNeedsUpdateTimer.getElapsedTimeF32());
+		args["EXISTENCE"] = fmt::to_string((U32)layer_set->getAvatar()->debugGetExistenceTimeElapsedF32());
+		args["TIME"] = fmt::to_string((U32)mNeedsUpdateTimer.getElapsedTimeF32());
 		args["BODYREGION"] = layer_set->getBodyRegionName();
 		args["RESOLUTION"] = lod_str;
 		LLNotificationsUtil::add("AvatarRezSelfBakedTextureUpdateNotification",args);

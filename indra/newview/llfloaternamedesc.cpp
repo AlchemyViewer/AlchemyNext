@@ -125,7 +125,7 @@ BOOL LLFloaterNameDesc::postBuild()
 	getChild<LLUICtrl>("cancel_btn")->setCommitCallback(boost::bind(&LLFloaterNameDesc::onBtnCancel, this));
 
 	S32 expected_upload_cost = getExpectedUploadCost();
-	getChild<LLUICtrl>("ok_btn")->setLabelArg("[AMOUNT]", llformat("%d", expected_upload_cost));
+	getChild<LLUICtrl>("ok_btn")->setLabelArg("[AMOUNT]", fmt::to_string(expected_upload_cost));
 
 	LLTextBox* info_text = getChild<LLTextBox>("info_text");
 	if (info_text)
@@ -210,7 +210,7 @@ void LLFloaterNameDesc::onBtnOK( )
     else
     {
         LLSD args;
-        args["COST"] = llformat("%d", expected_upload_cost);
+        args["COST"] = fmt::to_string(expected_upload_cost);
         LLNotificationsUtil::add("ErrorCannotAffordUpload", args);
     }
 

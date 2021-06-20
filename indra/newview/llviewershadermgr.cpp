@@ -425,7 +425,7 @@ void LLViewerShaderMgr::setShaders()
     reentrance = true;
 
     //setup preprocessor definitions
-    LLShaderMgr::instance()->mDefinitions["NUM_TEX_UNITS"] = llformat("%d", gGLManager.mNumTextureImageUnits);
+    LLShaderMgr::instance()->mDefinitions["NUM_TEX_UNITS"] = fmt::to_string(gGLManager.mNumTextureImageUnits);
     
     // Make sure the compiled shader map is cleared before we recompile shaders.
     mVertexShaderObjects.clear();
@@ -1589,7 +1589,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
                 gDeferredMaterialProgram[i].addPermutation("LOCAL_LIGHT_KILL", "1");
             }
 
-            gDeferredMaterialProgram[i].addPermutation("DIFFUSE_ALPHA_MODE", llformat("%d", alpha_mode));
+            gDeferredMaterialProgram[i].addPermutation("DIFFUSE_ALPHA_MODE", fmt::to_string(alpha_mode));
 
             if (use_sun_shadow)
             {
@@ -1644,7 +1644,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
                 gDeferredMaterialWaterProgram[i].addPermutation("HAS_SPECULAR_MAP", "1");
             }
 
-            gDeferredMaterialWaterProgram[i].addPermutation("DIFFUSE_ALPHA_MODE", llformat("%d", alpha_mode));
+            gDeferredMaterialWaterProgram[i].addPermutation("DIFFUSE_ALPHA_MODE", fmt::to_string(alpha_mode));
             if (use_sun_shadow)
             {
                 gDeferredMaterialWaterProgram[i].addPermutation("HAS_SUN_SHADOW", "1");
@@ -1795,7 +1795,7 @@ BOOL LLViewerShaderMgr::loadShadersDeferred()
 			gDeferredMultiLightProgram[i].mShaderFiles.push_back(make_pair("deferred/multiPointLightV.glsl", GL_VERTEX_SHADER));
 			gDeferredMultiLightProgram[i].mShaderFiles.push_back(make_pair("deferred/multiPointLightF.glsl", GL_FRAGMENT_SHADER));
 			gDeferredMultiLightProgram[i].mShaderLevel = mShaderLevel[SHADER_DEFERRED];
-			gDeferredMultiLightProgram[i].addPermutation("LIGHT_COUNT", llformat("%d", i+1));
+			gDeferredMultiLightProgram[i].addPermutation("LIGHT_COUNT", fmt::to_string(i+1));
 
             if (ambient_kill)
             {
