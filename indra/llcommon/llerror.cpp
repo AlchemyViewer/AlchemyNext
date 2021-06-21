@@ -83,23 +83,39 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 
 	try
 	{
-		sSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, true));
-		sSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+		const std::string default_fmt("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%l] [%s:%#] [%!] %v");
+		const std::string console_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%l] [%s:%#] %v");
+		{
+			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, true);
+			basic_file->set_pattern(default_fmt);
+			sSinks.emplace_back(std::move(basic_file));
+		}
+		//sSinks.emplace_back(std::make_shared<al_stdout_color_sink_mt>());
 #if LL_WINDOWS
 		if (IsDebuggerPresent())
 		{
-			sSinks.emplace_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
+			auto msvc_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
+			msvc_sink->set_pattern(default_fmt);
+			sSinks.emplace_back(std::move(msvc_sink));
 		}
 #endif
 
-		MAIN_LOG = std::make_shared<spdlog::async_logger>("main", sSinks.begin(), sSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		auto dup_filter = std::make_shared<spdlog::sinks::dup_filter_sink_mt>(std::chrono::seconds(3));
+		for (const auto& sink_ptr : sSinks)
+		{
+			dup_filter->add_sink(sink_ptr);
+		}
+		sSinks.emplace_back(dup_filter);
+
+		MAIN_LOG = std::make_shared<spdlog::async_logger>("main", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		MAIN_LOG->flush_on(spdlog::level::err);
 		spdlog::register_logger(MAIN_LOG);
+		spdlog::set_default_logger(MAIN_LOG);
 
-		RENDER_LOG = std::make_shared<spdlog::async_logger>("render", sSinks.begin(), sSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		RENDER_LOG = std::make_shared<spdlog::async_logger>("render", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(RENDER_LOG);
 
-		NETWORK_LOG = std::make_shared<spdlog::async_logger>("network", sSinks.begin(), sSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		NETWORK_LOG = std::make_shared<spdlog::async_logger>("network", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(NETWORK_LOG);
 
 	}
@@ -108,8 +124,7 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 		std::cout << "Log init failed: " << ex.what() << std::endl;
 	}
 
-	spdlog::set_default_logger(MAIN_LOG);
-	spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%l] [%s:%# %!] %v");
+	//spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%l] [%s:%#] [%!] %v");
 }
 
 // static
