@@ -667,11 +667,11 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 
         */
 
- 		LL_DEBUGS("ShaderLoading") << "Looking in " << open_file_name << LL_ENDL;
+		ALOG_RNDR_DEBUG("Looking in {}", open_file_name);
 		file = LLFile::fopen(open_file_name, "r");		/* Flawfinder: ignore */
 		if (file)
 		{
-			LL_DEBUGS("ShaderLoading") << "Loading file: " << open_file_name << " (Want class " << gpu_class << ")" << LL_ENDL;            
+			ALOG_RNDR_DEBUG("Loading file: {} (Want class {})", open_file_name, gpu_class);
 			break; // done
 		}
 	}
@@ -1402,7 +1402,7 @@ void LLShaderMgr::initAttribsAndUniforms()
 	{
 		if (dupe_check.find(mReservedUniforms[i]) != dupe_check.end())
 		{
-			LL_ERRS() << "Duplicate reserved uniform name found: " << mReservedUniforms[i] << LL_ENDL;
+			ALOG_RNDR_CRITICAL("Duplicate reserved uniform name found: {}", mReservedUniforms[i]);
 		}
 		dupe_check.insert(mReservedUniforms[i]);
 	}

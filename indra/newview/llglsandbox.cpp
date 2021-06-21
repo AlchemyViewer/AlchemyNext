@@ -1138,7 +1138,7 @@ F32 gpu_benchmark()
 		//allocate render targets and textures
 		if (!dest[i].allocate(res, res, GL_RGBA, false, false, LLTexUnit::TT_TEXTURE, true))
 		{
-			LL_WARNS("Benchmark") << "Failed to allocate render target." << LL_ENDL;
+			ALOG_RNDR_WARN("Failed to allocate render target.");
 			// abandon the benchmark test
 			delete[] pixels;
 			return -1.f;
@@ -1150,7 +1150,7 @@ F32 gpu_benchmark()
 		if (!texHolder.bind(i))
 		{
 			// can use a dummy value mDummyTexUnit = new LLTexUnit(-1);
-			LL_WARNS("Benchmark") << "Failed to bind tex unit." << LL_ENDL;
+			ALOG_RNDR_WARN("Failed to bind tex unit.");
 			// abandon the benchmark test
 			delete[] pixels;
 			return -1.f;
@@ -1160,7 +1160,7 @@ F32 gpu_benchmark()
 		if (alloc_timer.getElapsedTimeF32() > time_limit)
 		{
 			// abandon the benchmark test
-			LL_WARNS("Benchmark") << "Allocation operation took longer then 30 seconds, stopping." << LL_ENDL;
+			ALOG_RNDR_WARN("Allocation operation took longer then 30 seconds, stopping.");
 			delete[] pixels;
 			return -1.f;
 		}
@@ -1173,7 +1173,7 @@ F32 gpu_benchmark()
 
 	if (!buff->allocateBuffer(3, 0, true))
 	{
-		LL_WARNS("Benchmark") << "Failed to allocate buffer during benchmark." << LL_ENDL;
+		ALOG_RNDR_WARN("Failed to allocate buffer during benchmark.");
 		// abandon the benchmark test
 		return -1.f;
 	}
@@ -1183,10 +1183,7 @@ F32 gpu_benchmark()
 
 	if (! buff->getVertexStrider(v))
 	{
-		LL_WARNS("Benchmark") << "GL LLVertexBuffer::getVertexStrider() returned false, "
-				   << "buff->getMappedData() is"
-				   << (buff->getMappedData()? " not" : "")
-				   << " NULL" << LL_ENDL;
+		ALOG_RNDR_WARN("GL LLVertexBuffer::getVertexStrider() returned false, buff->getMappedData() is{} NULL", (buff->getMappedData() ? " not" : ""));
 		// abandon the benchmark test
 		return -1.f;
 	}
@@ -1237,12 +1234,12 @@ F32 gpu_benchmark()
 
 	F32 gbps = results[results.size()/2];
 
-	LL_INFOS("Benchmark") << "Memory bandwidth is " << llformat("%.3f", gbps) << "GB/sec according to CPU timers, " << (F32)results.size() << " tests took " << time_passed << " seconds" << LL_ENDL;
+	ALOG_RNDR_INFO("Memory bandwidth is {:.3f}GB/sec according to CPU timers, {} tests took {} seconds", gbps, results.size(), time_passed);
   
 #if LL_DARWIN
     if (gbps > 512.f)
     { 
-        LL_WARNS("Benchmark") << "Memory bandwidth is improbably high and likely incorrect; discarding result." << LL_ENDL;
+		ALOG_RNDR_WARN("Memory bandwidth is improbably high and likely incorrect; discarding result.");
         //OSX is probably lying, discard result
         return -1.f;
     }
@@ -1255,7 +1252,7 @@ F32 gpu_benchmark()
 	F32 samples_sec = (samples_drawn/1000000000.0)/seconds;
 	gbps = samples_sec*8;
 
-	LL_INFOS("Benchmark") << "Memory bandwidth is " << llformat("%.3f", gbps) << "GB/sec according to ARB_timer_query, total time " << seconds << " seconds" << LL_ENDL;
+	ALOG_RNDR_INFO("Memory bandwidth is {:.3f}GB/sec according to ARB_timer_query, total time {} seconds", gbps, seconds);
 
 	return gbps;
 }

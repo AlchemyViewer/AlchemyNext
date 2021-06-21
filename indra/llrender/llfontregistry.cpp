@@ -384,10 +384,10 @@ LLFontGL *LLFontRegistry::createFont(const LLFontDescriptor& desc)
 	bool found_size = nameToSize(norm_desc.getSize(),point_size);
 	if (!found_size)
 	{
-		LL_WARNS() << "createFont unrecognized size " << norm_desc.getSize() << LL_ENDL;
+		ALOG_RNDR_WARN("createFont unrecognized size {}", norm_desc.getSize());
 		return NULL;
 	}
-	LL_INFOS() << "createFont " << norm_desc.getName() << " size " << norm_desc.getSize() << " style " << ((S32) norm_desc.getStyle()) << LL_ENDL;
+	ALOG_RNDR_INFO("createFont {} size {} style {}", norm_desc.getName(), norm_desc.getSize(), ((S32) norm_desc.getStyle()));
 	F32 fallback_scale = 1.0;
 
 	// Find corresponding font template (based on same descriptor with no size specified)
@@ -396,8 +396,7 @@ LLFontGL *LLFontRegistry::createFont(const LLFontDescriptor& desc)
 	const LLFontDescriptor *match_desc = getClosestFontTemplate(template_desc);
 	if (!match_desc)
 	{
-		LL_WARNS() << "createFont failed, no template found for "
-				<< norm_desc.getName() << " style [" << ((S32)norm_desc.getStyle()) << "]" << LL_ENDL;
+		ALOG_RNDR_WARN("createFont failed, no template found for {} style [{}]", norm_desc.getName(), ((S32)norm_desc.getStyle()));
 		return NULL;
 	}
 
@@ -410,7 +409,7 @@ LLFontGL *LLFontRegistry::createFont(const LLFontDescriptor& desc)
 	// This may not be the best solution, but it at least prevents a crash.
 	if (it != mFontMap.end() && it->second != NULL)
 	{
-		LL_INFOS() << "-- matching font exists: " << nearest_exact_desc.getName() << " size " << nearest_exact_desc.getSize() << " style " << ((S32) nearest_exact_desc.getStyle()) << LL_ENDL;
+		ALOG_RNDR_INFO("-- matching font exists: {} size {} style {}", nearest_exact_desc.getName(), nearest_exact_desc.getSize(), ((S32)nearest_exact_desc.getStyle()));
 		
 		// copying underlying Freetype font, and storing in LLFontGL with requested font descriptor
 		LLFontGL *font = new LLFontGL;
@@ -447,7 +446,7 @@ LLFontGL *LLFontRegistry::createFont(const LLFontDescriptor& desc)
 	// Load fonts based on names.
 	if (file_names.empty())
 	{
-		LL_WARNS() << "createFont failed, no file names specified" << LL_ENDL;
+		ALOG_RNDR_WARN("createFont failed, no file names specified");
 		return NULL;
 	}
 
@@ -523,7 +522,7 @@ LLFontGL *LLFontRegistry::createFont(const LLFontDescriptor& desc)
 		}
 		if(!is_font_loaded)
 		{
-			LL_INFOS_ONCE("LLFontRegistry") << "Couldn't load font " << *file_name_it <<  LL_ENDL;
+			ALOG_RNDR_INFO("Couldn't load font {}", *file_name_it);
 			delete fontp;
 			fontp = NULL;
 		}
@@ -540,7 +539,7 @@ LLFontGL *LLFontRegistry::createFont(const LLFontDescriptor& desc)
 	}
 	else
 	{
-		LL_WARNS() << "createFont failed in some way" << LL_ENDL;
+		ALOG_RNDR_WARN("createFont failed in some way");
 	}
 
 	mFontMap[desc] = result;

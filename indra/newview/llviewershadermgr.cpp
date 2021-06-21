@@ -406,7 +406,7 @@ void LLViewerShaderMgr::setShaders()
         || !gGLManager.mHasFragmentShader)
     {
         // Viewer will show 'hardware requirements' warning later
-        LL_INFOS("ShaderLoading") << "Shaders not supported" << LL_ENDL;
+        ALOG_RNDR_INFO("Shaders not supported");
         return;
     }
 
@@ -450,8 +450,8 @@ void LLViewerShaderMgr::setShaders()
     gPipeline.setLightingDetail(-1);
 
     // Shaders
-    LL_INFOS("ShaderLoading") << "\n~~~~~~~~~~~~~~~~~~\n Loading Shaders:\n~~~~~~~~~~~~~~~~~~" << LL_ENDL;
-    LL_INFOS("ShaderLoading") << llformat("Using GLSL %d.%d", gGLManager.mGLSLVersionMajor, gGLManager.mGLSLVersionMinor) << LL_ENDL;
+	ALOG_RNDR_INFO("\n~~~~~~~~~~~~~~~~~~\n Loading Shaders:\n~~~~~~~~~~~~~~~~~~");
+	ALOG_RNDR_INFO("Using GLSL {:d}.{:d}", gGLManager.mGLSLVersionMajor, gGLManager.mGLSLVersionMinor);
 
     for (S32 i = 0; i < SHADER_COUNT; i++)
     {
@@ -532,11 +532,11 @@ void LLViewerShaderMgr::setShaders()
     BOOL loaded = loadBasicShaders();
     if (loaded)
     {
-        LL_INFOS() << "Loaded basic shaders." << LL_ENDL;
+		ALOG_RNDR_INFO("Loaded basic shaders.");
     }
     else
     {
-        LL_WARNS() << "Failed to load basic shaders." << LL_ENDL;
+		ALOG_RNDR_WARN("Failed to load basic shaders.");
         llassert(loaded);
     }
 
@@ -550,11 +550,11 @@ void LLViewerShaderMgr::setShaders()
 
         if (loaded)
         {
-            LL_INFOS() << "Loaded environment shaders." << LL_ENDL;
+			ALOG_RNDR_INFO("Loaded environment shaders.");
         }
         else
         {
-            LL_WARNS() << "Failed to load environment shaders." << LL_ENDL;
+			ALOG_RNDR_WARN("Failed to load environment shaders.");
             llassert(loaded);
         }
 
@@ -563,11 +563,11 @@ void LLViewerShaderMgr::setShaders()
             loaded = loadShadersWater();
             if (loaded)
             {
-                LL_INFOS() << "Loaded water shaders." << LL_ENDL;
+				ALOG_RNDR_INFO("Loaded water shaders.");
             }
             else
             {
-                LL_WARNS() << "Failed to load water shaders." << LL_ENDL;
+				ALOG_RNDR_WARN("Failed to load water shaders.");
                 llassert(loaded);
             }
         }
@@ -577,11 +577,11 @@ void LLViewerShaderMgr::setShaders()
             loaded = loadShadersWindLight();
             if (loaded)
             {
-                LL_INFOS() << "Loaded windlight shaders." << LL_ENDL;
+				ALOG_RNDR_INFO("Loaded windlight shaders.");
             }
             else
             {
-                LL_WARNS() << "Failed to load windlight shaders." << LL_ENDL;
+				ALOG_RNDR_WARN("Failed to load windlight shaders.");
                 llassert(loaded);
             }
         }
@@ -591,11 +591,11 @@ void LLViewerShaderMgr::setShaders()
             loaded = loadShadersEffects();
             if (loaded)
             {
-                LL_INFOS() << "Loaded effects shaders." << LL_ENDL;
+				ALOG_RNDR_INFO("Loaded effects shaders.");
             }
             else
             {
-                LL_WARNS() << "Failed to load effects shaders." << LL_ENDL;
+				ALOG_RNDR_WARN("Failed to load effects shaders.");
                 llassert(loaded);
             }
         }
@@ -605,11 +605,11 @@ void LLViewerShaderMgr::setShaders()
             loaded = loadShadersInterface();
             if (loaded)
             {
-                LL_INFOS() << "Loaded interface shaders." << LL_ENDL;
+				ALOG_RNDR_INFO("Loaded interface shaders.");
             }
             else
             {
-                LL_WARNS() << "Failed to load interface shaders." << LL_ENDL;
+				ALOG_RNDR_WARN("Failed to load interface shaders.");
                 llassert(loaded);
             }
         }
@@ -674,7 +674,7 @@ void LLViewerShaderMgr::setShaders()
             if (gSavedSettings.getBOOL("WindLightUseAtmosShaders"))
             { //disable windlight and try again
                 gSavedSettings.setBOOL("WindLightUseAtmosShaders", FALSE);
-                LL_WARNS() << "Falling back to no windlight shaders." << LL_ENDL;
+				ALOG_RNDR_WARN("Falling back to no windlight shaders.");
                 reentrance = false;
                 setShaders();
                 return;
@@ -686,7 +686,7 @@ void LLViewerShaderMgr::setShaders()
         if (loaded && !loadShadersDeferred())
         { //everything else succeeded but deferred failed, disable deferred and try again
             gSavedSettings.setBOOL("RenderDeferred", FALSE);
-            LL_WARNS() << "Falling back to no deferred shaders." << LL_ENDL;
+			ALOG_RNDR_WARN("Falling back to no deferred shaders.");
             reentrance = false;
             setShaders();
             return;

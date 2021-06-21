@@ -104,7 +104,7 @@ void LLStandardBumpmap::addstandard()
 	// can't assert; we destroyGL and restoreGL a lot during *first* startup, which populates this list already, THEN we explicitly init the list as part of *normal* startup.  Sigh.  So clear the list every time before we (re-)add the standard bumpmaps.
 	//llassert( LLStandardBumpmap::sStandardBumpmapCount == 0 );
 	clear();
-	LL_INFOS() << "Adding standard bumpmaps." << LL_ENDL;
+	ALOG_RNDR_INFO("Adding standard bumpmaps.");
 	gStandardBumpmapList[LLStandardBumpmap::sStandardBumpmapCount++] = LLStandardBumpmap("None");		// BE_NO_BUMP
 	gStandardBumpmapList[LLStandardBumpmap::sStandardBumpmapCount++] = LLStandardBumpmap("Brightness");	// BE_BRIGHTNESS
 	gStandardBumpmapList[LLStandardBumpmap::sStandardBumpmapCount++] = LLStandardBumpmap("Darkness");	// BE_DARKNESS
@@ -113,7 +113,7 @@ void LLStandardBumpmap::addstandard()
 	LLFILE* file = LLFile::fopen( file_name, "rt" );	 /*Flawfinder: ignore*/
 	if( !file )
 	{
-		LL_WARNS() << "Could not open std_bump <" << file_name << ">" << LL_ENDL;
+		ALOG_RNDR_WARN("Could not open std_bump <{}>", file_name);
 		return;
 	}
 
@@ -122,14 +122,14 @@ void LLStandardBumpmap::addstandard()
 	S32 fields_read = fscanf( file, "LLStandardBumpmap version %d", &file_version );
 	if( fields_read != 1 )
 	{
-		LL_WARNS() << "Bad LLStandardBumpmap header" << LL_ENDL;
+		ALOG_RNDR_WARN("Bad LLStandardBumpmap header");
 		fclose(file);
 		return;
 	}
 
 	if( file_version > STD_BUMP_LATEST_FILE_VERSION )
 	{
-		LL_WARNS() << "LLStandardBumpmap has newer version (" << file_version << ") than viewer (" << STD_BUMP_LATEST_FILE_VERSION << ")" << LL_ENDL;
+		ALOG_RNDR_WARN("LLStandardBumpmap has newer version ({}) than viewer ({})", file_version, STD_BUMP_LATEST_FILE_VERSION);
 		fclose(file);
 		return;
 	}
@@ -147,7 +147,7 @@ void LLStandardBumpmap::addstandard()
 		}
 		if( fields_read != 2 )
 		{
-			LL_WARNS() << "Bad LLStandardBumpmap entry" << LL_ENDL;
+			ALOG_RNDR_WARN("Bad LLStandardBumpmap entry");
 			fclose(file);
 			return;
 		}
@@ -168,7 +168,7 @@ void LLStandardBumpmap::addstandard()
 // static
 void LLStandardBumpmap::clear()
 {
-	LL_INFOS() << "Clearing standard bumpmaps." << LL_ENDL;
+	ALOG_RNDR_INFO("Clearing standard bumpmaps.");
 	for( U32 i = 0; i < LLStandardBumpmap::sStandardBumpmapCount; i++ )
 	{
 		gStandardBumpmapList[i].mLabel.assign("");
@@ -950,7 +950,7 @@ void LLBumpImageList::init()
 
 void LLBumpImageList::clear()
 {
-	LL_INFOS() << "Clearing dynamic bumpmaps." << LL_ENDL;
+	ALOG_RNDR_INFO("Clearing dynamic bumpmaps.");
 	// these will be re-populated on-demand
 	mBrightnessEntries.clear();
 	mDarknessEntries.clear();
