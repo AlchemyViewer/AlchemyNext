@@ -1239,7 +1239,7 @@ LLIMModel::LLIMSession* LLIMModel::addMessageSilently(const LLUUID& session_id, 
 
 	if (!session)
 	{
-		LL_WARNS() << "session " << session_id << "does not exist " << LL_ENDL;
+		ALOG_UI_WARN("session {} does not exist ", session_id.asString());
 		return NULL;
 	}
 

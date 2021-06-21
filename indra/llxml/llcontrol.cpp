@@ -1050,7 +1050,7 @@ U32 LLControlGroup::saveToFile(const std::string& filename, BOOL nondefault_only
 		LLControlVariable* control = iter->second;
 		if (!control)
 		{
-			LL_WARNS("Settings") << "Tried to save invalid control: " << iter->first << LL_ENDL;
+			ALOG_WARN("Tried to save invalid control: {}", iter->first);
 		}
 		else if( control->shouldSave(nondefault_only) )
 		{
@@ -1066,12 +1066,12 @@ U32 LLControlGroup::saveToFile(const std::string& filename, BOOL nondefault_only
 	{
 		LLSDSerialize::toPrettyXML(settings, file);
 		file.close();
-		LL_INFOS("Settings") << "Saved to " << filename << LL_ENDL;
+		ALOG_INFO("Saved to {}", filename);
 	}
 	else
 	{
         // This is a warning because sometime we want to use settings files which can't be written...
-		LL_WARNS("Settings") << "Unable to open settings file: " << filename << LL_ENDL;
+		ALOG_WARN("Unable to open settings file: {}", filename);
 		return 0;
 	}
 	return num_saved;

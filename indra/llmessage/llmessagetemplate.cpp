@@ -39,8 +39,7 @@ void LLMsgVarData::addData(const void *data, S32 size, EMsgVariableType type, S3
 	{
 		if (mType != type)
 		{
-			LL_WARNS() << "Type mismatch in LLMsgVarData::addData for " << mName
-					<< LL_ENDL;
+			ALOG_NET_WARN("Type mismatch in LLMsgVarData::addData for {}", mName);
 		}
 	}
 	if(size)
@@ -181,12 +180,12 @@ void LLMessageTemplate::banUdp()
 	};
 	if (mDeprecation != MD_DEPRECATED)
 	{
-		LL_INFOS() << "Setting " << mName << " to UDPBlackListed was " << deprecation[mDeprecation] << LL_ENDL;
+		ALOG_NET_INFO("Setting {} to UDPBlackListed was {}", mName, deprecation[mDeprecation]);
 		mDeprecation = MD_UDPBLACKLISTED;
 	}
 	else
 	{
-		LL_INFOS() << mName << " is already more deprecated than UDPBlackListed" << LL_ENDL;
+		ALOG_NET_INFO("{} is already more deprecated than UDPBlackListed", mName);
 	}
 }
 

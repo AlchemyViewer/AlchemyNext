@@ -5306,7 +5306,7 @@ void LLMeshRepository::metricsUpdate()
 		metrics["teleports"] = LLSD::Integer(metrics_teleport_start_count);
 		metrics["user_cpu"] = double(user_cpu) / 1.0e6;
 		metrics["sys_cpu"] = double(sys_cpu) / 1.0e6;
-		LL_INFOS(LOG_MESH) << "EventMarker " << metrics << LL_ENDL;
+		ALOG_INFO("EventMarker {}", metrics);
 	}
 }
 

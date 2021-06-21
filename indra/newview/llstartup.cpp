@@ -331,7 +331,7 @@ bool idle_startup()
 	if (gViewerWindow == NULL)
 	{
 		// We expect window to be initialized
-		LL_WARNS_ONCE() << "gViewerWindow is not initialized" << LL_ENDL;
+		ALOG_WARN("gViewerWindow is not initialized");
 		return false; // No world yet
 	}
 
@@ -472,7 +472,7 @@ bool idle_startup()
 		//
 		// Initialize messaging system
 		//
-		LL_DEBUGS("AppInit") << "Initializing messaging system..." << LL_ENDL;
+		ALOG_DEBUG("Initializing messaging system...");
 
 		std::string message_template_path = gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS,"message_template.msg");
 
@@ -533,7 +533,7 @@ bool idle_startup()
 				   circuit_timeout))
 			{
 				std::string diagnostic = llformat(" Error: %d", gMessageSystem->getErrorCode());
-				LL_WARNS("AppInit") << diagnostic << LL_ENDL;
+				ALOG_WARN(diagnostic);
 				LLAppViewer::instance()->earlyExit("LoginFailedNoNetwork", LLSD().with("DIAGNOSTIC", diagnostic));
 			}
 
@@ -586,7 +586,7 @@ bool idle_startup()
 
 			if (gSavedSettings.getBOOL("LogMessages"))
 			{
-				LL_DEBUGS("AppInit") << "Message logging activated!" << LL_ENDL;
+				ALOG_DEBUG("Message logging activated!");
 				msg->startLogging();
 			}
 
@@ -611,20 +611,19 @@ bool idle_startup()
             F32 outBandwidth = gSavedSettings.getF32("OutBandwidth"); 
 			if (inBandwidth != 0.f)
 			{
-				LL_DEBUGS("AppInit") << "Setting packetring incoming bandwidth to " << inBandwidth << LL_ENDL;
+				ALOG_DEBUG("Setting packetring incoming bandwidth to {}", inBandwidth);
 				msg->mPacketRing.setUseInThrottle(TRUE);
 				msg->mPacketRing.setInBandwidth(inBandwidth);
 			}
 			if (outBandwidth != 0.f)
 			{
-				LL_DEBUGS("AppInit") << "Setting packetring outgoing bandwidth to " << outBandwidth << LL_ENDL;
+				ALOG_DEBUG("Setting packetring outgoing bandwidth to {}", outBandwidth);
 				msg->mPacketRing.setUseOutThrottle(TRUE);
 				msg->mPacketRing.setOutBandwidth(outBandwidth);
 			}
 		}
 
 		ALOG_INFO("Message System Initialized.");
-		LL_INFOS("AppInit") << "Message System Initialized." << LL_ENDL;
 
 		//-------------------------------------------------
 		// Init audio, which may be needed for prefs dialog
@@ -752,7 +751,7 @@ bool idle_startup()
 	
 	if (STATE_BROWSER_INIT == LLStartUp::getStartupState())
 	{
-		LL_DEBUGS("AppInit") << "STATE_BROWSER_INIT" << LL_ENDL;
+		ALOG_DEBUG("STATE_BROWSER_INIT");
 		std::string msg = LLTrans::getString("LoginInitializingBrowser");
 		set_startup_status(0.03f, msg.c_str(), gAgent.mMOTD.c_str());
 		display_startup();
@@ -764,14 +763,13 @@ bool idle_startup()
 
 	if (STATE_LOGIN_SHOW == LLStartUp::getStartupState())
 	{
-		LL_DEBUGS("AppInit") << "Initializing Window, show_connect_box = "
-							 << show_connect_box << LL_ENDL;
+		ALOG_DEBUG("Initializing Window, show_connect_box = {}", show_connect_box);
 
 		// if we've gone backwards in the login state machine, to this state where we show the UI
 		// AND the debug setting to exit in this case is true, then go ahead and bail quickly
 		if ( mLoginStatePastUI && gSavedSettings.getBOOL("QuitOnLoginActivated") )
 		{
-			LL_DEBUGS("AppInit") << "taking QuitOnLoginActivated exit" << LL_ENDL;
+			ALOG_DEBUG("taking QuitOnLoginActivated exit");
 			// no requirement for notification here - just exit
 			LLAppViewer::instance()->earlyExitNoNotify();
 		}
@@ -782,7 +780,7 @@ bool idle_startup()
 		// this startup phase more than once.
 		if (gLoginMenuBarView == NULL)
 		{
-			LL_DEBUGS("AppInit") << "initializing menu bar" << LL_ENDL;
+			ALOG_DEBUG("initializing menu bar");
 			initialize_spellcheck_menu();
 			init_menus();
 		}
@@ -790,13 +788,13 @@ bool idle_startup()
 
 		if (show_connect_box)
 		{
-			LL_DEBUGS("AppInit") << "show_connect_box on" << LL_ENDL;
+			ALOG_DEBUG("show_connect_box on");
 			// Load all the name information out of the login view
 			// NOTE: Hits "Attempted getFields with no login view shown" warning, since we don't
 			// show the login view until login_show() is called below.  
 			if (gUserCredential.isNull())                                                                          
 			{                                                  
-				LL_DEBUGS("AppInit") << "loading credentials from gLoginHandler" << LL_ENDL;
+				ALOG_DEBUG("loading credentials from gLoginHandler");
 				gUserCredential = gLoginHandler.initializeLoginInfo();                 
 			}     
 			// Make sure the process dialog doesn't hide things
@@ -812,12 +810,12 @@ bool idle_startup()
 			{
 				if (gSavedSettings.getBOOL("FirstLoginThisInstall"))
 				{
-					LL_INFOS("AppInit") << "FirstLoginThisInstall, calling show_first_run_dialog()" << LL_ENDL;
+					ALOG_INFO("FirstLoginThisInstall, calling show_first_run_dialog()");
 					show_first_run_dialog();
 				}
 				else
 				{
-					LL_DEBUGS("AppInit") << "FirstLoginThisInstall off" << LL_ENDL;
+					ALOG_DEBUG("FirstLoginThisInstall off");
 				}
 			}
 			display_startup();
@@ -825,7 +823,7 @@ bool idle_startup()
 		}
 		else
 		{
-			LL_DEBUGS("AppInit") << "show_connect_box off, skipping to STATE_LOGIN_CLEANUP" << LL_ENDL;
+			ALOG_DEBUG("show_connect_box off, skipping to STATE_LOGIN_CLEANUP");
 			// skip directly to message template verification
 			LLStartUp::setStartupState( STATE_LOGIN_CLEANUP );
 		}
@@ -836,7 +834,7 @@ bool idle_startup()
 		show_debug_menus();
 
 		// Hide the splash screen
-		LL_DEBUGS("AppInit") << "Hide the splash screen and show window" << LL_ENDL;
+		ALOG_DEBUG("Hide the splash screen and show window");
 		LLSplashScreen::hide();
 		// Push our window frontmost
 		gViewerWindow->getWindow()->show();
@@ -844,12 +842,12 @@ bool idle_startup()
 		// DEV-16927.  The following code removes errant keystrokes that happen while the window is being 
 		// first made visible.
 #ifdef _WIN32
-        LL_DEBUGS("AppInit") << "Processing PeekMessage" << LL_ENDL;
+		ALOG_DEBUG("Processing PeekMessage");
 		MSG msg;
 		while( PeekMessage( &msg, /*All hWnds owned by this thread */ NULL, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE ) )
         {
         }
-        LL_DEBUGS("AppInit") << "PeekMessage processed" << LL_ENDL;
+		ALOG_DEBUG("PeekMessage processed");
 #endif
         display_startup();
         timeout.reset();
@@ -932,7 +930,6 @@ bool idle_startup()
 		gSavedSettings.setBOOL("RememberPassword", gRememberPassword);
 		gSavedSettings.setBOOL("RememberUser", gRememberUser);
 		ALOG_INFO("Attempting login as: {}", userid);
-		LL_INFOS("AppInit") << "Attempting login as: " << userid << LL_ENDL;                                           
 		gDebugInfo["LoginName"] = userid;                                                                              
          
 		// create necessary directories
@@ -1333,12 +1330,11 @@ bool idle_startup()
 		display_startup();
 
 		LLViewerRegion *regionp = LLWorld::getInstance()->getRegionFromHandle(gFirstSimHandle);
-		LL_INFOS("AppInit") << "Adding initial simulator " << regionp->getOriginGlobal() << LL_ENDL;
+		ALOG_INFO("Adding initial simulator {}", regionp->getOriginGlobal());
 		
-		LL_DEBUGS("CrossingCaps") << "Calling setSeedCapability from init_idle(). Seed cap == "
-		<< gFirstSimSeedCap << LL_ENDL;
+		ALOG_DEBUG("Calling setSeedCapability from init_idle(). Seed cap == {}", gFirstSimSeedCap);
 		regionp->setSeedCapability(gFirstSimSeedCap);
-		LL_DEBUGS("AppInit") << "Waiting for seed grant ...." << LL_ENDL;
+		ALOG_DEBUG("Waiting for seed grant ....");
 		display_startup();
 		// Set agent's initial region to be the one we just created.
 		gAgent.setRegion(regionp);
@@ -1499,7 +1495,7 @@ bool idle_startup()
 
 		// Sets up the parameters for the first simulator
 
-		LL_DEBUGS("AppInit") << "Initializing camera..." << LL_ENDL;
+		ALOG_DEBUG("Initializing camera...");
 		gFrameTime    = totalTime();
 		F32Seconds last_time = gFrameTimeSeconds;
 		gFrameTimeSeconds = (gFrameTime - gStartTime);
@@ -1530,7 +1526,7 @@ bool idle_startup()
 		display_startup();
 
 		// Initialize global class data needed for surfaces (i.e. textures)
-		LL_DEBUGS("AppInit") << "Initializing sky..." << LL_ENDL;
+		ALOG_DEBUG("Initializing sky...");
 		// Initialize all of the viewer object classes for the first time (doing things like texture fetches.
 		LLGLState::checkStates();
 		LLGLState::checkTextureChannels();
@@ -1542,7 +1538,7 @@ bool idle_startup()
 
 		display_startup();
 
-		LL_DEBUGS("AppInit") << "Decoding images..." << LL_ENDL;
+		ALOG_DEBUG("Decoding images...");
 		// For all images pre-loaded into viewer cache, decode them.
 		// Need to do this AFTER we init the sky
 		const S32 DECODE_TIME_SEC = 2;
@@ -1562,14 +1558,14 @@ bool idle_startup()
 		LLMessageSystem* msg = gMessageSystem;
 		if (!msg->mOurCircuitCode)
 		{
-			LL_WARNS("AppInit") << "Attempting to connect to simulator with a zero circuit code!" << LL_ENDL;
+			ALOG_WARN("Attempting to connect to simulator with a zero circuit code!");
 		}
 
 		gUseCircuitCallbackCalled = false;
 
 		msg->enableCircuit(gFirstSim, TRUE);
 		// now, use the circuit info to tell simulator about us!
-		LL_INFOS("AppInit") << "viewer: UserLoginLocationReply() Enabling " << gFirstSim << " with code " << msg->mOurCircuitCode << LL_ENDL;
+		ALOG_INFO("viewer: UserLoginLocationReply() Enabling {} with code {}", gFirstSim, msg->mOurCircuitCode);
 		msg->newMessageFast(_PREHASH_UseCircuitCode);
 		msg->nextBlockFast(_PREHASH_CircuitCode);
 		msg->addU32Fast(_PREHASH_Code, msg->mOurCircuitCode);
@@ -1594,7 +1590,7 @@ bool idle_startup()
 	//---------------------------------------------------------------------
 	if(STATE_WORLD_WAIT == LLStartUp::getStartupState())
 	{
-		LL_DEBUGS("AppInit") << "Waiting for simulator ack...." << LL_ENDL;
+		ALOG_DEBUG("Waiting for simulator ack....");
 		set_startup_status(0.59f, LLTrans::getString("LoginWaitingForRegionHandshake"), gAgent.mMOTD);
 		if(gGotUseCircuitCodeAck)
 		{
@@ -1617,7 +1613,7 @@ bool idle_startup()
 	//---------------------------------------------------------------------
 	if (STATE_AGENT_SEND == LLStartUp::getStartupState())
 	{
-		LL_DEBUGS("AppInit") << "Connecting to region..." << LL_ENDL;
+		ALOG_DEBUG("Connecting to region...");
 		set_startup_status(0.60f, LLTrans::getString("LoginConnectingToRegion"), gAgent.mMOTD);
 		display_startup();
 		// register with the message system so it knows we're
@@ -1671,8 +1667,7 @@ bool idle_startup()
 				}
 				else
 				{
-					LL_DEBUGS("AppInit") << "Awaiting AvatarInitComplete, got "
-										 << gMessageSystem->getMessageName() << LL_ENDL;
+					ALOG_DEBUG("Awaiting AvatarInitComplete, got {}", gMessageSystem->getMessageName());
 				}
 				display_startup();
 			}
@@ -1689,7 +1684,7 @@ bool idle_startup()
 
 		if (!gAgentMovementCompleted && timeout.getElapsedTimeF32() > STATE_AGENT_WAIT_TIMEOUT)
 		{
-			LL_WARNS("AppInit") << "Backing up to login screen!" << LL_ENDL;
+			ALOG_WARN("Backing up to login screen!");
 			if (gRememberPassword)
 			{
 				LLNotificationsUtil::add("LoginPacketNeverReceived", LLSD(), LLSD(), login_alert_status);
@@ -1745,7 +1740,7 @@ bool idle_startup()
  		{
  			if(!gInventory.loadSkeleton(inv_skel_lib, gInventory.getLibraryOwnerID()))
  			{
- 				LL_WARNS("AppInit") << "Problem loading inventory-skel-lib" << LL_ENDL;
+				ALOG_WARN("Problem loading inventory-skel-lib");
  			}
  		}
 		display_startup();
@@ -1755,7 +1750,7 @@ bool idle_startup()
  		{
  			if(!gInventory.loadSkeleton(inv_skeleton, gAgent.getID()))
  			{
- 				LL_WARNS("AppInit") << "Problem loading inventory-skel-targets" << LL_ENDL;
+				ALOG_WARN("Problem loading inventory-skel-targets");
  			}
  		}
 		display_startup();
@@ -1763,7 +1758,7 @@ bool idle_startup()
 		LLSD inv_basic = response["inventory-basic"];
  		if(inv_basic.isDefined())
  		{
-			LL_INFOS() << "Basic inventory root folder id is " << inv_basic["folder_id"] << LL_ENDL;
+			ALOG_INFO("Basic inventory root folder id is {}", inv_basic["folder_id"].asUUID().asString());
  		}
 
 		LLSD buddy_list = response["buddy-list"];
@@ -1927,17 +1922,13 @@ bool idle_startup()
 			if (rate_bps > FASTER_RATE_BPS
 				&& rate_bps > max_bandwidth)
 			{
-				LL_DEBUGS("AppInit") << "Fast network connection, increasing max bandwidth to " 
-					<< FASTER_RATE_BPS/1024.f 
-					<< " kbps" << LL_ENDL;
+				ALOG_DEBUG("Fast network connection, increasing max bandwidth to {} kbps", FASTER_RATE_BPS / 1024.f);
 				gViewerThrottle.setMaxBandwidth(FASTER_RATE_BPS / 1024.f);
 			}
 			else if (rate_bps > FAST_RATE_BPS
 				&& rate_bps > max_bandwidth)
 			{
-				LL_DEBUGS("AppInit") << "Fast network connection, increasing max bandwidth to " 
-					<< FAST_RATE_BPS/1024.f 
-					<< " kbps" << LL_ENDL;
+				ALOG_DEBUG("Fast network connection, increasing max bandwidth to {} kbps", FAST_RATE_BPS / 1024.f);
 				gViewerThrottle.setMaxBandwidth(FAST_RATE_BPS / 1024.f);
 			}
 
@@ -1994,8 +1985,7 @@ bool idle_startup()
 			= LLLoginInstance::getInstance()->getResponse("gestures");
 		if (gesture_options.isDefined())
 		{
-			LL_DEBUGS("AppInit") << "Gesture Manager loading " << gesture_options.size()
-				<< LL_ENDL;
+			ALOG_DEBUG("Gesture Manager loading {}", gesture_options.size());
 			uuid_vec_t item_ids;
 			for(LLSD::array_const_iterator resp_it = gesture_options.beginArray(),
 				end = gesture_options.endArray(); resp_it != end; ++resp_it)
@@ -2031,9 +2021,8 @@ bool idle_startup()
 		msg->setHandlerFuncFast(_PREHASH_AttachedSound,				process_attached_sound);
 		msg->setHandlerFuncFast(_PREHASH_AttachedSoundGainChange,	process_attached_sound_gain_change);
 
-		LL_DEBUGS("AppInit") << "Initialization complete" << LL_ENDL;
-
-		LL_DEBUGS("SceneLoadTiming", "Start") << "Scene Load Started " << LL_ENDL;
+		ALOG_DEBUG("Initialization complete");
+		ALOG_DEBUG("Scene Load Started");
 		gRenderStartTime.reset();
 		gForegroundTime.reset();
 
@@ -2053,9 +2042,8 @@ bool idle_startup()
 		if (!gAgent.isFirstLogin())
 		{
 			ALOG_INFO("gAgentStartLocation : {:s}", gAgentStartLocation);
-			LL_INFOS() << "gAgentStartLocation : " << gAgentStartLocation << LL_ENDL;
 			LLSLURL start_slurl = LLStartUp::getStartSLURL();
-			LL_DEBUGS("AppInit") << "start slurl "<<start_slurl.asString()<<LL_ENDL;
+			ALOG_DEBUG("start slurl {}", start_slurl.asString());
 			
 			if (((start_slurl.getType() == LLSLURL::LOCATION) && (gAgentStartLocation == "url")) ||
 				((start_slurl.getType() == LLSLURL::LAST_LOCATION) && (gAgentStartLocation == "last")) ||
@@ -2209,7 +2197,7 @@ bool idle_startup()
 			if (isAgentAvatarValid()
 				&& gAgentAvatarp->isFullyLoaded())
 			{
-				LL_DEBUGS("Avatar") << "avatar fully loaded" << LL_ENDL;
+				ALOG_DEBUG("avatar fully loaded");
 				LLStartUp::setStartupState( STATE_CLEANUP );
 				return TRUE;
 			}
@@ -2220,7 +2208,7 @@ bool idle_startup()
 			if ( gAgentWearables.areWearablesLoaded() )
 			{
 				// We have our clothing, proceed.
-				LL_DEBUGS("Avatar") << "wearables loaded" << LL_ENDL;
+				ALOG_DEBUG("wearables loaded");
 				LLStartUp::setStartupState( STATE_CLEANUP );
 				return TRUE;
 			}
@@ -2248,7 +2236,7 @@ bool idle_startup()
 		gViewerWindow->showCursor();
 		gViewerWindow->getWindow()->resetBusyCount();
 		gViewerWindow->getWindow()->setCursor(UI_CURSOR_ARROW);
-		LL_DEBUGS("AppInit") << "Done releasing bitmap" << LL_ENDL;
+		ALOG_DEBUG("Done releasing bitmap");
 		//gViewerWindow->revealIntroPanel();
 		gViewerWindow->setStartupComplete(); 
 		gViewerWindow->setProgressCancelButtonVisible(FALSE);
@@ -2268,7 +2256,7 @@ bool idle_startup()
 		// Start automatic replay if the flag is set.
 		if (gSavedSettings.getBOOL("StatsAutoRun") || gAgentPilot.getReplaySession())
 		{
-			LL_DEBUGS("AppInit") << "Starting automatic playback" << LL_ENDL;
+			ALOG_DEBUG("Starting automatic playback");
 			gAgentPilot.startPlayback();
 		}
 
@@ -2397,7 +2385,7 @@ bool first_run_dialog_callback(const LLSD& notification, const LLSD& response)
 	S32 option = LLNotificationsUtil::getSelectedOption(notification, response);
 	if (0 == option)
 	{
-		LL_DEBUGS("AppInit") << "First run dialog cancelling" << LL_ENDL;
+		ALOG_DEBUG("First run dialog cancelling");
 		LLWeb::loadURLExternal(LLTrans::getString("create_account_url") );
 	}
 
@@ -2706,7 +2694,7 @@ std::string LLStartUp::getScreenHomeFilename()
 void LLStartUp::loadInitialOutfit( const std::string& outfit_folder_name,
 								   const std::string& gender_name )
 {
-	LL_DEBUGS() << "starting" << LL_ENDL;
+	ALOG_DEBUG("starting");
 
 	// Not going through the processAgentInitialWearables path, so need to set this here.
 	LLAppearanceMgr::instance().setAttachmentInvLinkEnable(true);
@@ -2716,12 +2704,12 @@ void LLStartUp::loadInitialOutfit( const std::string& outfit_folder_name,
 	ESex gender;
 	if (gender_name == "male")
 	{
-		LL_DEBUGS() << "male" << LL_ENDL;
+		ALOG_DEBUG("male");
 		gender = SEX_MALE;
 	}
 	else
 	{
-		LL_DEBUGS() << "female" << LL_ENDL;
+		ALOG_DEBUG("female");
 		gender = SEX_FEMALE;
 	}
 
@@ -2740,7 +2728,7 @@ void LLStartUp::loadInitialOutfit( const std::string& outfit_folder_name,
 		outfit_folder_name);
 	if (cat_id.isNull())
 	{
-		LL_DEBUGS() << "standard wearables" << LL_ENDL;
+		ALOG_DEBUG("standard wearables");
 		gAgentWearables.createStandardWearables();
 	}
 	else
@@ -2756,7 +2744,7 @@ void LLStartUp::loadInitialOutfit( const std::string& outfit_folder_name,
 		// Need to fetch cof contents before we can wear.
 		callAfterCategoryFetch(LLAppearanceMgr::instance().getCOF(),
 							   boost::bind(&LLAppearanceMgr::wearInventoryCategory, LLAppearanceMgr::getInstance(), cat, do_copy, do_append));
-		LL_DEBUGS() << "initial outfit category id: " << cat_id << LL_ENDL;
+		ALOG_DEBUG("initial outfit category id: {}", cat_id.asString());
 	}
 
 	gAgent.setOutfitChosen(TRUE);
@@ -2767,16 +2755,16 @@ void LLStartUp::loadInitialOutfit( const std::string& outfit_folder_name,
 void LLStartUp::saveInitialOutfit()
 {
 	if (sInitialOutfit.empty()) {
-		LL_DEBUGS() << "sInitialOutfit is empty" << LL_ENDL;
+		ALOG_DEBUG("sInitialOutfit is empty");
 		return;
 	}
 	
 	if (sWearablesLoadedCon.connected())
 	{
-		LL_DEBUGS("Avatar") << "sWearablesLoadedCon is connected, disconnecting" << LL_ENDL;
+		ALOG_DEBUG("sWearablesLoadedCon is connected, disconnecting");
 		sWearablesLoadedCon.disconnect();
 	}
-	LL_DEBUGS("Avatar") << "calling makeNewOutfitLinks( \"" << sInitialOutfit << "\" )" << LL_ENDL;
+	ALOG_DEBUG("calling makeNewOutfitLinks( \"{}\" )", sInitialOutfit);
 	LLAppearanceMgr::getInstance()->makeNewOutfitLinks(sInitialOutfit,false);
 }
 
@@ -2798,7 +2786,7 @@ std::string LLStartUp::getUserId()
 // frees the bitmap
 void release_start_screen()
 {
-	LL_DEBUGS("AppInit") << "Releasing bitmap..." << LL_ENDL;
+	ALOG_DEBUG("Releasing bitmap...");
 	gStartTexture = NULL;
 }
 
@@ -2839,9 +2827,8 @@ std::string LLStartUp::startupStateToString(EStartupState state)
 // static
 void LLStartUp::setStartupState( EStartupState state )
 {
-	LL_INFOS("AppInit") << "Startup state changing from " <<  
-		getStartupStateString() << " to " <<  
-		startupStateToString(state) << LL_ENDL;
+	ALOG_INFO("Startup state changing from {} to {}", 
+		getStartupStateString(), startupStateToString(state));
 
 	getPhases().stopPhase(getStartupStateString());
 	gStartupState = state;
@@ -2885,7 +2872,7 @@ void reset_login()
 // early, before the login screen). JC
 void LLStartUp::multimediaInit()
 {
-	LL_DEBUGS("AppInit") << "Initializing Multimedia...." << LL_ENDL;
+	ALOG_DEBUG("Initializing Multimedia....");
 	std::string msg = LLTrans::getString("LoginInitializingMultimedia");
 	set_startup_status(0.42f, msg.c_str(), gAgent.mMOTD.c_str());
 	display_startup();
@@ -2893,7 +2880,7 @@ void LLStartUp::multimediaInit()
 
 void LLStartUp::fontInit()
 {
-	LL_DEBUGS("AppInit") << "Initializing fonts...." << LL_ENDL;
+	ALOG_DEBUG("Initializing fonts....");
 	std::string msg = LLTrans::getString("LoginInitializingFonts");
 	set_startup_status(0.45f, msg.c_str(), gAgent.mMOTD.c_str());
 	display_startup();
@@ -2970,12 +2957,12 @@ bool LLStartUp::dispatchURL()
 
 void LLStartUp::setStartSLURL(const LLSLURL& slurl) 
 {
-	LL_DEBUGS("AppInit")<<slurl.asString()<<LL_ENDL;
+	ALOG_DEBUG(slurl.asString());
 
 	if ( slurl.isSpatial() )
 	{
 		std::string new_start = slurl.getSLURLString();
-		LL_DEBUGS("AppInit")<<new_start<<LL_ENDL;
+		ALOG_DEBUG(new_start);
 		sStartSLURL = slurl;
 		LLPanelLogin::onUpdateStartSLURL(slurl); // updates grid if needed
 
@@ -2987,7 +2974,7 @@ void LLStartUp::setStartSLURL(const LLSLURL& slurl)
 	}
 	else
 	{
-		LL_WARNS("AppInit")<<"Invalid start SLURL (ignored): "<<slurl.asString()<<LL_ENDL;
+		ALOG_WARN("Invalid start SLURL (ignored): {}", slurl.asString());
 	}
 }
 
@@ -3269,7 +3256,7 @@ void apply_udp_blacklist(const std::string& csv)
 		}
 		std::string item(csv, start, comma-start);
 
-		LL_DEBUGS() << "udp_blacklist " << item << LL_ENDL;
+		ALOG_NET_DEBUG("udp_blacklist {}", item);
 		gMessageSystem->banUdpMessage(item);
 		
 		start = comma + 1;
@@ -3297,7 +3284,7 @@ bool init_benefits(LLSD& response)
 	}
 	else
 	{
-		LL_DEBUGS("Benefits") << "Initialized current benefits, level " << package_name << " from " << benefits_sd << LL_ENDL;
+		ALOG_DEBUG("Initialized current benefits, level {} from {}", package_name, benefits_sd);
 	}
 	const LLSD& packages_sd = response["premium_packages"];
 	for(LLSD::map_const_iterator package_iter = packages_sd.beginMap();
@@ -3308,23 +3295,23 @@ bool init_benefits(LLSD& response)
 		const LLSD& benefits_sd = package_iter->second["benefits"];
 		if (LLAgentBenefitsMgr::init(package_name, benefits_sd))
 		{
-			LL_DEBUGS("Benefits") << "Initialized benefits for package " << package_name << " from " << benefits_sd << LL_ENDL;
+			ALOG_DEBUG("Initialized benefits for package {} from {}", package_name, benefits_sd);
 		}
 		else
 		{
-			LL_WARNS("Benefits") << "Failed init for package " << package_name << " from " << benefits_sd << LL_ENDL;
+			ALOG_WARN("Failed init for package {} from {}", package_name, benefits_sd);
 			succ = false;
 		}
 	}
 
 	if (!LLAgentBenefitsMgr::has("Base"))
 	{
-		LL_WARNS("Benefits") << "Benefits info did not include required package Base" << LL_ENDL;
+		ALOG_WARN("Benefits info did not include required package Base");
 		succ = false;
 	}
 	if (!LLAgentBenefitsMgr::has("Premium"))
 	{
-		LL_WARNS("Benefits") << "Benefits info did not include required package Premium" << LL_ENDL;
+		ALOG_WARN("Benefits info did not include required package Premium");
 		succ = false;
 	}
 
@@ -3506,7 +3493,7 @@ bool process_login_success_response()
 			substitution["datetime"] = (S32)server_utc_time;
 			std::string timeStr = "[month, datetime, slt] [day, datetime, slt] [year, datetime, slt] [hour, datetime, slt]:[min, datetime, slt]:[second, datetime, slt]";
 			LLStringUtil::format(timeStr, substitution);
-			LL_INFOS("AppInit") << "Server SLT timestamp: " << timeStr << ". Server-viewer time offset before correction: " << gUTCOffset << "s" << LL_ENDL;
+			ALOG_INFO("Server SLT timestamp: {}. Server-viewer time offset before correction: {}s", timeStr, gUTCOffset);;
 		}
 	}
 
@@ -3595,14 +3582,14 @@ bool process_login_success_response()
 	{
 		// We got an answer from the grid -> use that for map for the current session
 		gSavedSettings.setString("CurrentMapServerURL", map_server_url); 
-		LL_INFOS("LLStartup") << "map-server-url : we got an answer from the grid : " << map_server_url << LL_ENDL;
+		ALOG_INFO("map-server-url : we got an answer from the grid : {}", map_server_url);
 	}
 	else
 	{
 		// No answer from the grid -> use the default setting for current session 
 		map_server_url = gSavedSettings.getString("MapServerURL"); 
 		gSavedSettings.setString("CurrentMapServerURL", map_server_url); 
-		LL_INFOS("LLStartup") << "map-server-url : no map-server-url answer, we use the default setting for the map : " << map_server_url << LL_ENDL;
+		ALOG_INFO("map-server-url : no map-server-url answer, we use the default setting for the map : {}", map_server_url);
 	}
 	
 	// Default male and female avatars allowing the user to choose their avatar on first login.

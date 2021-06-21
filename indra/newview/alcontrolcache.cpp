@@ -34,7 +34,7 @@ F32  ALControlCache::PitchFromMousePosition = 90.f;
 		LLControlVariable* cntrl_ptr = gSavedSettings.getControl(#ctrl); \
 		if (!cntrl_ptr) \
 		{ \
-			LL_WARNS() << "Global setting name not found:" << #ctrl << LL_ENDL; \
+			ALOG_WARN("Global setting name not found: {}", #ctrl); \
 		} \
 		else \
 		{ \
@@ -43,7 +43,7 @@ F32  ALControlCache::PitchFromMousePosition = 90.f;
 					ctrl = convert_from_llsd<type>(new_val, ctrl_type, #ctrl); \
 				}); \
 			ctrl = convert_from_llsd<type>(cntrl_ptr->getValue(), ctrl_type, #ctrl); \
-			LL_INFOS() << "Global cached setting: " << #ctrl << " initialized with value: " << ctrl << LL_ENDL; \
+			ALOG_INFO("Global cached setting: {} initialized with value: {}", #ctrl, ctrl); \
 		} \
 	} \
 

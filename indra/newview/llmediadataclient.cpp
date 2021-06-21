@@ -341,7 +341,7 @@ void LLMediaDataClient::serviceQueue()
 
 		if(request->isDead())
 		{
-			LL_INFOS("LLMediaDataClient") << "Skipping dead request " << *request << LL_ENDL;
+			ALOG_MEDIA_INFO("Skipping dead request {}", *request);
 			continue;
 		}
 
@@ -352,7 +352,7 @@ void LLMediaDataClient::serviceQueue()
 	if (!url.empty())
 	{
 		const LLSD &sd_payload = request->getPayload();
-		LL_INFOS("LLMediaDataClient") << "Sending request for " << *request << LL_ENDL;
+		ALOG_MEDIA_INFO("Sending request for {}", *request);
 		
 		// Add this request to the non-queued tracking list
 		trackRequest(request);
@@ -365,8 +365,7 @@ void LLMediaDataClient::serviceQueue()
         if (handle == LLCORE_HTTP_HANDLE_INVALID)
         {
             LLCore::HttpStatus status = mHttpRequest->getStatus();
-            LL_WARNS("LLMediaDataClient") << "'" << url << "' request POST failed. Reason "
-                << status.toTerseString() << " \"" << status.toString() << "\"" << LL_ENDL;
+			ALOG_MEDIA_WARN("'{}' request POST failed. Reason {} \"{}\"", url, status.toTerseString(), status.toString());
         }
 	}
 	else 
@@ -375,7 +374,7 @@ void LLMediaDataClient::serviceQueue()
 		
 		if(request->getRetryCount() < mMaxNumRetries)
 		{
-			LL_WARNS("LLMediaDataClient") << "Could not send request " << *request << " (empty cap url), will retry." << LL_ENDL; 
+			ALOG_MEDIA_WARN("Could not send request {} (empty cap url), will retry.", *request);
 			// Put this request back at the head of its queue, and retry next time the queue timer fires.
 			request->incRetryCount();
 			pushBack(request);
@@ -383,7 +382,7 @@ void LLMediaDataClient::serviceQueue()
 		else
 		{
 			// This request has exceeded its maximum retry count.  It will be dropped.
-			LL_WARNS("LLMediaDataClient") << "Could not send request " << *request << " for " << mMaxNumRetries << " tries, dropping request." << LL_ENDL; 
+			ALOG_MEDIA_WARN("Could not send request {} for {} tries, dropping request.", *request, mMaxNumRetries);
 		}
 
 	}
