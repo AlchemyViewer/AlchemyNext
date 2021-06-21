@@ -3555,7 +3555,7 @@ void LLAppViewer::writeSystemInfo()
 	LL_INFOS("SystemInfo") << "Local time: " << tbuffer << LL_ENDL;
 
 	// query some system information
-	ALOG_INFO("CPU info:\n{}", gSysCPU);
+	ALOG_INFO("CPU info: {}", gSysCPU);
 	ALOG_INFO("Memory info:\n{}", gSysMemory);
 	ALOG_INFO("OS: {}", LLOSInfo::instance().getOSStringSimple());
 	ALOG_INFO("OS info: {}", LLOSInfo::instance());
