@@ -107,6 +107,8 @@ using linebuffer_sink_st = linebuffer_sink<spdlog::details::null_mutex>;
 std::shared_ptr<spdlog::logger> ALLog::MAIN_LOG;
 std::shared_ptr<spdlog::logger> ALLog::RENDER_LOG;
 std::shared_ptr<spdlog::logger> ALLog::NETWORK_LOG;
+std::shared_ptr<spdlog::logger> ALLog::AUDIO_LOG;
+std::shared_ptr<spdlog::logger> ALLog::IO_LOG;
 std::vector<spdlog::sink_ptr> ALLog::sSinks;
 ALLog::fatal_func_t ALLog::sFatalFunc;
 std::unique_ptr<absl::Mutex> ALLog::sMutex;
@@ -120,7 +122,7 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 	sBufferChanged = false;
 	sFatalFunc = std::move(fatal_func);
 
-	spdlog::init_thread_pool(16384, 2);
+	spdlog::init_thread_pool(16384, 1);
 	spdlog::flush_every(std::chrono::seconds(1));
 
 	try
@@ -163,6 +165,12 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 		spdlog::register_logger(RENDER_LOG);
 
 		NETWORK_LOG = std::make_shared<spdlog::async_logger>("network", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		spdlog::register_logger(NETWORK_LOG);
+
+		AUDIO_LOG = std::make_shared<spdlog::async_logger>("audio", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		spdlog::register_logger(RENDER_LOG);
+
+		IO_LOG = std::make_shared<spdlog::async_logger>("io", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(NETWORK_LOG);
 
 	}

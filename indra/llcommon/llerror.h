@@ -62,6 +62,8 @@ public:
 	static std::shared_ptr<spdlog::logger> MAIN_LOG;
 	static std::shared_ptr<spdlog::logger> RENDER_LOG;
 	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
+	static std::shared_ptr<spdlog::logger> AUDIO_LOG;
+	static std::shared_ptr<spdlog::logger> IO_LOG;
 
 	static std::vector<spdlog::sink_ptr> sSinks;
 	static std::atomic<bool> sBufferChanged;
@@ -113,6 +115,36 @@ public:
 	}
 #else
 #define ALOG_RNDR_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#endif
+
+#define ALOG_AUDIO_TRACE(...) SPDLOG_LOGGER_TRACE(ALLog::AUDIO_LOG, __VA_ARGS__)
+#define ALOG_AUDIO_DEBUG(...) SPDLOG_LOGGER_DEBUG(ALLog::AUDIO_LOG, __VA_ARGS__)
+#define ALOG_AUDIO_INFO(...) SPDLOG_LOGGER_INFO(ALLog::AUDIO_LOG, __VA_ARGS__)
+#define ALOG_AUDIO_WARN(...) SPDLOG_LOGGER_WARN(ALLog::AUDIO_LOG, __VA_ARGS__)
+#define ALOG_AUDIO_ERROR(...) SPDLOG_LOGGER_ERROR(ALLog::AUDIO_LOG, __VA_ARGS__)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_CRITICAL
+#define ALOG_AUDIO_CRITICAL(...) \
+	{ \
+		SPDLOG_LOGGER_CRITICAL(ALLog::AUDIO_LOG, __VA_ARGS__); \
+		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+	}
+#else
+#define ALOG_AUDIO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#endif
+
+#define ALOG_IO_TRACE(...) SPDLOG_LOGGER_TRACE(ALLog::IO_LOG, __VA_ARGS__)
+#define ALOG_IO_DEBUG(...) SPDLOG_LOGGER_DEBUG(ALLog::IO_LOG, __VA_ARGS__)
+#define ALOG_IO_INFO(...) SPDLOG_LOGGER_INFO(ALLog::IO_LOG, __VA_ARGS__)
+#define ALOG_IO_WARN(...) SPDLOG_LOGGER_WARN(ALLog::IO_LOG, __VA_ARGS__)
+#define ALOG_IO_ERROR(...) SPDLOG_LOGGER_ERROR(ALLog::IO_LOG, __VA_ARGS__)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_CRITICAL
+#define ALOG_IO_CRITICAL(...) \
+	{ \
+		SPDLOG_LOGGER_CRITICAL(ALLog::IO_LOG, __VA_ARGS__); \
+		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+	}
+#else
+#define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
 #endif
 
 
