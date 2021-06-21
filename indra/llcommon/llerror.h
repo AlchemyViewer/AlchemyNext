@@ -64,6 +64,8 @@ public:
 	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
 	static std::shared_ptr<spdlog::logger> AUDIO_LOG;
 	static std::shared_ptr<spdlog::logger> IO_LOG;
+	static std::shared_ptr<spdlog::logger> UI_LOG;
+	static std::shared_ptr<spdlog::logger> MEDIA_LOG;
 
 	static std::vector<spdlog::sink_ptr> sSinks;
 	static std::atomic<bool> sBufferChanged;
@@ -147,6 +149,36 @@ public:
 #define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
 #endif
 
+#define ALOG_UI_TRACE(...) SPDLOG_LOGGER_TRACE(ALLog::UI_LOG, __VA_ARGS__)
+#define ALOG_UI_DEBUG(...) SPDLOG_LOGGER_DEBUG(ALLog::UI_LOG, __VA_ARGS__)
+#define ALOG_UI_INFO(...) SPDLOG_LOGGER_INFO(ALLog::UI_LOG, __VA_ARGS__)
+#define ALOG_UI_WARN(...) SPDLOG_LOGGER_WARN(ALLog::UI_LOG, __VA_ARGS__)
+#define ALOG_UI_ERROR(...) SPDLOG_LOGGER_ERROR(ALLog::UI_LOG, __VA_ARGS__)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_CRITICAL
+#define ALOG_UI_CRITICAL(...) \
+	{ \
+		SPDLOG_LOGGER_CRITICAL(ALLog::UI_LOG, __VA_ARGS__); \
+		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+	}
+#else
+#define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#endif
+
+#define ALOG_MEDIA_TRACE(...) SPDLOG_LOGGER_TRACE(ALLog::MEDIA_LOG, __VA_ARGS__)
+#define ALOG_MEDIA_DEBUG(...) SPDLOG_LOGGER_DEBUG(ALLog::MEDIA_LOG, __VA_ARGS__)
+#define ALOG_MEDIA_INFO(...) SPDLOG_LOGGER_INFO(ALLog::MEDIA_LOG, __VA_ARGS__)
+#define ALOG_MEDIA_WARN(...) SPDLOG_LOGGER_WARN(ALLog::MEDIA_LOG, __VA_ARGS__)
+#define ALOG_MEDIA_ERROR(...) SPDLOG_LOGGER_ERROR(ALLog::MEDIA_LOG, __VA_ARGS__)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_CRITICAL
+#define ALOG_MEDIA_CRITICAL(...) \
+	{ \
+		SPDLOG_LOGGER_CRITICAL(ALLog::MEDIA_LOG, __VA_ARGS__); \
+		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+	}
+#else
+#define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#endif
+
 
 const int LL_ERR_NOERR = 0;
 
@@ -182,7 +214,7 @@ const int LL_ERR_NOERR = 0;
 
 #endif // !_DEBUG
 
-#define llassert_always_msg(func, msg) if (LL_UNLIKELY(!(func))) LL_ERRS() << "ASSERT (" << msg << ")" << LL_ENDL
+#define llassert_always_msg(func, msg) if (LL_UNLIKELY(!(func))) ALOG_CRITICAL("ASSERT ({})", msg)
 
 #define llassert_always(func)	llassert_always_msg(func, #func)
 

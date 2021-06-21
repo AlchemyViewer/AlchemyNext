@@ -109,6 +109,8 @@ std::shared_ptr<spdlog::logger> ALLog::RENDER_LOG;
 std::shared_ptr<spdlog::logger> ALLog::NETWORK_LOG;
 std::shared_ptr<spdlog::logger> ALLog::AUDIO_LOG;
 std::shared_ptr<spdlog::logger> ALLog::IO_LOG;
+std::shared_ptr<spdlog::logger> ALLog::UI_LOG;
+std::shared_ptr<spdlog::logger> ALLog::MEDIA_LOG;
 std::vector<spdlog::sink_ptr> ALLog::sSinks;
 ALLog::fatal_func_t ALLog::sFatalFunc;
 std::unique_ptr<absl::Mutex> ALLog::sMutex;
@@ -168,11 +170,16 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 		spdlog::register_logger(NETWORK_LOG);
 
 		AUDIO_LOG = std::make_shared<spdlog::async_logger>("audio", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-		spdlog::register_logger(RENDER_LOG);
+		spdlog::register_logger(AUDIO_LOG);
 
 		IO_LOG = std::make_shared<spdlog::async_logger>("io", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-		spdlog::register_logger(NETWORK_LOG);
+		spdlog::register_logger(IO_LOG);
 
+		UI_LOG = std::make_shared<spdlog::async_logger>("ui", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		spdlog::register_logger(UI_LOG);
+
+		MEDIA_LOG = std::make_shared<spdlog::async_logger>("media", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		spdlog::register_logger(MEDIA_LOG);
 	}
 	catch (const spdlog::spdlog_ex& ex)
 	{
