@@ -26,7 +26,12 @@ void log_subsystem_cleanup(LLError::ELevel level,
                            const char* function,
                            const char* classname)
 {
-    LL_VLOGS(level, "Cleanup") << LLError::abbreviateFile(file) << "(" << line << "): "
-                        << "calling " << classname << "::cleanupClass() in "
-                        << function << LL_ENDL;
+    if (level == LLError::ELevel::LEVEL_DEBUG)
+    {
+        ALOG_DEBUG("{}({}): calling {}::cleanupClass() in {}", LLError::abbreviateFile(file), line, classname, function);
+    }
+    else if(level == LLError::ELevel::LEVEL_INFO)
+    {
+        ALOG_INFO("{}({}): calling {}::cleanupClass() in {}", LLError::abbreviateFile(file), line, classname, function);
+    }
 }
