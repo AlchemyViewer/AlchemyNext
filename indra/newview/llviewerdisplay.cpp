@@ -218,6 +218,7 @@ void display_stats()
 	if (fps_log_freq > 0.f && gRecentFPSTime.getElapsedTimeF32() >= fps_log_freq)
 	{
 		F32 fps = gRecentFrameCount / fps_log_freq;
+		ALOG_INFO("FPS: {:.02f}", fps);
 		LL_INFOS() << llformat("FPS: %.02f", fps) << LL_ENDL;
 		gRecentFrameCount = 0;
 		gRecentFPSTime.reset();
@@ -227,6 +228,7 @@ void display_stats()
 	{
 		gMemoryAllocated = U64Bytes(LLMemory::getCurrentRSS());
 		U32Megabytes memory = gMemoryAllocated;
+		ALOG_INFO("MEMORY: {}", memory);
 		LL_INFOS() << "MEMORY: " << memory << LL_ENDL;
 		LLMemory::logMemoryInfo(TRUE) ;
 		gRecentMemoryTime.reset();

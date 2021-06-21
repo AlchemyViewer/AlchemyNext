@@ -35,6 +35,49 @@
 
 #include "llpreprocessor.h"
 
+#include "spdlog/spdlog.h"
+
+class ALLog
+{
+public:
+	typedef std::function<void(const std::string&)> fatal_func_t;
+
+	static void init(const std::string& log_filename, fatal_func_t fatal_func);
+	static void shutdown();
+
+	static std::shared_ptr<spdlog::logger> MAIN_LOG;
+	static std::shared_ptr<spdlog::logger> RENDER_LOG;
+	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
+
+	static void fatal_error(const std::string message) 
+	{
+		if (sFatalFunc)
+		{
+			sFatalFunc(message);
+		}
+	};
+
+private:
+	static std::vector<spdlog::sink_ptr> sSinks;
+	static fatal_func_t sFatalFunc;
+};
+
+#define ALOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)
+#define ALOG_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
+#define ALOG_INFO(...) SPDLOG_INFO(__VA_ARGS__)
+#define ALOG_WARN(...) SPDLOG_WARN(__VA_ARGS__)
+#define ALOG_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_CRITICAL
+#define ALOG_CRITICAL(...) \
+	{ \
+		SPDLOG_CRITICAL(__VA_ARGS__); \
+		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+	}
+#else
+#define ALOG_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#endif
+
+
 const int LL_ERR_NOERR = 0;
 
 // Define one of these for different error levels in release...

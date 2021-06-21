@@ -2144,7 +2144,10 @@ bool LLAppViewer::cleanup()
 	// deleteSingleton() methods.
 	LLSingletonBase::deleteAll();
 
-    LL_INFOS() << "Goodbye!" << LL_ENDL;
+	ALOG_INFO("Goodbye!");
+	LL_INFOS() << "Goodbye!" << LL_ENDL;
+
+	ALLog::shutdown();
 
 	removeDumpDir();
 
@@ -2262,7 +2265,16 @@ void LLAppViewer::initLoggingAndGetLastDuration()
 	// Get name of the log file
 	std::string log_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS,
 							     "Alchemy.log");
- 	/*
+
+	std::string spdlog_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS,
+		"Alchemy.spdlog");
+
+	std::string old_spdlog_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS,
+		"Alchemy.spdlog.old");
+
+	LLFile::remove(old_spdlog_file);
+	
+	/*
 	 * Before touching any log files, compute the duration of the last run
 	 * by comparing the ctime of the previous start marker file with the ctime
 	 * of the last log file.
@@ -2307,13 +2319,18 @@ void LLAppViewer::initLoggingAndGetLastDuration()
 
 	// Rename current log file to ".old"
 	LLFile::rename(log_file, old_log_file);
+	LLFile::rename(spdlog_file, old_spdlog_file);
 
 	// Set the log file to SecondLife.log
+	ALLog::init(spdlog_file, errorCallback);
 	LLError::logToFile(log_file);
 	if (!duration_log_msg.empty())
 	{
 		LL_WARNS("MarkerFile") << duration_log_msg << LL_ENDL;
+		ALOG_WARN("{:s}", duration_log_msg);
 	}
+
+	ALOG_INFO("Log System Initialized.");
 }
 
 bool LLAppViewer::loadSettingsFromDirectory(const std::string& location_key,

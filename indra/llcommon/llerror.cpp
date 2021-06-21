@@ -62,6 +62,67 @@
 
 #include <boost/make_shared.hpp>
 
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/msvc_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/async.h"
+
+std::shared_ptr<spdlog::logger> ALLog::MAIN_LOG;
+std::shared_ptr<spdlog::logger> ALLog::RENDER_LOG;
+std::shared_ptr<spdlog::logger> ALLog::NETWORK_LOG;
+std::vector<spdlog::sink_ptr> ALLog::sSinks;
+ALLog::fatal_func_t ALLog::sFatalFunc;
+
+// static
+void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
+{
+	sFatalFunc = std::move(fatal_func);
+
+	spdlog::init_thread_pool(16384, 2);
+	spdlog::flush_every(std::chrono::seconds(1));
+
+	try
+	{
+		sSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, true));
+		sSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+#if LL_WINDOWS
+		if (IsDebuggerPresent())
+		{
+			sSinks.emplace_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
+		}
+#endif
+
+		MAIN_LOG = std::make_shared<spdlog::async_logger>("main", sSinks.begin(), sSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		MAIN_LOG->flush_on(spdlog::level::err);
+		spdlog::register_logger(MAIN_LOG);
+
+		RENDER_LOG = std::make_shared<spdlog::async_logger>("render", sSinks.begin(), sSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		spdlog::register_logger(RENDER_LOG);
+
+		NETWORK_LOG = std::make_shared<spdlog::async_logger>("network", sSinks.begin(), sSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		spdlog::register_logger(NETWORK_LOG);
+
+	}
+	catch (const spdlog::spdlog_ex& ex)
+	{
+		std::cout << "Log init failed: " << ex.what() << std::endl;
+	}
+
+	spdlog::set_default_logger(MAIN_LOG);
+	spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%l] [%s:%# %!] %v");
+}
+
+// static
+void ALLog::shutdown()
+{
+	NETWORK_LOG = nullptr;
+	RENDER_LOG = nullptr;
+	MAIN_LOG = nullptr;
+	sSinks.clear();
+
+	spdlog::shutdown();
+}
+
 // On Mac, got:
 // #error "Boost.Stacktrace requires `_Unwind_Backtrace` function. Define
 // `_GNU_SOURCE` macro or `BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED` if

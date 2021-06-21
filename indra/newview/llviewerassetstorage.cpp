@@ -635,6 +635,12 @@ std::string LLViewerAssetStorage::getAssetURL(const std::string& cap_url, const 
 void LLViewerAssetStorage::logAssetStorageInfo()
 {
     LLMemory::logMemoryInfo(true);
+    ALOG_INFO("Active coros {:d}", mAssetCoroCount);
+    ALOG_INFO("mPendingDownloads size {:d}", mPendingDownloads.size());
+    ALOG_INFO("mCountStarted {:d}", mCountStarted);
+    ALOG_INFO("mCountCompleted {:d}", mCountCompleted);
+    ALOG_INFO("mCountSucceeded {:d}", mCountSucceeded);
+    ALOG_INFO("mTotalBytesFetched {:d}", mTotalBytesFetched);
     LL_INFOS("AssetStorage") << "Active coros " << mAssetCoroCount << LL_ENDL;
     LL_INFOS("AssetStorage") << "mPendingDownloads size " << mPendingDownloads.size() << LL_ENDL;
     LL_INFOS("AssetStorage") << "mCountStarted " << mCountStarted << LL_ENDL;
