@@ -65,7 +65,7 @@ inline bool Check_FMOD_Error(FMOD_RESULT result, const char *string)
 {
 	if(result == FMOD_OK)
 		return false;
-	LL_WARNS("AudioImpl") << string << " Error: " << FMOD_ErrorString(result) << LL_ENDL;
+	ALOG_AUDIO_WARN("{} Error: {}", string, FMOD_ErrorString(result));
 	return true;
 }
 
@@ -74,7 +74,7 @@ bool LLAudioEngine_FMODSTUDIO::init(const S32 num_channels, void* userdata, cons
 	U32 version;
 	FMOD_RESULT result;
 
-	LL_DEBUGS("AppInit") << "LLAudioEngine_FMODSTUDIO::init() initializing FMOD" << LL_ENDL;
+	ALOG_AUDIO_INFO("LLAudioEngine_FMODSTUDIO::init() initializing FMOD");
 
 	result = FMOD::System_Create(&mSystem);
 	if(Check_FMOD_Error(result, "FMOD::System_Create"))
@@ -222,34 +222,34 @@ bool LLAudioEngine_FMODSTUDIO::init(const S32 num_channels, void* userdata, cons
 	if (!getStreamingAudioImpl()) // no existing implementation added
 		setStreamingAudioImpl(new LLStreamingAudio_FMODSTUDIO(mSystem));
 
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init() FMOD Studio initialized correctly" << LL_ENDL;
+	ALOG_AUDIO_INFO("FMOD Studio initialized correctly");
 
 	FMOD_ADVANCEDSETTINGS adv_settings_dump = { };
 	mSystem->getAdvancedSettings(&adv_settings_dump);
 
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): resampler=" << adv_settings.resamplerMethod << " bytes" << LL_ENDL;
+	ALOG_AUDIO_INFO("resampler={} bytes", adv_settings.resamplerMethod);
 
 	int r_numbuffers, r_samplerate, r_channels;
 	unsigned int r_bufferlength;
 	mSystem->getDSPBufferSize(&r_bufferlength, &r_numbuffers);
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): r_bufferlength=" << r_bufferlength << " bytes" << LL_ENDL;
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): r_numbuffers=" << r_numbuffers << LL_ENDL;
+	ALOG_AUDIO_INFO("r_bufferlength={} bytes", r_bufferlength);
+	ALOG_AUDIO_INFO("r_numbuffers={}", r_numbuffers);
 
 	char r_name[512];
 	mSystem->getDriverInfo(0, r_name, 511, nullptr, &r_samplerate, nullptr, &r_channels);
 	r_name[511] = '\0';
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): r_name=\"" << r_name << "\"" <<  LL_ENDL;
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): r_samplerate=" << r_samplerate << "Hz" << LL_ENDL;
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): r_channels=" << r_channels << LL_ENDL;
+	ALOG_AUDIO_INFO("r_name=\"{}\"", r_name);
+	ALOG_AUDIO_INFO("r_samplerate = {}Hz", r_samplerate);
+	ALOG_AUDIO_INFO("r_channels={}", r_channels);
 
 	int latency = 100; // optimistic default - i suspect if sample rate is 0, everything breaks. 
 	if ( r_samplerate != 0 )
 		latency = (int)(1000.0f * r_bufferlength * r_numbuffers / r_samplerate);
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): latency=" << latency << "ms" << LL_ENDL;
+	ALOG_AUDIO_INFO("latency={}ms", latency);
 
 	mInited = true;
 
-	LL_INFOS("AppInit") << "LLAudioEngine_FMODSTUDIO::init(): initialization complete." << LL_ENDL;
+	ALOG_AUDIO_INFO("initialization complete.");
 
 	return true;
 }
@@ -278,7 +278,7 @@ void LLAudioEngine_FMODSTUDIO::allocateListener(void)
 	}
 	catch (const std::bad_alloc& e)
 	{
-		LL_WARNS() << "Listener allocation failed due to: " << e.what() << LL_ENDL;
+		ALOG_AUDIO_WARN("Listener allocation failed due to: {}", e.what());
 	}
 
 }
@@ -286,16 +286,16 @@ void LLAudioEngine_FMODSTUDIO::allocateListener(void)
 
 void LLAudioEngine_FMODSTUDIO::shutdown()
 {
-	LL_INFOS() << "About to LLAudioEngine::shutdown()" << LL_ENDL;
+	ALOG_AUDIO_INFO("About to LLAudioEngine::shutdown()");
 	LLAudioEngine::shutdown();
 	
-	LL_INFOS() << "LLAudioEngine_FMODSTUDIO::shutdown() closing FMOD Studio" << LL_ENDL;
+	ALOG_AUDIO_INFO("Closing FMOD Studio");
 	if ( mSystem ) // speculative fix for MAINT-2657
 	{
 		Check_FMOD_Error(mSystem->close(), "FMOD::System::close");
 		Check_FMOD_Error(mSystem->release(), "FMOD::System::release");
 	}
-	LL_INFOS() << "LLAudioEngine_FMODSTUDIO::shutdown() done closing FMOD Studio" << LL_ENDL;
+	ALOG_AUDIO_INFO("Done closing FMOD Studio");
 
 	delete mListenerp;
 	mListenerp = nullptr;
@@ -484,9 +484,7 @@ bool LLAudioChannelFMODSTUDIO::updateBuffer()
 	}
 	else
 	{
-#if SHOW_DEBUG
-		LL_DEBUGS() << "No source buffer!" << LL_ENDL;
-#endif
+		ALOG_DEBUG("No source buffer!");
 		return false;
 	}
 
@@ -572,7 +570,7 @@ void LLAudioChannelFMODSTUDIO::play()
 {
 	if (!mChannelp)
 	{
-		LL_WARNS() << "Playing without a channel handle, aborting" << LL_ENDL;
+		ALOG_WARN("Playing without a channel handle, aborting");
 		return;
 	}
 
@@ -674,7 +672,7 @@ bool LLAudioBufferFMODSTUDIO::loadWAV(const std::string& filename)
 	if (result != FMOD_OK)
 	{
 		// We failed to load the file for some reason.
-		LL_WARNS() << "Could not load data '" << filename << "': " << FMOD_ErrorString(result) << LL_ENDL;
+		ALOG_AUDIO_WARN("Could not load data '{}': {}", filename, FMOD_ErrorString(result));
 
 		//
 		// If we EVER want to load wav files provided by end users, we need

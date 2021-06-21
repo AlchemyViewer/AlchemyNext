@@ -345,18 +345,12 @@ bool LLAudioBufferOpenAL::loadWAV(const std::string& filename)
 		ALenum error = alutGetError(); 
 		if (LLFile::isfile(filename))
 		{
-			LL_WARNS() <<
-				"LLAudioBufferOpenAL::loadWAV() Error loading "
-				<< filename
-				<< " " << alutGetErrorString(error) << LL_ENDL;
+			ALOG_AUDIO_WARN("LLAudioBufferOpenAL::loadWAV() Error loading {} {}", filename, alutGetErrorString(error));
 		}
 		else
 		{
 			// It's common for the file to not actually exist.
-			LL_DEBUGS() <<
-				"LLAudioBufferOpenAL::loadWAV() Error loading "
-				 << filename
-				 << " " << alutGetErrorString(error) << LL_ENDL;
+			ALOG_AUDIO_DEBUG("LLAudioBufferOpenAL::loadWAV() Error loading {} {}", filename, alutGetErrorString(error));
 		}
 		return false;
 	}
@@ -499,7 +493,7 @@ void LLAudioEngine_OpenAL::updateWind(LLVector3 wind_vec, F32 camera_altitude)
 	error = alGetError();
 	if(error != AL_NO_ERROR)
 	{
-		LL_WARNS() << "LLAudioEngine_OpenAL::updateWind() error swapping (unqueuing) buffers" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine_OpenAL::updateWind() error swapping (unqueuing) buffers");
 	}
 	else
 	{
@@ -516,7 +510,7 @@ void LLAudioEngine_OpenAL::updateWind(LLVector3 wind_vec, F32 camera_altitude)
 	alGenBuffers(mNumEmptyWindALBuffers,&buffers[0]);
 	if((error=alGetError()) != AL_NO_ERROR)
 	{
-		LL_WARNS() << "LLAudioEngine_OpenAL::updateWind() Error creating wind buffer: " << error << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine_OpenAL::updateWind() Error creating wind buffer: {}", error);
 		//break;
 	}
 
@@ -533,7 +527,7 @@ void LLAudioEngine_OpenAL::updateWind(LLVector3 wind_vec, F32 camera_altitude)
 		error = alGetError();
 		if(error != AL_NO_ERROR)
 		{
-			LL_WARNS() << "LLAudioEngine_OpenAL::updateWind() error swapping (bufferdata) buffers" << LL_ENDL;
+			ALOG_AUDIO_WARN("LLAudioEngine_OpenAL::updateWind() error swapping (bufferdata) buffers");
 			errors++;
 		}
 	}
@@ -543,7 +537,7 @@ void LLAudioEngine_OpenAL::updateWind(LLVector3 wind_vec, F32 camera_altitude)
 	error = alGetError();
 	if(error != AL_NO_ERROR)
 	{
-		LL_WARNS() << "LLAudioEngine_OpenAL::updateWind() error swapping (queuing) buffers" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine_OpenAL::updateWind() error swapping (queuing) buffers");
 	}
 
 	mNumEmptyWindALBuffers = errors;
@@ -559,7 +553,7 @@ void LLAudioEngine_OpenAL::updateWind(LLVector3 wind_vec, F32 camera_altitude)
 	{
 		alSourcePlay(mWindSource);
 
-		LL_DEBUGS() << "Wind had stopped - probably ran out of buffers - restarting: " << (unprocessed+mNumEmptyWindALBuffers) << " now queued." << LL_ENDL;
+		ALOG_AUDIO_DEBUG("Wind had stopped - probably ran out of buffers - restarting: {} now queued.", (unprocessed + mNumEmptyWindALBuffers));
 	}
 }
 

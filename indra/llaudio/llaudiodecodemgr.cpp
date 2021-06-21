@@ -204,7 +204,7 @@ BOOL LLVorbisDecodeState::initDecode()
 	cache_callbacks.close_func = cache_close;
 	cache_callbacks.tell_func = cache_tell;
 
-	LL_DEBUGS("AudioEngine") << "Initing decode from vfile: " << mUUID << LL_ENDL;
+	ALOG_AUDIO_DEBUG("Initing decode from vfile: {}", mUUID);
 
 	mInFilep = new LLFileSystem(mUUID, LLAssetType::AT_SOUND);
 	if (!mInFilep || !mInFilep->open() || !mInFilep->getSize())
@@ -522,7 +522,7 @@ BOOL LLVorbisDecodeState::finishDecode()
 	
 	mDone = TRUE;
 
-	LL_DEBUGS("AudioEngine") << "Finished decode for " << getUUID() << LL_ENDL;
+	ALOG_AUDIO_DEBUG("Finished decode for {}", getUUID().asString());
 
 	return TRUE;
 }
@@ -642,9 +642,10 @@ void LLAudioDecodeMgr::Impl::processQueue(const F32 num_secs)
 					continue;
 				}
 
-				LL_DEBUGS() << "Decoding " << uuid << " from audio queue!" << LL_ENDL;
+				const auto uuid_str = uuid.asString();
+				ALOG_AUDIO_DEBUG("Decoding {} from audio queue!", uuid_str);
 
-				std::string d_path = gDirUtilp->getExpandedFilename(LL_PATH_CACHE, uuid.asString()) + ".dsf";
+				std::string d_path = gDirUtilp->getExpandedFilename(LL_PATH_CACHE, uuid_str) + ".dsf";
 
 				mCurrentDecodep = new LLVorbisDecodeState(uuid, d_path);
 				if (!mCurrentDecodep->initDecode())
@@ -678,18 +679,18 @@ BOOL LLAudioDecodeMgr::addDecodeRequest(const LLUUID &uuid)
 	if (gAudiop && gAudiop->hasDecodedFile(uuid))
 	{
 		// Already have a decoded version, don't need to decode it.
-		LL_DEBUGS("AudioEngine") << "addDecodeRequest for " << uuid << " has decoded file already" << LL_ENDL;
+		ALOG_AUDIO_DEBUG("addDecodeRequest for {} has decoded file already", uuid.asString());
 		return TRUE;
 	}
 
 	if (gAssetStorage->hasLocalAsset(uuid, LLAssetType::AT_SOUND))
 	{
 		// Just put it on the decode queue.
-		LL_DEBUGS("AudioEngine") << "addDecodeRequest for " << uuid << " has local asset file already" << LL_ENDL;
+		ALOG_AUDIO_DEBUG("addDecodeRequest for {} has local asset file already", uuid.asString());
 		mImpl->mDecodeQueue.push_back(uuid);
 		return TRUE;
 	}
 
-	LL_DEBUGS("AudioEngine") << "addDecodeRequest for " << uuid << " no file available" << LL_ENDL;
+	ALOG_AUDIO_DEBUG("addDecodeRequest for {} no file available", uuid.asString());
 	return FALSE;
 }

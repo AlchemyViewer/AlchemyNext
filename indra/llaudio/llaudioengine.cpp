@@ -119,7 +119,7 @@ bool LLAudioEngine::init(const S32 num_channels, void* userdata, const std::stri
 	// Initialize the decode manager
 	gAudioDecodeMgrp = new LLAudioDecodeMgr;
 
-	LL_INFOS("AudioEngine") << "LLAudioEngine::init() AudioEngine successfully initialized" << LL_ENDL;
+	ALOG_AUDIO_INFO("AudioEngine successfully initialized");
 
 	return true;
 }
@@ -588,7 +588,7 @@ LLAudioBuffer * LLAudioEngine::getFreeBuffer()
 
 	if (buffer_id >= 0)
 	{
-		LL_DEBUGS() << "Taking over unused buffer " << buffer_id << LL_ENDL;
+		ALOG_AUDIO_DEBUG("Taking over unused buffer {}", buffer_id);
 		//LL_INFOS() << "Flushing unused buffer!" << LL_ENDL;
 		mBuffers[buffer_id]->mAudioDatap->mBufferp = NULL;
 		delete mBuffers[buffer_id];
@@ -670,7 +670,7 @@ void LLAudioEngine::cleanupBuffer(LLAudioBuffer *bufferp)
 
 bool LLAudioEngine::preloadSound(const LLUUID &uuid)
 {
-	LL_DEBUGS("AudioEngine")<<"( "<<uuid<<" )"<<LL_ENDL;
+	ALOG_AUDIO_DEBUG("( {} )", uuid.asString());
 
 	getAudioData(uuid);	// We don't care about the return value, this is just to make sure
 									// that we have an entry, which will mean that the audio engine knows about this
@@ -995,7 +995,7 @@ void LLAudioEngine::cleanupAudioSource(LLAudioSource *asp)
 	}
 	else
 	{
-		LL_DEBUGS("AudioEngine") << "Cleaning up audio sources for "<< asp->getID() <<LL_ENDL;
+		ALOG_AUDIO_DEBUG("Cleaning up audio sources for {}", asp->getID().asString());
 		delete asp;
 		mAllSources.erase(iter);
 	}
@@ -1024,7 +1024,7 @@ bool LLAudioEngine::hasLocalFile(const LLUUID &uuid)
 {
 	// See if it's in the cache.
 	bool have_local = LLFileSystem::getExists(uuid, LLAssetType::AT_SOUND);
-	LL_DEBUGS("AudioEngine") << "sound uuid " << uuid << " exists in cache" << LL_ENDL;
+	ALOG_AUDIO_DEBUG("sound uuid {} exists in cache", uuid.asString());
 	return have_local;
 }
 
@@ -1212,7 +1212,7 @@ void LLAudioEngine::startNextTransfer()
 
 	if (asset_id.notNull())
 	{
-		LL_INFOS() << "Getting asset data for: " << asset_id << LL_ENDL;
+		ALOG_AUDIO_INFO("Getting asset data for: {}", asset_id);
 		mCurrentTransfer = asset_id;
 		mCurrentTransferTimer.reset();
 		gAssetStorage->getAssetData(asset_id, LLAssetType::AT_SOUND,
@@ -1700,7 +1700,7 @@ void LLAudioChannel::setSource(LLAudioSource *sourcep)
 	}
 	else
 	{
-		LL_DEBUGS("AudioEngine") << "( id: " << sourcep->getID() << ")" << LL_ENDL;
+		ALOG_AUDIO_DEBUG("( id: {})", sourcep->getID().asString());
 
 	if (sourcep == mCurrentSourcep)
 	{
