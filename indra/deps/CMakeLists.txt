@@ -45,6 +45,11 @@ FetchContent_Declare(
   GIT_TAG        7.1.3
   )
 FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+  GIT_TAG        v1.8.5
+  )
+FetchContent_Declare(
   nlohmann_json
   GIT_REPOSITORY https://git.alchemyviewer.org/alchemy/mirrors/modernjson.git
   GIT_TAG        v3.9.1
@@ -85,13 +90,16 @@ endif()
 # #Download the rest of the libraries
 FetchContent_MakeAvailable(fmt)
 
-set(MESHOPT_BUILD_SHARED_LIBS OFF)
+set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(spdlog)
+
+set(MESHOPT_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(meshoptimizer)
 
 # If you only include this third party in PRIVATE source files, you do not
 # need to install it when your main project gets installed.
-set(JSON_Install OFF CACHE INTERNAL "")
-set(JSON_BuildTests OFF CACHE INTERNAL "")
+set(JSON_Install OFF CACHE BOOL "" FORCE)
+set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(nlohmann_json)
 
 unset(CMAKE_FOLDER)
