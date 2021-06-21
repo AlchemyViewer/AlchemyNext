@@ -209,10 +209,12 @@ void LLCoros::setStackSize(S32 stacksize)
 
 void LLCoros::printActiveCoroutines(const std::string& when)
 {
+    ALOG_INFO("Number of active coroutines {}: {}", when, CoroData::instanceCount());
     LL_INFOS("LLCoros") << "Number of active coroutines " << when
                         << ": " << CoroData::instanceCount() << LL_ENDL;
     if (CoroData::instanceCount() > 0)
     {
+        ALOG_INFO("-------------- List of active coroutines ------------");
         LL_INFOS("LLCoros") << "-------------- List of active coroutines ------------";
         F64 time = LLTimer::getTotalSeconds();
         for (auto& cd : CoroData::instance_snapshot())
@@ -220,8 +222,10 @@ void LLCoros::printActiveCoroutines(const std::string& when)
             F64 life_time = time - cd.mCreationTime;
             LL_CONT << LL_NEWLINE
                     << cd.getKey() << ' ' << cd.mStatus << " life: " << life_time;
+            ALOG_INFO("{} {} life: {}", cd.getKey(), cd.mStatus, life_time);
         }
         LL_CONT << LL_ENDL;
+        ALOG_INFO("-----------------------------------------------------");
         LL_INFOS("LLCoros") << "-----------------------------------------------------" << LL_ENDL;
     }
 }

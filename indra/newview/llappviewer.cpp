@@ -813,6 +813,7 @@ bool LLAppViewer::init()
 
 	ALControlCache::initControls();
 
+	ALOG_INFO("Configuration initialized.");
 	LL_INFOS("InitInfo") << "Configuration initialized." << LL_ENDL ;
 
 	//set the max heap size.
@@ -838,6 +839,7 @@ bool LLAppViewer::init()
 	// before consumers (LLTextureFetch).
 	mAppCoreHttp.init();
 
+	ALOG_INFO("LLCore::Http initialized.");
 	LL_INFOS("InitInfo") << "LLCore::Http initialized." << LL_ENDL ;
 
     LLMachineID::init();
@@ -852,6 +854,7 @@ bool LLAppViewer::init()
 	}
 
 	initThreads();
+	ALOG_INFO("Threads initialized.");
 	LL_INFOS("InitInfo") << "Threads initialized." << LL_ENDL ;
 
 	// Initialize settings early so that the defaults for ignorable dialogs are
@@ -866,6 +869,7 @@ bool LLAppViewer::init()
 		LLUIImageList::getInstance(),
 		ui_audio_callback,
 		deferred_ui_audio_callback);
+	ALOG_INFO("UI initialized.");
 	LL_INFOS("InitInfo") << "UI initialized." << LL_ENDL ;
 
 	// NOW LLUI::getLanguage() should work. gDirUtilp must know the language
@@ -878,6 +882,7 @@ bool LLAppViewer::init()
 
 	// Setup notifications after LLUI::initClass() has been called.
 	LLNotifications::instance();
+	ALOG_INFO("Notifications initialized.");
 	LL_INFOS("InitInfo") << "Notifications initialized." << LL_ENDL ;
 
     writeSystemInfo();
@@ -892,6 +897,8 @@ bool LLAppViewer::init()
 	// Various introspection concerning the libs we're using - particularly
 	// the libs involved in getting to a full login screen.
 	//
+	ALOG_INFO("J2C Engine is: {:s}", LLImageJ2C::getEngineInfo());
+	ALOG_INFO("libcurl version is: {:s}", LLCore::LLHttp::getCURLVersion());
 	LL_INFOS("InitInfo") << "J2C Engine is: " << LLImageJ2C::getEngineInfo() << LL_ENDL;
 	LL_INFOS("InitInfo") << "libcurl version is: " << LLCore::LLHttp::getCURLVersion() << LL_ENDL;
 
@@ -918,6 +925,7 @@ bool LLAppViewer::init()
 	// Let code in llui access the viewer help floater
 	LLUI::getInstance()->mHelpImpl = LLViewerHelp::getInstance();
 
+	ALOG_INFO("UI initialization is done.");
 	LL_INFOS("InitInfo") << "UI initialization is done." << LL_ENDL ;
 
 	// Load translations for tooltips
@@ -967,6 +975,7 @@ bool LLAppViewer::init()
 		// Early out from user choice.
 		return false;
 	}
+	ALOG_INFO("Hardware test initialization done.");
 	LL_INFOS("InitInfo") << "Hardware test initialization done." << LL_ENDL ;
 
 	// Prepare for out-of-memory situations, during which we will crash on
@@ -979,12 +988,14 @@ bool LLAppViewer::init()
 
 	if (!initCache())
 	{
+		ALOG_WARN("Failed to init cache");
 		LL_WARNS("InitInfo") << "Failed to init cache" << LL_ENDL;
 		std::ostringstream msg;
 		msg << LLTrans::getString("MBUnableToAccessFile");
 		OSMessageBox(msg.str(),LLStringUtil::null,OSMB_OK);
 		return 0;
 	}
+	ALOG_INFO("Cache initialization is done.");
 	LL_INFOS("InitInfo") << "Cache initialization is done." << LL_ENDL ;
 
 	// Initialize the repeater service.
@@ -995,6 +1006,7 @@ bool LLAppViewer::init()
 	//
 	gGLActive = TRUE;
 	initWindow();
+	ALOG_INFO("Window is initialized.");
 	LL_INFOS("InitInfo") << "Window is initialized." << LL_ENDL ;
 
 	// initWindow also initializes the Feature List, so now we can initialize this global.
@@ -1593,6 +1605,7 @@ bool LLAppViewer::doFrame()
 			if (mPeriodicSlowFrame
 				&& (gFrameCount % 10 == 0))
 			{
+				ALOG_INFO("Periodic slow frame - sleeping 500 ms");
 				LL_INFOS() << "Periodic slow frame - sleeping 500 ms" << LL_ENDL;
 				ms_sleep(500);
 			}
@@ -1668,6 +1681,7 @@ bool LLAppViewer::doFrame()
 
 		destroyMainloopTimeout();
 
+		ALOG_INFO("Exiting main_loop");
 		LL_INFOS() << "Exiting main_loop" << LL_ENDL;
 	}
 
@@ -1703,6 +1717,7 @@ void LLAppViewer::flushLFSIO()
 		{
 			break;
 		}
+		ALOG_INFO("Waiting for pending IO to finish: {}", pending);
 		LL_INFOS() << "Waiting for pending IO to finish: " << pending << LL_ENDL;
 		ms_sleep(100);
 	}
@@ -1757,6 +1772,7 @@ bool LLAppViewer::cleanup()
 
 	disconnectViewer();
 
+	ALOG_INFO("Viewer disconnected");
 	LL_INFOS() << "Viewer disconnected" << LL_ENDL;
 	
 	if (gKeyboard)
@@ -1770,6 +1786,7 @@ bool LLAppViewer::cleanup()
 
 	LLError::logToFixedBuffer(NULL); // stop the fixed buffer recorder
 
+	ALOG_INFO("Cleaning Up");
 	LL_INFOS() << "Cleaning Up" << LL_ENDL;
 
 	// shut down mesh streamer
@@ -1785,6 +1802,7 @@ bool LLAppViewer::cleanup()
 		LLHUDObject::updateAll();
 		LLHUDManager::getInstance()->cleanupEffects();
 		LLHUDObject::cleanupHUDObjects();
+		ALOG_INFO("HUD Objects cleaned up");
 		LL_INFOS() << "HUD Objects cleaned up" << LL_ENDL;
 	}
 
@@ -1819,6 +1837,7 @@ bool LLAppViewer::cleanup()
 
 	LLCalc::cleanUp();
 
+	ALOG_INFO("Global stuff deleted");
 	LL_INFOS() << "Global stuff deleted" << LL_ENDL;
 
 	if (gAudiop)
@@ -1837,6 +1856,7 @@ bool LLAppViewer::cleanup()
 	// such that we can suck rectangle information out of
 	// it.
 	cleanupSavedSettings();
+	ALOG_INFO("Settings patched up");
 	LL_INFOS() << "Settings patched up" << LL_ENDL;
 
 	// delete some of the files left around in the cache.
@@ -1848,30 +1868,35 @@ bool LLAppViewer::cleanup()
 	removeCacheFiles("*.bodypart");
 	removeCacheFiles("*.clothing");
 
+	ALOG_INFO("Cache files removed");
 	LL_INFOS() << "Cache files removed" << LL_ENDL;
 
 	// Wait for any pending LFS IO
 	flushLFSIO();
+	ALOG_INFO("Shutting down Views");
 	LL_INFOS() << "Shutting down Views" << LL_ENDL;
 
 	// Destroy the UI
 	if( gViewerWindow)
 		gViewerWindow->shutdownViews();
 
+	ALOG_INFO("Cleaning up Inventory");
 	LL_INFOS() << "Cleaning up Inventory" << LL_ENDL;
 
 	// Cleanup Inventory after the UI since it will delete any remaining observers
 	// (Deleted observers should have already removed themselves)
 	gInventory.cleanupInventory();
 
-	LLCoros::getInstance()->printActiveCoroutines();
+	LLCoros::getInstance()->printActiveCoroutines("during cleanup");
 
+	ALOG_INFO("Cleaning up Selections");
 	LL_INFOS() << "Cleaning up Selections" << LL_ENDL;
 
 	// Clean up selection managers after UI is destroyed, as UI may be observing them.
 	// Clean up before GL is shut down because we might be holding on to objects with texture references
 	LLSelectMgr::cleanupGlobals();
 
+	ALOG_INFO("Shutting down OpenGL");
 	LL_INFOS() << "Shutting down OpenGL" << LL_ENDL;
 
 	// Shut down OpenGL
@@ -1884,9 +1909,11 @@ bool LLAppViewer::cleanup()
 		// Therefore must do this before destroying the message system.
 		delete gViewerWindow;
 		gViewerWindow = NULL;
+		ALOG_INFO("ViewerWindow deleted");
 		LL_INFOS() << "ViewerWindow deleted" << LL_ENDL;
 	}
 
+	ALOG_INFO("Cleaning up Keyboard & Joystick");
 	LL_INFOS() << "Cleaning up Keyboard & Joystick" << LL_ENDL;
 
 	// viewer UI relies on keyboard so keep it aound until viewer UI isa gone
@@ -1899,6 +1926,7 @@ bool LLAppViewer::cleanup()
         LLViewerJoystick::getInstance()->terminate();
     }
 
+	ALOG_INFO("Cleaning up Objects");
 	LL_INFOS() << "Cleaning up Objects" << LL_ENDL;
 
 	LLViewerObject::cleanupVOClasses();
@@ -1919,10 +1947,12 @@ bool LLAppViewer::cleanup()
 	LLVolumeMgr* volume_manager = LLPrimitive::getVolumeManager();
 	if (!volume_manager->cleanup())
 	{
+		ALOG_WARN("Remaining references in the volume manager!");
 		LL_WARNS() << "Remaining references in the volume manager!" << LL_ENDL;
 	}
 	LLPrimitive::cleanupVolumeManager();
 
+	ALOG_INFO("Additional Cleanup...");
 	LL_INFOS() << "Additional Cleanup..." << LL_ENDL;
 
 	LLViewerParcelMgr::cleanupGlobals();
@@ -1935,6 +1965,7 @@ bool LLAppViewer::cleanup()
 	SUBSYSTEM_CLEANUP(LLWorldMapView);
 	SUBSYSTEM_CLEANUP(LLFolderViewItem);
 
+	ALOG_INFO("Saving Data");
 	LL_INFOS() << "Saving Data" << LL_ENDL;
 
 	// Store the time of our current logoff
@@ -1956,6 +1987,7 @@ bool LLAppViewer::cleanup()
 	// *FIX:Mani This should get really saved in a "logoff" mode.
 	if (gSavedSettings.getString("PerAccountSettingsFile").empty())
 	{
+		ALOG_INFO("Not saving per-account settings; don't know the account name yet.");
 		LL_INFOS() << "Not saving per-account settings; don't know the account name yet." << LL_ENDL;
 	}
 	// Only save per account settings if the previous login succeeded, otherwise
@@ -1963,11 +1995,13 @@ bool LLAppViewer::cleanup()
 	// failed after loading per account settings.
 	else if (!mSavePerAccountSettings)
 	{
+		ALOG_INFO("Not saving per-account settings; last login was not successful.");
 		LL_INFOS() << "Not saving per-account settings; last login was not successful." << LL_ENDL;
 	}
 	else
 	{
 		gSavedPerAccountSettings.saveToFile(gSavedSettings.getString("PerAccountSettingsFile"), TRUE);
+		ALOG_INFO("Saved settings");
 		LL_INFOS() << "Saved settings" << LL_ENDL;
 
 		if (LLViewerParcelAskPlay::instanceExists())
@@ -1996,6 +2030,7 @@ bool LLAppViewer::cleanup()
 
 	if (mPurgeCacheOnExit)
 	{
+		ALOG_INFO("Purging all cache files on exit");
 		LL_INFOS() << "Purging all cache files on exit" << LL_ENDL;
 		gDirUtilp->deleteFilesInDir(gDirUtilp->getExpandedFilename(LL_PATH_CACHE,""), "*.*");
 	}
@@ -2009,6 +2044,7 @@ bool LLAppViewer::cleanup()
 	// Stop the plugin read thread if it's running.
 	LLPluginProcessParent::setUseReadThread(false);
 
+	ALOG_INFO("Shutting down Threads");
 	LL_INFOS() << "Shutting down Threads" << LL_ENDL;
 
 	// Let threads finish
@@ -2029,6 +2065,7 @@ bool LLAppViewer::cleanup()
 		}
 		else if(idle_time >= max_idle_time)
 		{
+			ALOG_WARN("Quitting with pending background tasks.");
 			LL_WARNS() << "Quitting with pending background tasks." << LL_ENDL;
 			break;
 		}
@@ -2052,6 +2089,7 @@ bool LLAppViewer::cleanup()
 	sTextureFetch->shutDownTextureCacheThread() ;
 	sTextureFetch->shutDownImageDecodeThread() ;
 
+	ALOG_INFO("Shutting down message system");
 	LL_INFOS() << "Shutting down message system" << LL_ENDL;
 	end_messaging_system();
 
@@ -2073,6 +2111,7 @@ bool LLAppViewer::cleanup()
 
 	if (LLFastTimerView::sAnalyzePerformance)
 	{
+		ALOG_INFO("Analyzing performance");
 		LL_INFOS() << "Analyzing performance" << LL_ENDL;
 
 		std::string baseline_name = LLTrace::BlockTimer::sLogName + "_baseline.slp";
@@ -2087,6 +2126,7 @@ bool LLAppViewer::cleanup()
 
 	SUBSYSTEM_CLEANUP(LLMetricPerformanceTesterBasic) ;
 
+	ALOG_INFO("Cleaning up Media and Textures");
 	LL_INFOS() << "Cleaning up Media and Textures" << LL_ENDL;
 
 	//Note:
@@ -2098,6 +2138,7 @@ bool LLAppViewer::cleanup()
 	SUBSYSTEM_CLEANUP(LLImage);
 	SUBSYSTEM_CLEANUP(LLLFSThread);
 
+	ALOG_INFO("Misc Cleanup");
 	LL_INFOS() << "Misc Cleanup" << LL_ENDL;
 
 	gSavedSettings.cleanup();
@@ -2111,6 +2152,7 @@ bool LLAppViewer::cleanup()
 	// is at the right resolution before we launch IE.
 	if (!gLaunchFileOnQuit.empty())
 	{
+		ALOG_INFO("Launch file on quit.");
 		LL_INFOS() << "Launch file on quit." << LL_ENDL;
 #if LL_WINDOWS
 		// Indicate an application is starting.
@@ -2121,9 +2163,11 @@ bool LLAppViewer::cleanup()
 		ms_sleep(1000);
 
 		LLWeb::loadURLExternal( gLaunchFileOnQuit, false );
+		ALOG_INFO("File launched.");
 		LL_INFOS() << "File launched." << LL_ENDL;
 	}
 	// make sure nothing uses applyProxySettings by this point.
+	ALOG_INFO("Cleaning up LLProxy.");
 	LL_INFOS() << "Cleaning up LLProxy." << LL_ENDL;
 	SUBSYSTEM_CLEANUP(LLProxy);
     LLCore::LLHttp::cleanup();
@@ -2339,6 +2383,7 @@ bool LLAppViewer::loadSettingsFromDirectory(const std::string& location_key,
 {
 	if (!mSettingsLocationList)
 	{
+		ALOG_CRITICAL("Invalid settings location list");
 		LL_ERRS() << "Invalid settings location list" << LL_ENDL;
 	}
 
@@ -2350,18 +2395,21 @@ bool LLAppViewer::loadSettingsFromDirectory(const std::string& location_key,
 		ELLPath path_index = (ELLPath)group.path_index();
 		if(path_index <= LL_PATH_NONE || path_index >= LL_PATH_LAST)
 		{
+			ALOG_CRITICAL("Out of range path index in app_settings/settings_files.xml");
 			LL_ERRS() << "Out of range path index in app_settings/settings_files.xml" << LL_ENDL;
 			return false;
 		}
 
 		for (const SettingsFile& file : group.files)
 		{
+			ALOG_INFO("Attempting to load settings for the group {} - from location {}", file.name(), location_key);
 			LL_INFOS("Settings") << "Attempting to load settings for the group " << file.name()
 			    << " - from location " << location_key << LL_ENDL;
 
 			LLControlGroup* settings_group = LLControlGroup::getInstance(file.name);
 			if(!settings_group)
 			{
+				ALOG_WARN("No matching settings group for name {:s}", file.name());
 				LL_WARNS("Settings") << "No matching settings group for name " << file.name() << LL_ENDL;
 				continue;
 			}
@@ -2391,12 +2439,14 @@ bool LLAppViewer::loadSettingsFromDirectory(const std::string& location_key,
 
 			if(settings_group->loadFromFile(full_settings_path, set_defaults, file.persistent))
 			{	// success!
+				ALOG_INFO("Loaded settings file {:s}", full_settings_path);
 				LL_INFOS("Settings") << "Loaded settings file " << full_settings_path << LL_ENDL;
 			}
 			else
 			{	// failed to load
 				if(file.required)
 				{
+					ALOG_CRITICAL("Error: Cannot load required settings file from: {:s}", full_settings_path);
 					LL_ERRS() << "Error: Cannot load required settings file from: " << full_settings_path << LL_ENDL;
 					return false;
 				}
@@ -2405,6 +2455,7 @@ bool LLAppViewer::loadSettingsFromDirectory(const std::string& location_key,
 					// only complain if we actually have a filename at this point
 					if (!full_settings_path.empty())
 					{
+						ALOG_INFO("Cannot load {:s} - No settings found.", full_settings_path);
 						LL_INFOS("Settings") << "Cannot load " << full_settings_path << " - No settings found." << LL_ENDL;
 					}
 				}
@@ -3013,6 +3064,7 @@ bool LLAppViewer::meetsRequirementsForMaximizedStart()
 
 bool LLAppViewer::initWindow()
 {
+	ALOG_INFO("Initializing window...");
 	LL_INFOS("AppInit") << "Initializing window..." << LL_ENDL;
 
 	// store setting in a global for easy access and modification
@@ -3037,6 +3089,7 @@ bool LLAppViewer::initWindow()
 
 	gViewerWindow = new LLViewerWindow(window_params);
 
+	ALOG_INFO("gViewerwindow created.");
 	LL_INFOS("AppInit") << "gViewerwindow created." << LL_ENDL;
 
 	// Need to load feature table before cheking to start watchdog.
@@ -3056,6 +3109,7 @@ bool LLAppViewer::initWindow()
 	{
 		LLWatchdog::getInstance()->init(watchdog_killer_callback);
 	}
+	ALOG_INFO("watchdog setting is done.");
 	LL_INFOS("AppInit") << "watchdog setting is done." << LL_ENDL;
 
 	LLNotificationsUI::LLNotificationManager::getInstance();
@@ -3080,6 +3134,7 @@ bool LLAppViewer::initWindow()
 	gSavedSettings.saveToFile( gSavedSettings.getString("ClientSettingsFile"), TRUE );
 
 	gPipeline.init();
+	ALOG_INFO("gPipeline Initialized");
 	LL_INFOS("AppInit") << "gPipeline Initialized" << LL_ENDL;
 
 	stop_glerror();
@@ -3100,6 +3155,7 @@ bool LLAppViewer::initWindow()
 	//
 	if (gSavedSettings.getBOOL("FirstLoginThisInstall") && meetsRequirementsForMaximizedStart())
 	{
+		ALOG_INFO("This client met the requirements for a maximized initial screen.");
 		LL_INFOS("AppInit") << "This client met the requirements for a maximized initial screen." << LL_ENDL;
 		gSavedSettings.setBOOL("WindowMaximized", TRUE);
 	}
@@ -3120,6 +3176,7 @@ bool LLAppViewer::initWindow()
 	// show viewer window
 	//gViewerWindow->getWindow()->show();
 
+	ALOG_INFO("Window initialization done.");
 	LL_INFOS("AppInit") << "Window initialization done." << LL_ENDL;
 
 	return true;
@@ -3133,6 +3190,7 @@ void LLAppViewer::writeDebugInfo(bool isStatic)
         ? getStaticDebugFile()
         : getDynamicDebugFile() );
 
+	ALOG_INFO("Writing debug file {:s}", *debug_filename);
     LL_INFOS() << "Writing debug file " << *debug_filename << LL_ENDL;
     llofstream out_file(debug_filename->c_str());
 
@@ -4018,6 +4076,7 @@ void LLAppViewer::fastQuit(S32 error_code)
 
 void LLAppViewer::requestQuit()
 {
+	ALOG_INFO("requestQuit");
 	LL_INFOS() << "requestQuit" << LL_ENDL;
 
 	LLViewerRegion* region = gAgent.getRegion();
@@ -4084,6 +4143,7 @@ static LLNotificationFunctorRegistration finish_quit_reg("ConfirmQuit", finish_q
 
 void LLAppViewer::userQuit()
 {
+	ALOG_INFO("User requested quit");
 	LL_INFOS() << "User requested quit" << LL_ENDL;
 	if (gDisconnected
 		|| !gViewerWindow
@@ -4106,6 +4166,7 @@ static bool finish_early_exit(const LLSD& notification, const LLSD& response)
 
 void LLAppViewer::earlyExit(const std::string& name, const LLSD& substitutions)
 {
+	ALOG_WARN("app_early_exit: {:s}", name);
    	LL_WARNS() << "app_early_exit: " << name << LL_ENDL;
 	gDoDisconnect = TRUE;
 	LLNotificationsUtil::add(name, substitutions, LLSD(), finish_early_exit);
@@ -4114,14 +4175,16 @@ void LLAppViewer::earlyExit(const std::string& name, const LLSD& substitutions)
 // case where we need the viewer to exit without any need for notifications
 void LLAppViewer::earlyExitNoNotify()
 {
-   	LL_WARNS() << "app_early_exit with no notification: " << LL_ENDL;
+	ALOG_WARN("app_early_exit with no notification");
+   	LL_WARNS() << "app_early_exit with no notification" << LL_ENDL;
 	gDoDisconnect = TRUE;
 	finish_early_exit( LLSD(), LLSD() );
 }
 
 void LLAppViewer::abortQuit()
 {
-    LL_INFOS() << "abortQuit()" << LL_ENDL;
+	ALOG_INFO("abortQuit");
+    LL_INFOS() << "abortQuit" << LL_ENDL;
 	mQuitRequested = false;
 }
 
@@ -4612,12 +4675,14 @@ void LLAppViewer::loadNameCache()
 	// display names cache
 	std::string filename =
 		gDirUtilp->getExpandedFilename(LL_PATH_CACHE, "avatar_name_cache.xml");
+	ALOG_INFO("Loading name cache from file: {:s}", filename);
 	LL_INFOS("AvNameCache") << filename << LL_ENDL;
 	llifstream name_cache_stream(filename.c_str());
 	if(name_cache_stream.is_open())
 	{
 		if ( ! LLAvatarNameCache::getInstance()->importFile(name_cache_stream))
         {
+			ALOG_WARN("Removing invalid namec ache '{:s}'", filename);
             LL_WARNS("AppInit") << "removing invalid '" << filename << "'" << LL_ENDL;
             name_cache_stream.close();
             LLFile::remove(filename);
@@ -5206,16 +5271,19 @@ void LLAppViewer::sendLogoutRequest()
 			mLogoutMarkerFile.open(mLogoutMarkerFileName, LL_APR_WB);
 			if (mLogoutMarkerFile.getFileHandle())
 			{
+				ALOG_INFO("Created logout marker file '{:s}'", mLogoutMarkerFileName);
 				LL_INFOS("MarkerFile") << "Created logout marker file '"<< mLogoutMarkerFileName << "' " << LL_ENDL;
 				recordMarkerVersion(mLogoutMarkerFile);
 			}
 			else
 			{
+				ALOG_WARN("Cannot create logout marker file '{:s}'", mLogoutMarkerFileName);
 				LL_WARNS("MarkerFile") << "Cannot create logout marker file " << mLogoutMarkerFileName << LL_ENDL;
 			}
 		}
 		else
 		{
+			ALOG_INFO("Did not create logout marker file because this is a second instance");
 			LL_INFOS("MarkerFile") << "Did not logout marker file because this is a second instance" << LL_ENDL;
 		}
 
@@ -5683,6 +5751,7 @@ void LLAppViewer::handleLoginComplete()
 	writeDebugInfo();
 
 	// we logged in successfully, so save settings on logout
+	ALOG_INFO("Login successful, per account settings will be saved on log out.");
 	LL_INFOS() << "Login successful, per account settings will be saved on log out." << LL_ENDL;
 	mSavePerAccountSettings=true;
 }

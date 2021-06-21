@@ -2305,8 +2305,10 @@ bool idle_startup()
 		// Unmute audio if desired and setup volumes.
 		// This is a not-uncommon crash site, so surround it with
 		// LL_INFOS() output to aid diagnosis.
+		ALOG_INFO("Doing first audio_update_volume...");
 		LL_INFOS("AppInit") << "Doing first audio_update_volume..." << LL_ENDL;
 		audio_update_volume();
+		ALOG_INFO("Done first audio_update_volume.");
 		LL_INFOS("AppInit") << "Done first audio_update_volume." << LL_ENDL;
 
 		// reset keyboard focus to sane state of pointing at world
@@ -2335,6 +2337,7 @@ bool idle_startup()
 
 void login_show()
 {
+	ALOG_INFO("Initializing Login Screen");
 	LL_INFOS("AppInit") << "Initializing Login Screen" << LL_ENDL;
 
 	// Hide the toolbars: may happen to come back here if login fails after login agent but before login in region
