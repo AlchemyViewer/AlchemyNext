@@ -179,21 +179,12 @@ void HttpPolicy::retryOp(const HttpOpRequest::ptr_t &op)
 	{
 		++op->mPolicy503Retries;
 	}
-#ifdef SHOW_DEBUG
-	LL_DEBUGS(LOG_CORE) << "HTTP request " << op->getHandle()
-						<< " retry " << op->mPolicyRetries
-						<< " scheduled in " << (delta / HttpTime(1000))
-						<< " mS (" << (external_delta ? "external" : "internal")
-						<< ").  Status:  " << op->mStatus.toTerseString()
-						<< LL_ENDL;
-#endif
+
+	ALOG_NET_DEBUG("HTTP request {} retry {} scheduled in {} mS ({}).  Status: {}", fmt::ptr(op->getHandle()), op->mPolicyRetries, (delta / HttpTime(1000)), (external_delta ? "external" : "internal"), op->mStatus.toTerseString());
+
 	if (op->mTracing > HTTP_TRACE_OFF)
 	{
-		LL_INFOS(LOG_CORE) << "TRACE, ToRetryQueue, Handle:  "
-                            << op->getHandle()
-						    << ", Delta:  " << (delta / HttpTime(1000))
-						    << ", Retries:  " << op->mPolicyRetries
-						    << LL_ENDL;
+		ALOG_NET_INFO("TRACE, ToRetryQueue, Handle: {}, Delta: {}, Retries: {}", fmt::ptr(op->getHandle()), (delta / HttpTime(1000)), op->mPolicyRetries);
 	}
 	mClasses[policy_class]->mRetryQueue.push(op);
 }
@@ -281,9 +272,7 @@ HttpService::ELoopSpeed HttpPolicy::processReadyQueue()
 					if (now >= state.mThrottleEnd)
 					{
 						// Throttle expired, move to next window
-						LL_DEBUGS(LOG_CORE) << "Throttle expired with " << state.mThrottleLeft
-											<< " requests to go and " << state.mRequestCount
-											<< " requests issued." << LL_ENDL;
+						ALOG_NET_DEBUG("Throttle expired with {} requests to go and {} requests issued.", state.mThrottleLeft, state.mRequestCount);
 						state.mThrottleLeft = state.mOptions.mThrottleRate;
 						state.mThrottleEnd = now + HttpTime(1000000);
 					}
@@ -310,9 +299,7 @@ HttpService::ELoopSpeed HttpPolicy::processReadyQueue()
 					if (now >= state.mThrottleEnd)
 					{
 						// Throttle expired, move to next window
-						LL_DEBUGS(LOG_CORE) << "Throttle expired with " << state.mThrottleLeft
-											<< " requests to go and " << state.mRequestCount
-											<< " requests issued." << LL_ENDL;
+						ALOG_NET_DEBUG("Throttle expired with {} requests to go and {} requests issued.", state.mThrottleLeft, state.mRequestCount);
 						state.mThrottleLeft = state.mOptions.mThrottleRate;
 						state.mThrottleEnd = now + HttpTime(1000000);
 					}
@@ -438,18 +425,10 @@ bool HttpPolicy::stageAfterCompletion(const HttpOpRequest::ptr_t &op)
 	if (! op->mStatus)
 	{
 		ALOG_NET_WARN(FMT_STRING("HTTP request {:p} failed after {:d} retries. Reason: {:s} ({:s})"), fmt::ptr(op->getHandle()), op->mPolicyRetries, op->mStatus.toString(), op->mStatus.toTerseString());
-		LL_WARNS(LOG_CORE) << "HTTP request " << op->getHandle()
-						   << " failed after " << op->mPolicyRetries
-						   << " retries.  Reason:  " << op->mStatus.toString()
-						   << " (" << op->mStatus.toTerseString() << ")"
-						   << LL_ENDL;
 	}
 	else if (op->mPolicyRetries)
 	{
 		ALOG_NET_DEBUG(FMT_STRING("HTTP request {:p} succeeded on retry {:d}."), fmt::ptr(op->getHandle()), op->mPolicyRetries);
-        LL_DEBUGS(LOG_CORE) << "HTTP request " << op->getHandle()
-							<< " succeeded on retry " << op->mPolicyRetries << "."
-							<< LL_ENDL;
 	}
 
 	op->stageFromActive(mService);

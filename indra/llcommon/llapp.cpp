@@ -450,7 +450,7 @@ void LLApp::startErrorThread()
 	//
 	if(!mThreadErrorp)
 	{
-		LL_INFOS() << "Starting error thread" << LL_ENDL;
+		ALOG_INFO("Starting error thread");
 		mThreadErrorp = new LLErrorThread();
 		mThreadErrorp->setUserData((void *) this);
 		mThreadErrorp->start();

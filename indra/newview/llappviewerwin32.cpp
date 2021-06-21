@@ -498,11 +498,11 @@ void LLAppViewerWin32::disableWinErrorReporting()
 
 	if( S_OK == WerAddExcludedApplication( ll_convert_string_to_wide(executable_name).c_str(), FALSE ) )
 	{
-		LL_INFOS() << "WerAddExcludedApplication() succeeded for " << executable_name << LL_ENDL;
+		ALOG_INFO("WerAddExcludedApplication() succeeded for {}", executable_name);
 	}
 	else
 	{
-		LL_INFOS() << "WerAddExcludedApplication() failed for " << executable_name << LL_ENDL;
+		ALOG_INFO("WerAddExcludedApplication() failed for {}", executable_name);
 	}
 }
 
@@ -723,10 +723,10 @@ bool LLAppViewerWin32::initHardwareTest()
 	{
 		LLSplashScreen::update(LLTrans::getString("StartupDetectingHardware"));
 
-		LL_DEBUGS("AppInit") << "Attempting to poll DirectX for hardware info" << LL_ENDL;
+		ALOG_DEBUG("Attempting to poll DirectX for hardware info");
 		gDXHardware.setWriteDebugFunc(write_debug_dx);
 		gDXHardware.updateVRAM();
-		LL_DEBUGS("AppInit") << "Done polling DXGI for vram info" << LL_ENDL;
+		ALOG_DEBUG("Done polling DXGI for vram info");
 
 		// Disable so debugger can work
 		std::string splash_msg;
@@ -739,7 +739,7 @@ bool LLAppViewerWin32::initHardwareTest()
 
 	if (!restoreErrorTrap())
 	{
-		LL_WARNS("AppInit") << " Someone took over my exception handler (post hardware probe)!" << LL_ENDL;
+		ALOG_WARN("Someone took over my exception handler (post hardware probe)!");
 	}
 
 	if (gGLManager.mVRAM == 0)
@@ -747,7 +747,7 @@ bool LLAppViewerWin32::initHardwareTest()
 		gGLManager.mVRAM = gDXHardware.getVRAM();
 	}
 
-	LL_INFOS("AppInit") << "Detected VRAM: " << gGLManager.mVRAM << LL_ENDL;
+	ALOG_INFO("Detected VRAM: {}", gGLManager.mVRAM);
 
 	return true;
 }
@@ -766,9 +766,9 @@ bool LLAppViewerWin32::initParseCommandLine(LLCommandLineParser& clp)
 	{
 		if (success >= 2 && locale->lang) // confident!
 		{
-			LL_INFOS("AppInit") << "Language: " << ll_safe_string(locale->lang) << LL_ENDL;
-			LL_INFOS("AppInit") << "Location: " << ll_safe_string(locale->country) << LL_ENDL;
-			LL_INFOS("AppInit") << "Variant: " << ll_safe_string(locale->variant) << LL_ENDL;
+			ALOG_INFO("Language: {}", ll_safe_string(locale->lang));
+			ALOG_INFO("Location: {}", ll_safe_string(locale->country));
+			ALOG_INFO("Variant: {}", ll_safe_string(locale->variant));
 			LLControlVariable* c = gSavedSettings.getControl("SystemLanguage");
 			if(c)
 			{

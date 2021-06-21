@@ -444,41 +444,41 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
 		pGetDpiForWindow = (GetDpiForWindow_t) GetProcAddress(mUser32DLL, "GetDpiForWindow");
 		if (pGetDpiForWindow != nullptr)
 		{
-			LL_INFOS() << "Successfully got address for function GetDpiForWindow" << LL_ENDL;
+			ALOG_INFO("Successfully got address for function GetDpiForWindow");
 		}
 		else
 		{
-			LL_INFOS() << "Failed to get address for function GetDpiForWindow" << LL_ENDL;
+			ALOG_WARN("Failed to get address for function GetDpiForWindow");
 		}
 
 		pGetDpiForSystem = (GetDpiForSystem_t)GetProcAddress(mUser32DLL, "GetDpiForSystem");
 		if (pGetDpiForSystem != nullptr)
 		{
-			LL_INFOS() << "Successfully got address for function GetDpiForSystem" << LL_ENDL;
+			ALOG_INFO("Successfully got address for function GetDpiForSystem");
 		}
 		else
 		{
-			LL_INFOS() << "Failed to get address for function GetDpiForSystem" << LL_ENDL;
+			ALOG_WARN("Failed to get address for function GetDpiForSystem");
 		}
 
 		pAdjustWindowRectExForDpi = (AdjustWindowRectExForDpi_t) GetProcAddress(mUser32DLL, "AdjustWindowRectExForDpi");
 		if (pAdjustWindowRectExForDpi != nullptr)
 		{
-			LL_INFOS() << "Successfully got address for function AdjustWindowRectExForDpi" << LL_ENDL;
+			ALOG_INFO("Successfully got address for function AdjustWindowRectExForDpi");
 		}
 		else
 		{
-			LL_INFOS() << "Failed to get address for function AdjustWindowRectExForDpi" << LL_ENDL;
+			ALOG_WARN("Failed to get address for function AdjustWindowRectExForDpi");
 		}
 
 		pGetSystemMetricsForDpi = (GetSystemMetricsForDpi_t) GetProcAddress(mUser32DLL, "GetSystemMetricsForDpi");
 		if (pGetSystemMetricsForDpi != nullptr)
 		{
-			LL_INFOS() << "Successfully got address for function GetSystemMetricsForDpi" << LL_ENDL;
+			ALOG_INFO("Successfully got address for function GetSystemMetricsForDpi");
 		}
 		else
 		{
-			LL_INFOS() << "Failed to get address for function GetSystemMetricsForDpi" << LL_ENDL;
+			ALOG_WARN("Failed to get address for function GetSystemMetricsForDpi");
 		}
 	}
 
@@ -488,20 +488,20 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
 		pGetProcessDpiAwareness = (GetProcessDpiAwareness_t) GetProcAddress(mShellcoDLL, "GetProcessDpiAwareness");
 		if (pGetProcessDpiAwareness != nullptr)
 		{
-			LL_INFOS() << "Successfully got address for function GetProcessDpiAwareness" << LL_ENDL;
+			ALOG_INFO("Successfully got address for function GetProcessDpiAwareness");
 		}
 		else
 		{
-			LL_INFOS() << "Failed to get address for function GetProcessDpiAwareness" << LL_ENDL;
+			ALOG_WARN("Failed to get address for function GetProcessDpiAwareness");
 		}
 		pGetDpiForMonitor = (GetDpiForMonitor_t) GetProcAddress(mShellcoDLL, "GetDpiForMonitor");
 		if (pGetDpiForMonitor != nullptr)
 		{
-			LL_INFOS() << "Successfully got address for function GetDpiForMonitor" << LL_ENDL;
+			ALOG_INFO("Successfully got address for function GetDpiForMonitor");
 		}
 		else
 		{
-			LL_INFOS() << "Failed to get address for function GetDpiForMonitor" << LL_ENDL;
+			ALOG_WARN("Failed to get address for function GetDpiForMonitor");
 		}
 	}
 
@@ -902,7 +902,7 @@ LLWindowWin32::~LLWindowWin32()
 
 void LLWindowWin32::show()
 {
-    LL_DEBUGS("Window") << "Setting window to show" << LL_ENDL;
+	ALOG_DEBUG("Setting window to show");
 	ShowWindow(mWindowHandle, SW_SHOW);
 	SetForegroundWindow(mWindowHandle);
 	SetFocus(mWindowHandle);
@@ -963,7 +963,7 @@ bool destroy_window_handler(HWND &hWnd)
 // Usually called from LLWindowManager::destroyWindow()
 void LLWindowWin32::close()
 {
-	LL_DEBUGS("Window") << "Closing LLWindowWin32" << LL_ENDL;
+	ALOG_DEBUG("Closing LLWindowWin32");
 	// Is window is already closed?
 	if (!mWindowHandle)
 	{
@@ -990,11 +990,11 @@ void LLWindowWin32::close()
 	// Clean up remaining GL state
 	if (gGLManager.mInited)
 	{
-		LL_INFOS("Window") << "Cleaning up GL" << LL_ENDL;
+		ALOG_INFO("Cleaning up GL");
 		gGLManager.shutdownGL();
 	}
 
-	LL_DEBUGS("Window") << "Releasing Context" << LL_ENDL;
+	ALOG_INFO("Releasing Context");
 	if (mhRC)
 	{
 		if (!wglMakeCurrent(NULL, NULL))
@@ -1022,7 +1022,7 @@ void LLWindowWin32::close()
 		mhDC = NULL;
 	}
 
-	LL_DEBUGS("Window") << "Destroying Window" << LL_ENDL;
+	ALOG_INFO("Destroying Window");
 
     if (IsWindow(mWindowHandle))
     {
@@ -1405,7 +1405,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 		return FALSE;
 	}
 
-	LL_INFOS("Window") << "Device context retrieved." << LL_ENDL ;
+	ALOG_INFO("Device context retrieved.");
 
     try
     {
@@ -1428,7 +1428,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 		return FALSE;
 	}
 
-	LL_INFOS("Window") << "Pixel format chosen." << LL_ENDL ;
+	ALOG_INFO("Pixel format chosen.");
 
 	// Verify what pixel format we actually received.
 	if (!DescribePixelFormat(mhDC, pixel_format, sizeof(PIXELFORMATDESCRIPTOR),
@@ -1743,19 +1743,19 @@ const	S32   max_format  = (S32)num_formats - 1;
 			{
 			case WGL_SWAP_EXCHANGE_ARB:
 				mSwapMethod = SWAP_METHOD_EXCHANGE;
-				LL_DEBUGS("Window") << "Swap Method: Exchange" << LL_ENDL;
+				ALOG_DEBUG("Swap Method: Exchange");
 				break;
 			case WGL_SWAP_COPY_ARB:
 				mSwapMethod = SWAP_METHOD_COPY;
-				LL_DEBUGS("Window") << "Swap Method: Copy" << LL_ENDL;
+				ALOG_DEBUG("Swap Method: Copy");
 				break;
 			case WGL_SWAP_UNDEFINED_ARB:
 				mSwapMethod = SWAP_METHOD_UNDEFINED;
-				LL_DEBUGS("Window") << "Swap Method: Undefined" << LL_ENDL;
+				ALOG_DEBUG("Swap Method: Undefined");
 				break;
 			default:
 				mSwapMethod = SWAP_METHOD_UNDEFINED;
-				LL_DEBUGS("Window") << "Swap Method: Unknown" << LL_ENDL;
+				ALOG_DEBUG("Swap Method: Unknown");
 				break;
 			}
 		}		
@@ -3127,7 +3127,7 @@ LRESULT CALLBACK LLWindowWin32::mainWindowProc(HWND h_wnd, UINT u_msg, WPARAM w_
     else
     {
         // (NULL == window_imp)
-        LL_DEBUGS("Window") << "No window implementation to handle message with, message code: " << U32(u_msg) << LL_ENDL;
+		ALOG_DEBUG("No window implementation to handle message with, message code: {}", U32(u_msg));
     }
 
 	// pass unhandled messages down to Windows
@@ -3392,7 +3392,7 @@ BOOL LLWindowWin32::restoreGamma()
 {
 	if (mCustomGammaSet != FALSE)
 	{
-        LL_DEBUGS("Window") << "Restoring gamma" << LL_ENDL;
+		ALOG_DEBUG("Restoring gamma");
 		mCustomGammaSet = FALSE;
 		return SetDeviceGammaRamp(mhDC, mPrevGammaRamp);
 	}
@@ -3408,17 +3408,17 @@ BOOL LLWindowWin32::setGamma(const F32 gamma)
 	{
         if (!gGLManager.mIsIntel) // skip for Intel GPUs (see SL-11341)
         {
-            LL_DEBUGS("Window") << "Getting the previous gamma ramp to restore later" << LL_ENDL;
+			ALOG_DEBUG("Getting the previous gamma ramp to restore later");
             if(GetDeviceGammaRamp(mhDC, mPrevGammaRamp) == FALSE)
             {
-                LL_WARNS("Window") << "Failed to get the previous gamma ramp" << LL_ENDL;
+				ALOG_WARN("Failed to get the previous gamma ramp");
                 return FALSE;
             }
         }
 		mCustomGammaSet = TRUE;
 	}
 
-	LL_DEBUGS("Window") << "Setting gamma to " << gamma << LL_ENDL;
+	ALOG_DEBUG("Setting gamma to {}", gamma);
 
 	for ( int i = 0; i < 256; ++i )
 	{

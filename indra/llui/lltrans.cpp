@@ -169,7 +169,7 @@ std::string LLTrans::getString(std::string_view xml_desc, const LLStringUtil::fo
 	}
 	else
 	{
-		LL_WARNS_ONCE("configuration") << "Missing String in strings.xml: [" << xml_desc << "]" << LL_ENDL;
+		ALOG_WARN("Missing String in strings.xml: [{}]", xml_desc);
 		return absl::StrCat("MissingString(", xml_desc, ")");
 	}
 }
@@ -189,7 +189,7 @@ std::string LLTrans::getDefString(std::string_view xml_desc, const LLStringUtil:
 	}
 	else
 	{
-		LL_WARNS_ONCE("configuration") << "Missing String in strings.xml: [" << xml_desc << "]" << LL_ENDL;
+		ALOG_WARN("Missing String in strings.xml: [{}]", xml_desc);
 		return absl::StrCat("MissingString(", xml_desc, ")");
 	}
 }
@@ -215,7 +215,7 @@ std::string LLTrans::getString(std::string_view xml_desc, const LLSD& msg_args, 
 	}
 	else
 	{
-		LL_WARNS_ONCE("configuration") << "Missing String in strings.xml: [" << xml_desc << "]" << LL_ENDL;
+		ALOG_WARN("Missing String in strings.xml: [{}]", xml_desc);
 		return absl::StrCat("MissingString(", xml_desc, ")");
 	}
 }
@@ -232,7 +232,7 @@ std::string LLTrans::getDefString(std::string_view xml_desc, const LLSD& msg_arg
 	}
 	else
 	{
-		LL_WARNS_ONCE("configuration") << "Missing String in strings.xml: [" << xml_desc << "]" << LL_ENDL;
+		ALOG_WARN("Missing String in strings.xml: [{}]", xml_desc);
 		return absl::StrCat("MissingString(", xml_desc, ")");
 	}
 }
@@ -254,7 +254,7 @@ bool LLTrans::findString(std::string &result, std::string_view xml_desc, const L
 	}
 	else
 	{
-		LL_WARNS_ONCE("configuration") << "Missing String in strings.xml: [" << xml_desc << "]" << LL_ENDL;	
+		ALOG_WARN("Missing String in strings.xml: [{}]", xml_desc);
 		return false;
 	}
 }
@@ -274,7 +274,7 @@ bool LLTrans::findString(std::string &result, std::string_view xml_desc, const L
 	}
 	else
 	{
-		LL_WARNS_ONCE("configuration") << "Missing String in strings.xml: [" << xml_desc << "]" << LL_ENDL;	
+		ALOG_WARN("Missing String in strings.xml: [{}]", xml_desc);
 		return false;
 	}
 }
