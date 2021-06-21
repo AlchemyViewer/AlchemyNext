@@ -417,6 +417,7 @@ bool LLGLManager::initGL()
 		}
 		if (mVRAM != 0)
 		{
+			ALOG_RNDR_INFO("VRAM Detected (AMDAssociations): {}", mVRAM);
 			LL_INFOS("RenderInit") << "VRAM Detected (AMDAssociations):" << mVRAM << LL_ENDL;
 		}
 	}
@@ -428,6 +429,7 @@ bool LLGLManager::initGL()
 		glGetIntegerv(GL_TEXTURE_FREE_MEMORY_ATI, meminfo);
 
 		mVRAM = meminfo[0] / 1024;
+		ALOG_RNDR_INFO("VRAM Detected (ATIMemInfo): {}", mVRAM);
 		LL_INFOS("RenderInit") << "VRAM Detected (ATIMemInfo):" << mVRAM << LL_ENDL;
 	}
 
@@ -436,6 +438,7 @@ bool LLGLManager::initGL()
 		S32 dedicated_memory;
 		glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &dedicated_memory);
 		mVRAM = dedicated_memory/1024;
+		ALOG_RNDR_INFO("VRAM Detected (NVXMemInfo): {}", mVRAM);
 		LL_INFOS("RenderInit") << "VRAM Detected (NVXMemInfo):" << mVRAM << LL_ENDL;
 	}
 
@@ -451,6 +454,7 @@ bool LLGLManager::initGL()
 		if (mem != 0)
 		{
 			mVRAM = mem;
+			ALOG_RNDR_INFO("VRAM Detected (WMI): {}", mVRAM);
 			LL_INFOS("RenderInit") << "VRAM Detected (WMI):" << mVRAM<< LL_ENDL;
 		}
 	}
@@ -466,11 +470,13 @@ bool LLGLManager::initGL()
 
 		else
 		{
+			ALOG_RNDR_INFO("Detected VRAM from GL: {}", mVRAM);
 			LL_INFOS("RenderInit") << "Detected VRAM from GL: " << mVRAM << LL_ENDL;
 		}
 	}
 	else
 	{
+		ALOG_RNDR_INFO("Using VRAM value from OS: {}", mVRAM);
 		LL_INFOS("RenderInit") << "Using VRAM value from OS: " << mVRAM << LL_ENDL;
 	}
 
@@ -483,6 +489,7 @@ bool LLGLManager::initGL()
 		mNumTextureImageUnits = llmin(num_tex_image_units, 32);
 	}
 
+	ALOG_RNDR_INFO("NUM TEX IMAGE UNITS: {}", mNumTextureImageUnits);
 	LL_INFOS() << "NUM TEX IMAGE UNITS: " << mNumTextureImageUnits << LL_ENDL;
 
 	if (LLRender::sGLCoreProfile)
@@ -643,12 +650,18 @@ void LLGLManager::printGLInfoString()
 {
 	if (gHeadlessClient)
 	{
+		ALOG_RNDR_INFO("GL_VENDOR:     {}", HEADLESS_VENDOR_STRING);
+		ALOG_RNDR_INFO("GL_RENDERER:   {}", HEADLESS_RENDERER_STRING);
+		ALOG_RNDR_INFO("GL_VERSION:    {}", HEADLESS_VERSION_STRING);
 		LL_INFOS("RenderInit") << "GL_VENDOR:     " << HEADLESS_VENDOR_STRING << LL_ENDL;
 		LL_INFOS("RenderInit") << "GL_RENDERER:   " << HEADLESS_RENDERER_STRING << LL_ENDL;
 		LL_INFOS("RenderInit") << "GL_VERSION:    " << HEADLESS_VERSION_STRING << LL_ENDL;
 	}
 	else
 	{
+		ALOG_RNDR_INFO("GL_VENDOR:     {}", ll_safe_string((const char*)glGetString(GL_VENDOR)));
+		ALOG_RNDR_INFO("GL_RENDERER:   {}", ll_safe_string((const char*)glGetString(GL_RENDERER)));
+		ALOG_RNDR_INFO("GL_VERSION:    {}", ll_safe_string((const char*)glGetString(GL_VERSION)));
 		LL_INFOS("RenderInit") << "GL_VENDOR:     " << ll_safe_string((const char *)glGetString(GL_VENDOR)) << LL_ENDL;
 		LL_INFOS("RenderInit") << "GL_RENDERER:   " << ll_safe_string((const char *)glGetString(GL_RENDERER)) << LL_ENDL;
 		LL_INFOS("RenderInit") << "GL_VERSION:    " << ll_safe_string((const char *)glGetString(GL_VERSION)) << LL_ENDL;
@@ -665,6 +678,7 @@ void LLGLManager::printGLInfoString()
             if (!exten.empty() && i != n)
                 gl_extension_strstrm << exten << "\n";
         }
+		ALOG_RNDR_INFO("GL_EXTENSIONS:\n{:s}", gl_extension_strstrm.str());
         LL_INFOS("RenderInit") << "GL_EXTENSIONS:\n" << gl_extension_strstrm.str() << LL_ENDL;
     }
     else
@@ -672,6 +686,7 @@ void LLGLManager::printGLInfoString()
     {
         std::string all_exts = ll_safe_string((const char *) glGetString(GL_EXTENSIONS));
         LLStringUtil::replaceChar(all_exts, ' ', '\n');
+		ALOG_RNDR_INFO("GL_EXTENSIONS:\n{:s}", all_exts);
         LL_INFOS("RenderInit") << "GL_EXTENSIONS:\n" << all_exts << LL_ENDL;
     }
 #endif
