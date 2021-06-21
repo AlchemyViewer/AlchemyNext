@@ -73,10 +73,10 @@ void LLDebugView::init()
 	LLRect rect = getLocalRect();
 
 	// Rectangle to draw debug data in (full height, 3/4 width)
-	r.set(10, rect.getHeight() - 100, ((rect.getWidth()*3)/4), 100);
+	r.set(10, rect.getHeight() - 100, ((rect.getWidth()*3)/2), 100);
 	LLConsole::Params cp;
 	cp.name("debug console");
-	cp.max_lines(20);
+	cp.max_lines(30);
 	cp.rect(r);
 	cp.font(LLFontGL::getFontMonospace());
 	cp.follows.flags(FOLLOWS_BOTTOM | FOLLOWS_LEFT);
