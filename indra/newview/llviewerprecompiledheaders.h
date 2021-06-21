@@ -50,6 +50,7 @@
 
 #include <fmt/format.h>
 #include <fmt/compile.h>
+#include <fmt/ostream.h>
 
 // Library headers from llcommon project:
 #include "indra_constants.h"

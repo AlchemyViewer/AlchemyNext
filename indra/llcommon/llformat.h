@@ -30,6 +30,7 @@
 
 #include <fmt/format.h>
 #include <fmt/compile.h>
+#include <fmt/ostream.h>
 
 // Use as follows:
 // LL_INFOS() << llformat("Test:%d (%.2f %.2f)", idx, x, y) << LL_ENDL;

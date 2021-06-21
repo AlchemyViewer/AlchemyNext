@@ -325,6 +325,7 @@ if(${CMAKE_VERSION} VERSION_GREATER "3.15.0")
     <absl/container/flat_hash_map.h>
     <fmt/format.h>
     <fmt/compile.h>
+    <fmt/ostream.h>
     )
 endif()
 
