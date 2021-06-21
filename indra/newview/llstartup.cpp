@@ -675,7 +675,6 @@ bool idle_startup()
 				else
 				{
 					ALOG_WARN("Unable to initialize audio engine");
-					LL_WARNS("AppInit") << "Unable to initialize audio engine" << LL_ENDL;
 					delete gAudiop;
 					gAudiop = NULL;
 				}
@@ -686,7 +685,6 @@ bool idle_startup()
 					if (NULL == gAudiop->getStreamingAudioImpl())
 					{
 						ALOG_INFO("Using media plugins to render streaming audio");
-						LL_INFOS("AppInit") << "Using media plugins to render streaming audio" << LL_ENDL;
 						gAudiop->setStreamingAudioImpl(new LLStreamingAudio_MediaPlugins());
 					}
 				}
@@ -694,12 +692,10 @@ bool idle_startup()
 		}
 		
 		ALOG_INFO("Audio Engine Initialized.");
-		LL_INFOS("AppInit") << "Audio Engine Initialized." << LL_ENDL;
 		
 		if (LLTimer::knownBadTimer())
 		{
 			ALOG_WARN("Unreliable timers detected (may be bad PCI chipset)!!");
-			LL_WARNS("AppInit") << "Unreliable timers detected (may be bad PCI chipset)!!" << LL_ENDL;
 		}
 
 		//

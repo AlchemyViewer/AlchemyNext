@@ -192,10 +192,10 @@ void LLMemory::logMemoryInfo(BOOL update)
 		updateMemoryInfo() ;
 	}
 
-	LL_INFOS() << "Current allocated physical memory(KB): " << sAllocatedMemInKB << LL_ENDL ;
-	LL_INFOS() << "Current allocated page size (KB): " << sAllocatedPageSizeInKB << LL_ENDL ;
-	LL_INFOS() << "Current available physical memory(KB): " << sAvailPhysicalMemInKB << LL_ENDL ;
-	LL_INFOS() << "Current max usable memory(KB): " << sMaxPhysicalMemInKB << LL_ENDL ;
+	ALOG_INFO("Current allocated physical memory(KB): {}", sAllocatedMemInKB);
+	ALOG_INFO("Current allocated page size (KB): {}", sAllocatedPageSizeInKB);
+	ALOG_INFO("Current available physical memory(KB): {}", sAvailPhysicalMemInKB);
+	ALOG_INFO("Current max usable memory(KB): {}", sMaxPhysicalMemInKB);
 }
 
 //static 

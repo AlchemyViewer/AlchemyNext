@@ -1201,26 +1201,15 @@ public:
         }
         // Congratulations, we've hit a new low.  :-P
 
-        LL_INFOS("FrameWatcher") << ' ';
-        if (! prevSize)
+        if (!prevSize)
         {
 			ALOG_INFO("initial framerate {:.1f}\n{}", framerate, LLMemoryInfo());
-            LL_CONT << "initial framerate ";
         }
         else
         {
 			ALOG_INFO("slowest framerate for last {:d} seconds {:.1f}\n{}", int(prevSize * MEM_INFO_THROTTLE), framerate, LLMemoryInfo());
-            LL_CONT << "slowest framerate for last " << int(prevSize * MEM_INFO_THROTTLE)
-                    << " seconds ";
         }
 
-	S32 precision = LL_CONT.precision();
-
-        LL_CONT << std::fixed << std::setprecision(1) << framerate << '\n'
-                << LLMemoryInfo();
-
-	LL_CONT.precision(precision);
-	LL_CONT << LL_ENDL;
         return false;
     }
 
