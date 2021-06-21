@@ -62,20 +62,62 @@
 
 #include <boost/make_shared.hpp>
 
+#include "spdlog/details/null_mutex.h"
+#include "spdlog/sinks/base_sink.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/dup_filter_sink.h"
 #include "spdlog/sinks/msvc_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/async.h"
+#include <mutex>
+
+template<typename Mutex>
+class linebuffer_sink : public spdlog::sinks::base_sink <Mutex>
+{
+protected:
+	void sink_it_(const spdlog::details::log_msg& msg) override
+	{
+		if (ALLog::sBufferChanged)
+		{
+			mBuffer = ALLog::getLineBuffer();
+			ALLog::sBufferChanged = false;
+		}
+
+		if (!mBuffer)
+			return;
+		// log_msg is a struct containing the log entry info like level, timestamp, thread id etc.
+		// msg.raw contains pre formatted log
+
+		// If needed (very likely but not mandatory), the sink formats the message before sending it to its final destination:
+		spdlog::memory_buf_t formatted;
+		spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
+		mBuffer->addLine(fmt::to_string(formatted));
+	}
+
+	void flush_() override
+	{
+	}
+
+	LLLineBuffer* mBuffer = nullptr;
+};
+
+using linebuffer_sink_mt = linebuffer_sink<std::mutex>;
+using linebuffer_sink_st = linebuffer_sink<spdlog::details::null_mutex>;
 
 std::shared_ptr<spdlog::logger> ALLog::MAIN_LOG;
 std::shared_ptr<spdlog::logger> ALLog::RENDER_LOG;
 std::shared_ptr<spdlog::logger> ALLog::NETWORK_LOG;
 std::vector<spdlog::sink_ptr> ALLog::sSinks;
 ALLog::fatal_func_t ALLog::sFatalFunc;
+std::unique_ptr<absl::Mutex> ALLog::sMutex;
+std::atomic<bool> ALLog::sBufferChanged;
+LLLineBuffer* ALLog::sLineBuffer = nullptr;;
 
 // static
 void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 {
+	sMutex = std::make_unique<absl::Mutex>();
+	sBufferChanged = false;
 	sFatalFunc = std::move(fatal_func);
 
 	spdlog::init_thread_pool(16384, 2);
@@ -89,6 +131,11 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, true);
 			basic_file->set_pattern(default_fmt);
 			sSinks.emplace_back(std::move(basic_file));
+		}
+		{
+			auto linebuffer = std::make_shared<linebuffer_sink_mt>();
+			linebuffer->set_pattern(console_fmt);
+			sSinks.emplace_back(std::move(linebuffer));
 		}
 		//sSinks.emplace_back(std::make_shared<al_stdout_color_sink_mt>());
 #if LL_WINDOWS
@@ -130,12 +177,31 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 // static
 void ALLog::shutdown()
 {
+	sLineBuffer = nullptr;
+	sMutex.reset();
+
 	NETWORK_LOG = nullptr;
 	RENDER_LOG = nullptr;
 	MAIN_LOG = nullptr;
 	sSinks.clear();
 
 	spdlog::shutdown();
+}
+
+// static 
+LLLineBuffer* ALLog::getLineBuffer()
+{
+	absl::MutexLockMaybe mtx_lock(sMutex.get());
+	auto retval = sLineBuffer;
+	return retval;
+}
+
+// static 
+void ALLog::setLineBuffer(LLLineBuffer* bufferp)
+{
+	absl::MutexLockMaybe mtx_lock(sMutex.get());
+	sLineBuffer = bufferp;
+	sBufferChanged = true;
 }
 
 // On Mac, got:

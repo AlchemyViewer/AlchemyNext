@@ -35,7 +35,10 @@
 
 #include "llpreprocessor.h"
 
+#include "absl/synchronization/mutex.h"
 #include "spdlog/spdlog.h"
+
+class LLLineBuffer;
 
 class ALLog
 {
@@ -45,10 +48,6 @@ public:
 	static void init(const std::string& log_filename, fatal_func_t fatal_func);
 	static void shutdown();
 
-	static std::shared_ptr<spdlog::logger> MAIN_LOG;
-	static std::shared_ptr<spdlog::logger> RENDER_LOG;
-	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
-
 	static void fatal_error(const std::string message) 
 	{
 		if (sFatalFunc)
@@ -57,9 +56,18 @@ public:
 		}
 	};
 
-private:
+	static LLLineBuffer* getLineBuffer();
+	static void setLineBuffer(LLLineBuffer*);
+
+	static std::shared_ptr<spdlog::logger> MAIN_LOG;
+	static std::shared_ptr<spdlog::logger> RENDER_LOG;
+	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
+
 	static std::vector<spdlog::sink_ptr> sSinks;
+	static std::atomic<bool> sBufferChanged;
+	static std::unique_ptr<absl::Mutex> sMutex;
 	static fatal_func_t sFatalFunc;
+	static LLLineBuffer* sLineBuffer;
 };
 
 #define ALOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)

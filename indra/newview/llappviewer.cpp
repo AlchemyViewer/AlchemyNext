@@ -1784,10 +1784,10 @@ bool LLAppViewer::cleanup()
 
 	release_start_screen(); // just in case
 
-	LLError::logToFixedBuffer(NULL); // stop the fixed buffer recorder
+	//LLError::logToFixedBuffer(NULL); // stop the fixed buffer recorder
+	ALLog::setLineBuffer(nullptr);
 
 	ALOG_INFO("Cleaning Up");
-	LL_INFOS() << "Cleaning Up" << LL_ENDL;
 
 	// shut down mesh streamer
 	gMeshRepo.shutdown();
