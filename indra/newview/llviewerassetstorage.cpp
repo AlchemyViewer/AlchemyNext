@@ -641,10 +641,4 @@ void LLViewerAssetStorage::logAssetStorageInfo()
     ALOG_INFO("mCountCompleted {:d}", mCountCompleted);
     ALOG_INFO("mCountSucceeded {:d}", mCountSucceeded);
     ALOG_INFO("mTotalBytesFetched {:d}", mTotalBytesFetched);
-    LL_INFOS("AssetStorage") << "Active coros " << mAssetCoroCount << LL_ENDL;
-    LL_INFOS("AssetStorage") << "mPendingDownloads size " << mPendingDownloads.size() << LL_ENDL;
-    LL_INFOS("AssetStorage") << "mCountStarted " << mCountStarted << LL_ENDL;
-    LL_INFOS("AssetStorage") << "mCountCompleted " << mCountCompleted << LL_ENDL;
-    LL_INFOS("AssetStorage") << "mCountSucceeded " << mCountSucceeded << LL_ENDL;
-    LL_INFOS("AssetStorage") << "mTotalBytesFetched " << mTotalBytesFetched << LL_ENDL;
 }

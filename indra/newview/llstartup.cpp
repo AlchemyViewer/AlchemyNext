@@ -1444,7 +1444,6 @@ bool idle_startup()
 		// Set message handlers
 		//
 		ALOG_INFO("Initializing communications...");
-		LL_INFOS("AppInit") << "Initializing communications..." << LL_ENDL;
 
 		// register callbacks for messages. . . do this after initial handshake to make sure that we don't catch any unwanted
 		register_viewer_callbacks(gMessageSystem);
@@ -1869,37 +1868,29 @@ bool idle_startup()
 
 		// set up callbacks
 		ALOG_INFO("Registering Callbacks");
-		LL_INFOS() << "Registering Callbacks" << LL_ENDL;
 		LLMessageSystem* msg = gMessageSystem;
 		ALOG_INFO(" Inventory");
-		LL_INFOS() << " Inventory" << LL_ENDL;
 		LLInventoryModel::registerCallbacks(msg);
 		ALOG_INFO(" AvatarTracker");
-		LL_INFOS() << " AvatarTracker" << LL_ENDL;
 		LLAvatarTracker::instance().registerCallbacks(msg);
 		ALOG_INFO(" Landmark");
-		LL_INFOS() << " Landmark" << LL_ENDL;
 		LLLandmark::registerCallbacks(msg);
 		display_startup();
 
 		// request mute list
 		ALOG_INFO("Requesting Mute List");
-		LL_INFOS() << "Requesting Mute List" << LL_ENDL;
 		LLMuteList::getInstance()->requestFromServer(gAgent.getID());
 		display_startup();
 		// Get L$ and ownership credit information
 		ALOG_INFO("Requesting Money Balance");
-		LL_INFOS() << "Requesting Money Balance" << LL_ENDL;
 		LLStatusBar::sendMoneyBalanceRequest();
 		display_startup();
 		// request all group information
 		ALOG_INFO("Requesting Agent Data");
-		LL_INFOS() << "Requesting Agent Data" << LL_ENDL;
 		gAgent.sendAgentDataUpdateRequest();
 		display_startup();
 		// Create the inventory views
 		ALOG_INFO("Creating Inventory Views");
-		LL_INFOS() << "Creating Inventory Views" << LL_ENDL;
 		LLFloaterReg::getInstance("inventory");
 		display_startup();
 
@@ -2301,12 +2292,10 @@ bool idle_startup()
 
 		// Unmute audio if desired and setup volumes.
 		// This is a not-uncommon crash site, so surround it with
-		// LL_INFOS() output to aid diagnosis.
+		// ALOG_INFO() output to aid diagnosis.
 		ALOG_INFO("Doing first audio_update_volume...");
-		LL_INFOS("AppInit") << "Doing first audio_update_volume..." << LL_ENDL;
 		audio_update_volume();
 		ALOG_INFO("Done first audio_update_volume.");
-		LL_INFOS("AppInit") << "Done first audio_update_volume." << LL_ENDL;
 
 		// reset keyboard focus to sane state of pointing at world
 		gFocusMgr.setKeyboardFocus(NULL);
@@ -2335,7 +2324,6 @@ bool idle_startup()
 void login_show()
 {
 	ALOG_INFO("Initializing Login Screen");
-	LL_INFOS("AppInit") << "Initializing Login Screen" << LL_ENDL;
 
 	// Hide the toolbars: may happen to come back here if login fails after login agent but before login in region
 	if (gToolBarView)
