@@ -437,6 +437,7 @@ bool HttpPolicy::stageAfterCompletion(const HttpOpRequest::ptr_t &op)
 	// This op is done, finalize it delivering it to the reply queue...
 	if (! op->mStatus)
 	{
+		ALOG_WARN(FMT_STRING("HTTP request {:p} failed after {:d} retries. Reason: {:s} ({:s})"), fmt::ptr(op->getHandle()), op->mPolicyRetries, op->mStatus.toString(), op->mStatus.toTerseString());
 		LL_WARNS(LOG_CORE) << "HTTP request " << op->getHandle()
 						   << " failed after " << op->mPolicyRetries
 						   << " retries.  Reason:  " << op->mStatus.toString()
@@ -445,6 +446,7 @@ bool HttpPolicy::stageAfterCompletion(const HttpOpRequest::ptr_t &op)
 	}
 	else if (op->mPolicyRetries)
 	{
+		ALOG_DEBUG(FMT_STRING("HTTP request {:p} succeeded on retry {:d}."), fmt::ptr(op->getHandle()), op->mPolicyRetries);
         LL_DEBUGS(LOG_CORE) << "HTTP request " << op->getHandle()
 							<< " succeeded on retry " << op->mPolicyRetries << "."
 							<< LL_ENDL;

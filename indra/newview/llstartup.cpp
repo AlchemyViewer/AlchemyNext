@@ -623,6 +623,7 @@ bool idle_startup()
 			}
 		}
 
+		ALOG_INFO("Message System Initialized.");
 		LL_INFOS("AppInit") << "Message System Initialized." << LL_ENDL;
 
 		//-------------------------------------------------
@@ -673,6 +674,7 @@ bool idle_startup()
 				}
 				else
 				{
+					ALOG_WARN("Unable to initialize audio engine");
 					LL_WARNS("AppInit") << "Unable to initialize audio engine" << LL_ENDL;
 					delete gAudiop;
 					gAudiop = NULL;
@@ -683,6 +685,7 @@ bool idle_startup()
 					// if the audio engine hasn't set up its own preferred handler for streaming audio then set up the generic streaming audio implementation which uses media plugins
 					if (NULL == gAudiop->getStreamingAudioImpl())
 					{
+						ALOG_INFO("Using media plugins to render streaming audio");
 						LL_INFOS("AppInit") << "Using media plugins to render streaming audio" << LL_ENDL;
 						gAudiop->setStreamingAudioImpl(new LLStreamingAudio_MediaPlugins());
 					}
@@ -690,10 +693,12 @@ bool idle_startup()
 			}
 		}
 		
+		ALOG_INFO("Audio Engine Initialized.");
 		LL_INFOS("AppInit") << "Audio Engine Initialized." << LL_ENDL;
 		
 		if (LLTimer::knownBadTimer())
 		{
+			ALOG_WARN("Unreliable timers detected (may be bad PCI chipset)!!");
 			LL_WARNS("AppInit") << "Unreliable timers detected (may be bad PCI chipset)!!" << LL_ENDL;
 		}
 
@@ -930,6 +935,7 @@ bool idle_startup()
         }
 		gSavedSettings.setBOOL("RememberPassword", gRememberPassword);
 		gSavedSettings.setBOOL("RememberUser", gRememberUser);
+		ALOG_INFO("Attempting login as: {}", userid);
 		LL_INFOS("AppInit") << "Attempting login as: " << userid << LL_ENDL;                                           
 		gDebugInfo["LoginName"] = userid;                                                                              
          
@@ -1440,6 +1446,7 @@ bool idle_startup()
 		//
 		// Set message handlers
 		//
+		ALOG_INFO("Initializing communications...");
 		LL_INFOS("AppInit") << "Initializing communications..." << LL_ENDL;
 
 		// register callbacks for messages. . . do this after initial handshake to make sure that we don't catch any unwanted
@@ -1864,29 +1871,37 @@ bool idle_startup()
 		gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE,true);
 
 		// set up callbacks
+		ALOG_INFO("Registering Callbacks");
 		LL_INFOS() << "Registering Callbacks" << LL_ENDL;
 		LLMessageSystem* msg = gMessageSystem;
+		ALOG_INFO(" Inventory");
 		LL_INFOS() << " Inventory" << LL_ENDL;
 		LLInventoryModel::registerCallbacks(msg);
+		ALOG_INFO(" AvatarTracker");
 		LL_INFOS() << " AvatarTracker" << LL_ENDL;
 		LLAvatarTracker::instance().registerCallbacks(msg);
+		ALOG_INFO(" Landmark");
 		LL_INFOS() << " Landmark" << LL_ENDL;
 		LLLandmark::registerCallbacks(msg);
 		display_startup();
 
 		// request mute list
+		ALOG_INFO("Requesting Mute List");
 		LL_INFOS() << "Requesting Mute List" << LL_ENDL;
 		LLMuteList::getInstance()->requestFromServer(gAgent.getID());
 		display_startup();
 		// Get L$ and ownership credit information
+		ALOG_INFO("Requesting Money Balance");
 		LL_INFOS() << "Requesting Money Balance" << LL_ENDL;
 		LLStatusBar::sendMoneyBalanceRequest();
 		display_startup();
 		// request all group information
+		ALOG_INFO("Requesting Agent Data");
 		LL_INFOS() << "Requesting Agent Data" << LL_ENDL;
 		gAgent.sendAgentDataUpdateRequest();
 		display_startup();
 		// Create the inventory views
+		ALOG_INFO("Creating Inventory Views");
 		LL_INFOS() << "Creating Inventory Views" << LL_ENDL;
 		LLFloaterReg::getInstance("inventory");
 		display_startup();
@@ -2049,6 +2064,7 @@ bool idle_startup()
 		// thus, do not show this alert.
 		if (!gAgent.isFirstLogin())
 		{
+			ALOG_INFO("gAgentStartLocation : {:s}", gAgentStartLocation);
 			LL_INFOS() << "gAgentStartLocation : " << gAgentStartLocation << LL_ENDL;
 			LLSLURL start_slurl = LLStartUp::getStartSLURL();
 			LL_DEBUGS("AppInit") << "start slurl "<<start_slurl.asString()<<LL_ENDL;

@@ -1204,10 +1204,12 @@ public:
         LL_INFOS("FrameWatcher") << ' ';
         if (! prevSize)
         {
+			ALOG_INFO("initial framerate {:.1f}\n{}", framerate, LLMemoryInfo());
             LL_CONT << "initial framerate ";
         }
         else
         {
+			ALOG_INFO("slowest framerate for last {:d} seconds {:.1f}\n{}", int(prevSize * MEM_INFO_THROTTLE), framerate, LLMemoryInfo());
             LL_CONT << "slowest framerate for last " << int(prevSize * MEM_INFO_THROTTLE)
                     << " seconds ";
         }
