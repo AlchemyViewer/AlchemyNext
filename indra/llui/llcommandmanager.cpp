@@ -153,7 +153,7 @@ void LLCommandManager::addCommand(LLCommand * command)
 	mCommandIndices[command_id.uuid()] = mCommands.size();
 	mCommands.push_back(command);
 
-	LL_DEBUGS() << "Successfully added command: " << command->name() << LL_ENDL;
+	ALOG_UI_DEBUG("Successfully added command: {}", command->name());
 }
 
 //static

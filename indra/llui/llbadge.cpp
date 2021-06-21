@@ -343,7 +343,7 @@ void LLBadge::draw()
 			}
 			else
 			{
-				LL_DEBUGS() << "No image for badge " << getName() << " on owner " << owner_view->getName() << LL_ENDL;
+				ALOG_UI_DEBUG("No image for badge {} on owner {}", getName(), owner_view->getName());
 				
 				renderBadgeBackground(badge_center_x, badge_center_y,
 									  badge_width, badge_height,

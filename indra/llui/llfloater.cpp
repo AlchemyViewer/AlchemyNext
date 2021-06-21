@@ -702,7 +702,7 @@ void LLFloater::openFloater(const LLSD& key)
 
 void LLFloater::closeFloater(bool app_quitting)
 {
-	LL_INFOS() << "Closing floater " << getName() << LL_ENDL;
+	ALOG_UI_INFO("Closing floater {}", getName());
 
 #if AL_VIEWER_EVENT_RECORDER
 	if(LLViewerEventRecorder::getLoggingStatus())
@@ -1568,7 +1568,7 @@ BOOL LLFloater::handleScrollWheel(S32 x, S32 y, S32 clicks)
 // virtual
 BOOL LLFloater::handleMouseUp(S32 x, S32 y, MASK mask)
 {
-	LL_DEBUGS() << "LLFloater::handleMouseUp calling LLPanel (really LLView)'s handleMouseUp (first initialized xui to: " << getPathname() << " )" << LL_ENDL;
+	ALOG_UI_DEBUG("LLFloater::handleMouseUp calling LLPanel(really LLView)'s handleMouseUp (first initialized xui to: {} )", getPathname());
 	BOOL handled = LLPanel::handleMouseUp(x,y,mask); // Not implemented in LLPanel so this actually calls LLView
 
 #if AL_VIEWER_EVENT_RECORDER
@@ -3453,7 +3453,7 @@ bool LLFloater::buildFromFile(const std::string& filename)
 	
 	bool res = true;
 	
-	LL_DEBUGS() << "Building floater " << filename << LL_ENDL;
+	ALOG_UI_DEBUG("Building floater {}", filename);
 	LLUICtrlFactory::instance().pushFileName(filename);
 	{
 		if (!getFactoryMap().empty())

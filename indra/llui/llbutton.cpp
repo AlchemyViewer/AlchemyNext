@@ -608,9 +608,7 @@ BOOL LLButton::handleHover(S32 x, S32 y, MASK mask)
 
 		// We only handle the click if the click both started and ended within us
 		getWindow()->setCursor(UI_CURSOR_ARROW);
-#ifdef SHOW_DEBUG
-		LL_DEBUGS("UserInput") << "hover handled by " << getName() << LL_ENDL;
-#endif
+		ALOG_UI_DEBUG("hover handled by {}", getName());
 	}
 	return TRUE;
 }
@@ -847,7 +845,7 @@ void LLButton::draw()
 	else
 	{
 		// no image
-		LL_DEBUGS() << "No image for button " << getName() << LL_ENDL;
+		ALOG_UI_DEBUG("No image for button {}", getName());
 		// draw it in pink so we can find it
 		gl_rect_2d(0, getRect().getHeight(), getRect().getWidth(), 0, LLColor4::pink1 % alpha, FALSE);
 	}
