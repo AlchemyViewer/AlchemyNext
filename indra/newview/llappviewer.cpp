@@ -157,6 +157,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <boost/throw_exception.hpp>
+#include <fmt/chrono.h>
 
 #if LL_WINDOWS
 #	include <share.h> // For _SH_DENYWR in processMarkerFiles
@@ -3541,17 +3542,23 @@ void LLAppViewer::writeSystemInfo()
 	}
 
 	// Dump some debugging info
+	ALOG_INFO("Application: {:s}", LLTrans::getString("APP_NAME"));
+	ALOG_INFO("Version: {:s}", LLVersionInfo::instance().getChannelAndVersion());
 	LL_INFOS("SystemInfo") << "Application: " << LLTrans::getString("APP_NAME") << LL_ENDL;
 	LL_INFOS("SystemInfo") << "Version: " << LLVersionInfo::instance().getChannelAndVersion() << LL_ENDL;
 
 	// Dump the local time and time zone
-	time_t now;
-	time(&now);
+	time_t now = std::time(nullptr);
+	ALOG_INFO("Local time: {:%Y-%m-%dT%H:%M:%S %Z}", fmt::localtime(now));
 	char tbuffer[256];		/* Flawfinder: ignore */
 	strftime(tbuffer, 256, "%Y-%m-%dT%H:%M:%S %Z", localtime(&now));
 	LL_INFOS("SystemInfo") << "Local time: " << tbuffer << LL_ENDL;
 
 	// query some system information
+	ALOG_INFO("CPU info:\n{}", gSysCPU);
+	ALOG_INFO("Memory info:\n{}", gSysMemory);
+	ALOG_INFO("OS: {}", LLOSInfo::instance().getOSStringSimple());
+	ALOG_INFO("OS info: {}", LLOSInfo::instance());
 	LL_INFOS("SystemInfo") << "CPU info:\n" << gSysCPU << LL_ENDL;
 	LL_INFOS("SystemInfo") << "Memory info:\n" << gSysMemory << LL_ENDL;
 	LL_INFOS("SystemInfo") << "OS: " << LLOSInfo::instance().getOSStringSimple() << LL_ENDL;
