@@ -45,7 +45,7 @@ class ALLog
 public:
 	typedef std::function<void(const std::string&)> fatal_func_t;
 
-	static void init(const std::string& log_filename, fatal_func_t fatal_func);
+	static void init(const std::string& log_filename = "", fatal_func_t fatal_func = fatal_func_t(), bool log_to_stderr = true);
 	static void shutdown();
 
 	static void fatal_error(const std::string message) 

@@ -71,6 +71,41 @@
 #include "spdlog/async.h"
 #include <mutex>
 
+namespace
+{
+	bool shouldLogToStderr()
+	{
+#if LL_DARWIN
+		// On Mac OS X, stderr from apps launched from the Finder goes to the
+		// console log.  It's generally considered bad form to spam too much
+		// there. That scenario can be detected by noticing that stderr is a
+		// character device (S_IFCHR).
+
+		// If stderr is a tty or a pipe, assume the user launched from the
+		// command line or debugger and therefore wants to see stderr.
+		if (isatty(STDERR_FILENO))
+			return true;
+		// not a tty, but might still be a pipe -- check
+		struct stat st;
+		if (fstat(STDERR_FILENO, &st) < 0)
+		{
+			// capture errno right away, before engaging any other operations
+			auto errno_save = errno;
+			// this gets called during log-system setup -- can't log yet!
+			std::cerr << "shouldLogToStderr: fstat(" << STDERR_FILENO << ") failed, errno "
+				<< errno_save << std::endl;
+			// if we can't tell, err on the safe side and don't write stderr
+			return false;
+		}
+
+		// fstat() worked: return true only if stderr is a pipe
+		return ((st.st_mode & S_IFMT) == S_IFIFO);
+#else
+		return true;
+#endif
+	}
+}
+
 template<typename Mutex>
 class linebuffer_sink : public spdlog::sinks::base_sink <Mutex>
 {
@@ -118,7 +153,7 @@ std::atomic<bool> ALLog::sBufferChanged;
 LLLineBuffer* ALLog::sLineBuffer = nullptr;;
 
 // static
-void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
+void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool log_to_stderr)
 {
 	sMutex = std::make_unique<absl::Mutex>();
 	sBufferChanged = false;
@@ -141,7 +176,12 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func)
 			linebuffer->set_pattern(console_fmt);
 			sSinks.emplace_back(std::move(linebuffer));
 		}
-		//sSinks.emplace_back(std::make_shared<al_stdout_color_sink_mt>());
+		if (log_to_stderr && shouldLogToStderr())
+		{
+			auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+			stderr_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(console_fmt), spdlog::pattern_time_type::utc)));
+			sSinks.emplace_back(std::move(stderr_sink));
+		}
 #if LL_WINDOWS
 		if (IsDebuggerPresent())
 		{
@@ -902,38 +942,6 @@ namespace LLError
 
 namespace
 {
-    bool shouldLogToStderr()
-    {
-#if LL_DARWIN
-        // On Mac OS X, stderr from apps launched from the Finder goes to the
-        // console log.  It's generally considered bad form to spam too much
-        // there. That scenario can be detected by noticing that stderr is a
-        // character device (S_IFCHR).
-
-        // If stderr is a tty or a pipe, assume the user launched from the
-        // command line or debugger and therefore wants to see stderr.
-        if (isatty(STDERR_FILENO))
-            return true;
-        // not a tty, but might still be a pipe -- check
-        struct stat st;
-        if (fstat(STDERR_FILENO, &st) < 0)
-        {
-            // capture errno right away, before engaging any other operations
-            auto errno_save = errno;
-            // this gets called during log-system setup -- can't log yet!
-            std::cerr << "shouldLogToStderr: fstat(" << STDERR_FILENO << ") failed, errno "
-                      << errno_save << std::endl;
-            // if we can't tell, err on the safe side and don't write stderr
-            return false;
-        }
-
-        // fstat() worked: return true only if stderr is a pipe
-        return ((st.st_mode & S_IFMT) == S_IFIFO);
-#else
-        return true;
-#endif
-    }
-
 	bool stderrLogWantsTime()
 	{
 #if LL_WINDOWS
