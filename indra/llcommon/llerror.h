@@ -43,17 +43,39 @@ class LLLineBuffer;
 class ALLog
 {
 public:
+	using ELevel = spdlog::level::level_enum;
+
 	typedef std::function<void(const std::string&)> fatal_func_t;
 
 	static void init(const std::string& log_filename = "", fatal_func_t fatal_func = fatal_func_t(), bool log_to_stderr = true);
 	static void shutdown();
 
-	static void fatal_error(const std::string message) 
+	static ELevel getLevel(std::string logger = "");
+	static void setLevel(ELevel level, std::string logger = "");
+
+	static fatal_func_t getFatalFunction();
+	static void setFatalFunction(fatal_func_t fatal_func);
+	static void fatalError(const std::string message);
+
+	static void crashAndLoop(const std::string& msg);
+
+	/// temporarily override the FatalFunction for the duration of a
+	/// particular scope, e.g. for unit tests
+	class LL_COMMON_API OverrideFatalFunction
 	{
-		if (sFatalFunc)
+	public:
+		OverrideFatalFunction(const fatal_func_t& func) :
+			mPrev(getFatalFunction())
 		{
-			sFatalFunc(message);
+			setFatalFunction(func);
 		}
+		~OverrideFatalFunction()
+		{
+			setFatalFunction(mPrev);
+		}
+
+	private:
+		fatal_func_t mPrev;
 	};
 
 	static LLLineBuffer* getLineBuffer();
@@ -70,6 +92,7 @@ public:
 	static std::vector<spdlog::sink_ptr> sSinks;
 	static std::atomic<bool> sBufferChanged;
 	static std::unique_ptr<absl::Mutex> sMutex;
+	static std::unique_ptr<absl::Mutex> sFatalMutex;
 	static fatal_func_t sFatalFunc;
 	static LLLineBuffer* sLineBuffer;
 };
@@ -83,7 +106,7 @@ public:
 #define ALOG_CRITICAL(...) \
 	{ \
 		SPDLOG_CRITICAL(__VA_ARGS__); \
-		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
 #define ALOG_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
@@ -98,7 +121,7 @@ public:
 #define ALOG_NET_CRITICAL(...) \
 	{ \
 		SPDLOG_LOGGER_CRITICAL(ALLog::NETWORK_LOG, __VA_ARGS__); \
-		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
 #define ALOG_NET_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
@@ -113,7 +136,7 @@ public:
 #define ALOG_RNDR_CRITICAL(...) \
 	{ \
 		SPDLOG_LOGGER_CRITICAL(ALLog::RENDER_LOG, __VA_ARGS__); \
-		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
 #define ALOG_RNDR_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
@@ -128,7 +151,7 @@ public:
 #define ALOG_AUDIO_CRITICAL(...) \
 	{ \
 		SPDLOG_LOGGER_CRITICAL(ALLog::AUDIO_LOG, __VA_ARGS__); \
-		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
 #define ALOG_AUDIO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
@@ -143,7 +166,7 @@ public:
 #define ALOG_IO_CRITICAL(...) \
 	{ \
 		SPDLOG_LOGGER_CRITICAL(ALLog::IO_LOG, __VA_ARGS__); \
-		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
 #define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
@@ -158,7 +181,7 @@ public:
 #define ALOG_UI_CRITICAL(...) \
 	{ \
 		SPDLOG_LOGGER_CRITICAL(ALLog::UI_LOG, __VA_ARGS__); \
-		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
 #define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
@@ -173,7 +196,7 @@ public:
 #define ALOG_MEDIA_CRITICAL(...) \
 	{ \
 		SPDLOG_LOGGER_CRITICAL(ALLog::MEDIA_LOG, __VA_ARGS__); \
-		ALLog::fatal_error(fmt::format(__VA_ARGS__)); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
 #define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)

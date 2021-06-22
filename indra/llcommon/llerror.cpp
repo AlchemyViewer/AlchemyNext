@@ -149,15 +149,24 @@ std::shared_ptr<spdlog::logger> ALLog::MEDIA_LOG;
 std::vector<spdlog::sink_ptr> ALLog::sSinks;
 ALLog::fatal_func_t ALLog::sFatalFunc;
 std::unique_ptr<absl::Mutex> ALLog::sMutex;
+std::unique_ptr<absl::Mutex> ALLog::sFatalMutex;
 std::atomic<bool> ALLog::sBufferChanged;
-LLLineBuffer* ALLog::sLineBuffer = nullptr;;
+LLLineBuffer* ALLog::sLineBuffer = nullptr;
 
 // static
 void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool log_to_stderr)
 {
 	sMutex = std::make_unique<absl::Mutex>();
+	sFatalMutex = std::make_unique<absl::Mutex>();
 	sBufferChanged = false;
-	sFatalFunc = std::move(fatal_func);
+	if (fatal_func)
+	{
+		setFatalFunction(std::move(fatal_func));
+	}
+	else
+	{
+		setFatalFunction(ALLog::crashAndLoop);
+	}
 
 	spdlog::init_thread_pool(8192, 2);
 	spdlog::flush_every(std::chrono::seconds(1));
@@ -232,6 +241,7 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool 
 void ALLog::shutdown()
 {
 	sLineBuffer = nullptr;
+	sBufferChanged = true;
 	sMutex.reset();
 
 	MEDIA_LOG = nullptr;
@@ -244,7 +254,98 @@ void ALLog::shutdown()
 	sSinks.clear();
 
 	spdlog::shutdown();
+
+	sFatalMutex.reset();
 }
+
+// static 
+ALLog::ELevel ALLog::getLevel(std::string logger/* = ""*/)
+{
+	if (!logger.empty())
+	{
+		return spdlog::get(logger)->level();
+	}
+	else
+	{
+		return spdlog::get_level();
+	}
+	
+}
+
+// static
+void ALLog::setLevel(ELevel level, std::string logger/* = ""*/)
+{
+	if (level >= ELevel::trace && level < ELevel::n_levels)
+	{
+		if (!logger.empty())
+		{
+			spdlog::get(logger)->set_level(level);
+		}
+		else
+		{
+			spdlog::set_level(level);
+		}
+	}
+	else
+	{
+		ALOG_WARN("Unable to set log level due to invalid value");
+	}
+}
+
+// static
+ALLog::fatal_func_t ALLog::getFatalFunction()
+{
+	fatal_func_t fatal_func;
+	{
+		absl::MutexLockMaybe mtx_lock(sFatalMutex.get());
+		fatal_func = sFatalFunc;
+	}
+	return fatal_func;
+}
+
+// static
+void ALLog::setFatalFunction(fatal_func_t fatal_func)
+{	
+	absl::MutexLockMaybe mtx_lock(sFatalMutex.get());
+	sFatalFunc = std::move(fatal_func);
+}
+
+// static 
+void ALLog::fatalError(const std::string message)
+{
+	fatal_func_t fatal_func;
+	{
+		absl::MutexLockMaybe mtx_lock(sFatalMutex.get());
+		fatal_func = sFatalFunc;
+	}
+	if (fatal_func)
+	{
+		fatal_func(message);
+	}
+};
+
+#if LL_WINDOWS
+// VC80 was optimizing the error away.
+#pragma optimize("", off)
+#endif
+void ALLog::crashAndLoop(const std::string& message)
+{
+	// Now, we go kaboom!
+	int* make_me_crash = NULL;
+
+	*make_me_crash = 0;
+
+	while (true)
+	{
+		// Loop forever, in case the crash didn't work?
+	}
+
+	// this is an attempt to let Coverity and other semantic scanners know that this function won't be returning ever.
+	exit(EXIT_FAILURE);
+}
+#if LL_WINDOWS
+#pragma optimize("", on)
+#endif
 
 // static 
 LLLineBuffer* ALLog::getLineBuffer()
