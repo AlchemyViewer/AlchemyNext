@@ -2483,6 +2483,25 @@ class LLDevelopSetLoggingLevel : public view_listener_t
 	}
 };
 
+class LLDevelopCheckLoggingLevelSpd : public view_listener_t
+{
+	bool handleEvent(const LLSD& userdata)
+	{
+		U32 level = userdata.asInteger();
+		return (static_cast<ALLog::ELevel>(level) == ALLog::getLevel());
+	}
+};
+
+class LLDevelopSetLoggingLevelSpd : public view_listener_t
+{
+	bool handleEvent(const LLSD& userdata)
+	{
+		U32 level = userdata.asInteger();
+		ALLog::setLevel(static_cast<ALLog::ELevel>(level));
+		return true;
+	}
+};
+
 class LLDevelopTextureFetchDebugger : public view_listener_t
 {
 	bool handleEvent(const LLSD& userdata)
@@ -9669,6 +9688,10 @@ void initialize_menus()
 	// Develop >Set logging level
 	view_listener_t::addMenu(new LLDevelopCheckLoggingLevel(), "Develop.CheckLoggingLevel");
 	view_listener_t::addMenu(new LLDevelopSetLoggingLevel(), "Develop.SetLoggingLevel");
+
+	// Develop >Set logging level
+	view_listener_t::addMenu(new LLDevelopCheckLoggingLevelSpd(), "ALog.CheckLoggingLevel");
+	view_listener_t::addMenu(new LLDevelopSetLoggingLevelSpd(), "ALog.SetLoggingLevel");
 	
 	//Develop (Texture Fetch Debug Console)
 	view_listener_t::addMenu(new LLDevelopTextureFetchDebugger(), "Develop.SetTexFetchDebugger");
