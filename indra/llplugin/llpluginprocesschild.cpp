@@ -92,7 +92,7 @@ void LLPluginProcessChild::idle(void)
 			}
 			else if (mSocketError != APR_SUCCESS)
 			{
-				LL_INFOS("Plugin") << "message pipe is in error state (" << mSocketError << "), moving to STATE_ERROR" << LL_ENDL;
+				ALOG_INFO("message pipe is in error state ({}), moving to STATE_ERROR", mSocketError);
 				setState(STATE_ERROR);
 			}
 
@@ -100,7 +100,7 @@ void LLPluginProcessChild::idle(void)
 			{
 				// The pipe has been closed -- we're done.
 				// TODO: This could be slightly more subtle, but I'm not sure it needs to be.
-				LL_INFOS("Plugin") << "message pipe went away, moving to STATE_ERROR" << LL_ENDL;
+				ALOG_INFO("message pipe went away, moving to STATE_ERROR");
 				setState(STATE_ERROR);
 			}
 		}
@@ -217,7 +217,7 @@ void LLPluginProcessChild::idle(void)
 			// waiting for goodbye from plugin.
 			if (mWaitGoodbye.hasExpired())
 			{
-				LL_WARNS() << "Wait for goodbye expired.  Advancing to UNLOADED" << LL_ENDL;
+				ALOG_WARN("Wait for goodbye expired.  Advancing to UNLOADED");
 				if (mInstance != NULL)
 				{
 					// Something went wrong, at least make sure plugin will terminate
@@ -320,7 +320,7 @@ void LLPluginProcessChild::sendMessageToPlugin(const LLPluginMessage &message)
 	{
 		std::string buffer = message.generate();
 
-		LL_DEBUGS("Plugin") << "Sending to plugin: " << buffer << LL_ENDL;
+		ALOG_DEBUG("Sending to plugin: {}", buffer);
 		LLTimer elapsed;
 
 		mInstance->sendMessage(buffer);
@@ -329,7 +329,7 @@ void LLPluginProcessChild::sendMessageToPlugin(const LLPluginMessage &message)
 	}
 	else
 	{
-		LL_WARNS("Plugin") << "mInstance == NULL" << LL_ENDL;
+		ALOG_WARN("mInstance == NULL");
 	}
 }
 
@@ -337,7 +337,7 @@ void LLPluginProcessChild::sendMessageToParent(const LLPluginMessage &message)
 {
 	std::string buffer = message.generate();
 
-	LL_DEBUGS("Plugin") << "Sending to parent: " << buffer << LL_ENDL;
+	ALOG_DEBUG("Sending to parent: {}", buffer);
 
 	writeMessageRaw(buffer);
 }
@@ -346,7 +346,7 @@ void LLPluginProcessChild::receiveMessageRaw(const std::string &message)
 {
 	// Incoming message from the TCP Socket
 
-	LL_DEBUGS("Plugin") << "Received from parent: " << message << LL_ENDL;
+	ALOG_DEBUG("Received from parent: {}", message);
 
 	// Decode this message
 	LLPluginMessage parsed;
@@ -398,7 +398,7 @@ void LLPluginProcessChild::receiveMessageRaw(const std::string &message)
 				if (iter != mSharedMemoryRegions.end())
 				{
 					// Need to remove the old region first
-					LL_WARNS("Plugin") << "Adding a duplicate shared memory segment!" << LL_ENDL;
+					ALOG_WARN("Adding a duplicate shared memory segment!");
 				}
 				else
 				{
@@ -425,7 +425,7 @@ void LLPluginProcessChild::receiveMessageRaw(const std::string &message)
 					}
 					else
 					{
-						LL_WARNS("Plugin") << "Couldn't create a shared memory segment!" << LL_ENDL;
+						ALOG_WARN("Couldn't create a shared memory segment!");
 						delete region;
 					}
 				}
@@ -444,7 +444,7 @@ void LLPluginProcessChild::receiveMessageRaw(const std::string &message)
 				}
 				else
 				{
-					LL_WARNS("Plugin") << "shm_remove for unknown memory segment!" << LL_ENDL;
+					ALOG_WARN("shm_remove for unknown memory segment!");
 				}
 			}
 			else if (message_name == "sleep_time")
@@ -454,12 +454,12 @@ void LLPluginProcessChild::receiveMessageRaw(const std::string &message)
 			else if (message_name == "crash")
 			{
 				// Crash the plugin
-				LL_ERRS("Plugin") << "Plugin crash requested." << LL_ENDL;
+				ALOG_CRITICAL("Plugin crash requested.");
 			}
 			else if (message_name == "hang")
 			{
 				// Hang the plugin
-				LL_WARNS("Plugin") << "Plugin hang requested." << LL_ENDL;
+				ALOG_WARN("Plugin hang requested.");
 				while (1)
 				{
 					// wheeeeeeeee......
@@ -467,7 +467,7 @@ void LLPluginProcessChild::receiveMessageRaw(const std::string &message)
 			}
 			else
 			{
-				LL_WARNS("Plugin") << "Unknown internal message from parent: " << message_name << LL_ENDL;
+				ALOG_WARN("Unknown internal message from parent: {}", message_name);
 			}
 		}
 	}
@@ -485,12 +485,12 @@ void LLPluginProcessChild::receiveMessageRaw(const std::string &message)
 /* virtual */
 void LLPluginProcessChild::receivePluginMessage(const std::string &message)
 {
-	LL_DEBUGS("Plugin") << "Received from plugin: " << message << LL_ENDL;
+	ALOG_DEBUG("Received from plugin: {}", message);
 
 	if (mBlockingRequest)
 	{
 		// 
-		LL_ERRS("Plugin") << "Can't send a message while already waiting on a blocking request -- aborting!" << LL_ENDL;
+		ALOG_CRITICAL("Can't send a message while already waiting on a blocking request -- aborting!");
 	}
 
 	// Incoming message from the plugin instance
@@ -560,7 +560,7 @@ void LLPluginProcessChild::receivePluginMessage(const std::string &message)
 				}
 				else
 				{
-					LL_WARNS("Plugin") << "shm_remove_response for unknown memory segment!" << LL_ENDL;
+					ALOG_WARN("shm_remove_response for unknown memory segment!");
 				}
 			}
 		}
@@ -568,7 +568,7 @@ void LLPluginProcessChild::receivePluginMessage(const std::string &message)
 
 	if (passMessage)
 	{
-		LL_DEBUGS("Plugin") << "Passing through to parent: " << message << LL_ENDL;
+		ALOG_DEBUG("Passing through to parent: {}", message);
 		writeMessageRaw(message);
 	}
 
@@ -589,7 +589,7 @@ void LLPluginProcessChild::receivePluginMessage(const std::string &message)
 
 void LLPluginProcessChild::setState(EState state)
 {
-	LL_DEBUGS("Plugin") << "setting state to " << state << LL_ENDL;
+	ALOG_DEBUG("setting state to {}", state);
 	mState = state;
 };
 

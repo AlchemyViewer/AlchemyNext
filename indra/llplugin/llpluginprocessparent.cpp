@@ -108,7 +108,7 @@ LLPluginProcessParent::LLPluginProcessParent(LLPluginProcessParentOwner *owner):
 
 LLPluginProcessParent::~LLPluginProcessParent()
 {
-	LL_DEBUGS("Plugin") << "destructor" << LL_ENDL;
+	ALOG_DEBUG("destructor");
 
 	// Destroy any remaining shared memory regions
 	sharedMemoryRegionsType::iterator iter;
@@ -190,7 +190,7 @@ void LLPluginProcessParent::requestShutdown()
     // After requestShutdown has been called our previous owner will no longer call 
     // our idle() method.  Tie into the event loop here to do that until we are good
     // and finished.
-    LL_DEBUGS("LLPluginProcessParent") << "listening on \"mainloop\"" << LL_ENDL;
+    ALOG_DEBUG("listening on \"mainloop\"");
     mPolling = LLEventPumps::instance().obtain("mainloop")
         .listen(namestream.str(), boost::bind(&LLPluginProcessParent::pollTick, this));
 
@@ -282,7 +282,7 @@ bool LLPluginProcessParent::accept()
 	
 	if(status == APR_SUCCESS)
 	{
-//		LL_INFOS() << "SUCCESS" << LL_ENDL;
+//		ALOG_INFO("SUCCESS");
 		// Success.  Create a message pipe on the new socket
 
 		// we MUST create a new pool for the LLSocket, since it will take ownership of it and delete it in its destructor!
@@ -296,14 +296,14 @@ bool LLPluginProcessParent::accept()
 	}
 	else if(APR_STATUS_IS_EAGAIN(status))
 	{
-//		LL_INFOS() << "EAGAIN" << LL_ENDL;
+//		ALOG_INFO("EAGAIN");
 
 		// No incoming connections.  This is not an error.
 		status = APR_SUCCESS;
 	}
 	else
 	{
-//		LL_INFOS() << "Error:" << LL_ENDL;
+//		ALOG_INFO("Error:");
 		ll_apr_warn_status(status);
 		
 		// Some other error.
@@ -357,7 +357,7 @@ void LLPluginProcessParent::idle(void)
 			else if(mSocketError != APR_SUCCESS)
 			{
 				// The socket is in an error state -- the plugin is gone.
-				LL_WARNS("Plugin") << "Socket hit an error state (" << mSocketError << ")" << LL_ENDL;
+				ALOG_WARN("Socket hit an error state ({})", mSocketError);
 				errorState();
 			}
 		}	
@@ -420,7 +420,7 @@ void LLPluginProcessParent::idle(void)
 
 					if(mBoundPort == 0)
 					{
-						LL_WARNS("Plugin") << "Bound port number unknown, bailing out." << LL_ENDL;
+						ALOG_WARN("Bound port number unknown, bailing out.");
 						
 						killSockets();
 						errorState();
@@ -428,7 +428,7 @@ void LLPluginProcessParent::idle(void)
 					}
 				}
 				
-				LL_DEBUGS("Plugin") << "Bound tcp socket to port: " << addr->port << LL_ENDL;
+				ALOG_DEBUG("Bound tcp socket to port: {}", addr->port);
 
 				// Make the listen socket non-blocking
 				status = apr_socket_opt_set(mListenSocket->getSocket(), APR_SO_NONBLOCK, 1);
@@ -537,7 +537,7 @@ void LLPluginProcessParent::idle(void)
 			    break;
 
 			case STATE_HELLO:
-				LL_DEBUGS("Plugin") << "received hello message" << LL_ENDL;
+				ALOG_DEBUG("received hello message");
 				
 				// Send the message to load the plugin
 				{
@@ -580,7 +580,7 @@ void LLPluginProcessParent::idle(void)
 				}
 				else if(pluginLockedUp())
 				{
-					LL_WARNS("Plugin") << "timeout in exiting state, bailing out" << LL_ENDL;
+					ALOG_WARN("timeout in exiting state, bailing out");
 					errorState();
 				}
     			break;
@@ -678,9 +678,9 @@ void LLPluginProcessParent::sendMessage(const LLPluginMessage &message)
 	}
 	
 	std::string buffer = message.generate();
-#ifdef SHOW_DEBUG
-	LL_DEBUGS("Plugin") << "Sending: " << buffer << LL_ENDL;	
-#endif
+
+	ALOG_DEBUG("Sending: {}", buffer);
+
 	writeMessageRaw(buffer);
 	
 	// Try to send message immediately.
@@ -732,7 +732,7 @@ void LLPluginProcessParent::dirtyPollSet()
 	
 	if(sReadThread)
 	{
-		LL_DEBUGS("PluginPoll") << "unpausing read thread " << LL_ENDL;
+		ALOG_DEBUG("unpausing read thread {}", fmt::ptr(sReadThread));
 		sReadThread->unpause();
 	}
 }
@@ -749,7 +749,7 @@ void LLPluginProcessParent::updatePollset()
 
 	if(sPollSet)
 	{
-		LL_DEBUGS("PluginPoll") << "destroying pollset " << sPollSet << LL_ENDL;
+		ALOG_DEBUG("destroying pollset {}", fmt::ptr(sPollSet));
 		// delete the existing pollset.
 		apr_pollset_destroy(sPollSet);
 		sPollSet = NULL;
@@ -779,13 +779,13 @@ void LLPluginProcessParent::updatePollset()
 			if(status != APR_SUCCESS)
 			{
 #endif // APR_POLLSET_NOCOPY
-				LL_WARNS("PluginPoll") << "Couldn't create pollset.  Falling back to non-pollset mode." << LL_ENDL;
+				ALOG_WARN("Couldn't create pollset.  Falling back to non-pollset mode.");
 				sPollSet = NULL;
 #ifdef APR_POLLSET_NOCOPY
 			}
 			else
 			{
-				LL_DEBUGS("PluginPoll") << "created pollset " << sPollSet << LL_ENDL;
+				ALOG_DEBUG("created pollset {}", fmt::ptr(sPollSet));
 				
 				// Pollset was created, add all instances to it.
 				for(iter = sInstances.begin(); iter != sInstances.end(); iter++)
@@ -799,7 +799,7 @@ void LLPluginProcessParent::updatePollset()
 						}
 						else
 						{
-							LL_WARNS("PluginPoll") << "apr_pollset_add failed with status " << status << LL_ENDL;
+							ALOG_WARN("apr_pollset_add failed with status {}", status);
 						}
 					}
 				}
@@ -820,7 +820,7 @@ void LLPluginProcessParent::setUseReadThread(bool use_read_thread)
 			if(!sReadThread)
 			{
 				// start up the read thread
-				LL_INFOS("PluginPoll") << "creating read thread " << LL_ENDL;
+				ALOG_INFO("creating read thread");
 
 				// make sure the pollset gets rebuilt.
 				sPollsetNeedsRebuild = true;
@@ -834,7 +834,7 @@ void LLPluginProcessParent::setUseReadThread(bool use_read_thread)
 			if(sReadThread)
 			{
 				// shut down the read thread
-				LL_INFOS("PluginPoll") << "destroying read thread " << LL_ENDL;
+				ALOG_INFO("destroying read thread");
 				delete sReadThread;
 				sReadThread = NULL;
 			}
@@ -891,11 +891,11 @@ void LLPluginProcessParent::poll(F64 timeout)
 		{
 			// This happens when one of the file descriptors in the pollset is destroyed, which happens whenever a plugin's socket is closed.
 			// The pollset has been or will be recreated, so just return.
-			LL_DEBUGS("PluginPoll") << "apr_pollset_poll returned EBADF" << LL_ENDL;
+			ALOG_DEBUG("apr_pollset_poll returned EBADF");
 		}
 		else if(status != APR_SUCCESS)
 		{
-			LL_WARNS("PluginPoll") << "apr_pollset_poll failed with status " << status << LL_ENDL;
+			ALOG_WARN("apr_pollset_poll failed with status {}", status);
 		}
 	}
 
@@ -932,9 +932,7 @@ void LLPluginProcessParent::servicePoll()
 
 void LLPluginProcessParent::receiveMessageRaw(const std::string &message)
 {
-#ifdef SHOW_DEBUG
-	LL_DEBUGS("Plugin") << "Received: " << message << LL_ENDL;
-#endif
+	ALOG_DEBUG("Received: {}", message);
 	
 	LLPluginMessage parsed;
 	if(LLSDParser::PARSE_FAILURE != parsed.parse(message))
@@ -1001,7 +999,7 @@ void LLPluginProcessParent::receiveMessage(const LLPluginMessage &message)
 			}
 			else
 			{
-				LL_WARNS("Plugin") << "received hello message in wrong state -- bailing out" << LL_ENDL;
+				ALOG_WARN("received hello message in wrong state -- bailing out");
 				errorState();
 			}
 			
@@ -1013,7 +1011,7 @@ void LLPluginProcessParent::receiveMessage(const LLPluginMessage &message)
 				// Plugin has been loaded. 
 				
 				mPluginVersionString = message.getValue("plugin_version");
-				LL_INFOS("Plugin") << "plugin version string: " << mPluginVersionString << LL_ENDL;
+				ALOG_INFO("plugin version string: {}", mPluginVersionString);
 
 				// Check which message classes/versions the plugin supports.
 				// TODO: check against current versions
@@ -1022,7 +1020,7 @@ void LLPluginProcessParent::receiveMessage(const LLPluginMessage &message)
 				LLSD::map_iterator iter;
 				for(iter = mMessageClassVersions.beginMap(); iter != mMessageClassVersions.endMap(); iter++)
 				{
-					LL_INFOS("Plugin") << "message class: " << iter->first << " -> version: " << iter->second.asString() << LL_ENDL;
+					ALOG_INFO("message class: {} -> version: {}", iter->first, iter->second.asString());
 				}
 				
 				// Send initial sleep time
@@ -1033,7 +1031,7 @@ void LLPluginProcessParent::receiveMessage(const LLPluginMessage &message)
 			}
 			else
 			{
-				LL_WARNS("Plugin") << "received load_plugin_response message in wrong state -- bailing out" << LL_ENDL;
+				ALOG_WARN("received load_plugin_response message in wrong state -- bailing out");
 				errorState();
 			}
 		}
@@ -1043,10 +1041,8 @@ void LLPluginProcessParent::receiveMessage(const LLPluginMessage &message)
 			mHeartbeat.setTimerExpirySec(mPluginLockupTimeout);
 
 			mCPUUsage = message.getValueReal("cpu_usage");
-#ifdef SHOW_DEBUG
-			LL_DEBUGS("Plugin") << "cpu usage reported as " << mCPUUsage << LL_ENDL;
-#endif
-			
+
+			ALOG_DEBUG("cpu usage reported as {}", mCPUUsage);
 		}
 		else if(message_name == "shm_add_response")
 		{
@@ -1070,7 +1066,7 @@ void LLPluginProcessParent::receiveMessage(const LLPluginMessage &message)
 		}
 		else
 		{
-			LL_WARNS("Plugin") << "Unknown internal message from child: " << message_name << LL_ENDL;
+			ALOG_WARN("Unknown internal message from child: {}", message_name);
 		}
 	}
 	else
@@ -1102,7 +1098,7 @@ std::string LLPluginProcessParent::addSharedMemory(size_t size)
 	}
 	else
 	{
-		LL_WARNS("Plugin") << "Couldn't create a shared memory segment!" << LL_ENDL;
+		ALOG_WARN("Couldn't create a shared memory segment!");
 
 		// Don't leak
 		delete region;
@@ -1124,7 +1120,7 @@ void LLPluginProcessParent::removeSharedMemory(const std::string &name)
 	}
 	else
 	{
-		LL_WARNS("Plugin") << "Request to remove an unknown shared memory segment." << LL_ENDL;
+		ALOG_WARN("Request to remove an unknown shared memory segment.");
 	}
 }
 size_t LLPluginProcessParent::getSharedMemorySize(const std::string &name)
@@ -1171,7 +1167,7 @@ std::string LLPluginProcessParent::getPluginVersion(void)
 
 void LLPluginProcessParent::setState(EState state)
 {
-	LL_DEBUGS("Plugin") << "setting state to " << state << LL_ENDL;
+	ALOG_DEBUG("setting state to {}", state);
 	mState = state; 
 };
 
@@ -1181,12 +1177,12 @@ bool LLPluginProcessParent::pluginLockedUpOrQuit()
 	
 	if (! LLProcess::isRunning(mProcess))
 	{
-		LL_WARNS("Plugin") << "child exited" << LL_ENDL;
+		ALOG_WARN("child exited");
 		result = true;
 	}
 	else if(pluginLockedUp())
 	{
-		LL_WARNS("Plugin") << "timeout" << LL_ENDL;
+		ALOG_WARN("timeout");
 		result = true;
 	}
 	

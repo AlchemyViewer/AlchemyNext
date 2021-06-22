@@ -175,13 +175,13 @@ int main(int argc, char **argv)
 #if LL_WINDOWS
 	if( strlen( lpCmdLine ) == 0 )
 	{
-		LL_ERRS("slplugin") << "usage: " << "SLPlugin" << " launcher_port" << LL_ENDL;
+		ALOG_CRITICAL("usage: SLPlugin launcher_port");
 	};
 
 	U32 port = 0;
 	if(!LLStringUtil::convertToU32(lpCmdLine, port))
 	{
-		LL_ERRS("slplugin") << "port number must be numeric" << LL_ENDL;
+		ALOG_CRITICAL("port number must be numeric");
 	};
 
 	// Insert our exception handler into the system so this plugin doesn't
@@ -191,13 +191,13 @@ int main(int argc, char **argv)
 #elif LL_DARWIN || LL_LINUX
 	if(argc < 2)
 	{
-		LL_ERRS("slplugin") << "usage: " << argv[0] << " launcher_port" << LL_ENDL;
+		ALOG_CRITICAL("usage: {} launcher_port", argv[0]);
 	}
 
 	U32 port = 0;
 	if(!LLStringUtil::convertToU32(argv[1], port))
 	{
-		LL_ERRS("slplugin") << "port number must be numeric" << LL_ENDL;
+		ALOG_CRITICAL("port number must be numeric");
 	}
 
 	// Catch signals that most kinds of crashes will generate, and exit cleanly so the system crash dialog isn't shown.

@@ -63,9 +63,9 @@ LLPluginClassMedia::~LLPluginClassMedia()
 
 bool LLPluginClassMedia::init(const std::string &launcher_filename, const std::string &plugin_dir, const std::string &plugin_filename, bool debug)
 {
-	LL_DEBUGS("Plugin") << "launcher: " << launcher_filename << LL_ENDL;
-	LL_DEBUGS("Plugin") << "dir: " << plugin_dir << LL_ENDL;
-	LL_DEBUGS("Plugin") << "plugin: " << plugin_filename << LL_ENDL;
+	ALOG_DEBUG("launcher: {}", launcher_filename);
+	ALOG_DEBUG("dir: {}", plugin_dir);
+	ALOG_DEBUG("plugin: {}", plugin_filename);
 
 	mPlugin = LLPluginProcessParent::create(this);
 	mPlugin->setSleepTime(mSleepTime);
@@ -200,7 +200,7 @@ void LLPluginClassMedia::idle(void)
 				}
 				else
 				{
-					LL_WARNS("Plugin") << "Unable to pad texture width, padding size " << mPadding << "is not a multiple of pixel size " << mRequestedTextureDepth << LL_ENDL;
+					ALOG_WARN("Unable to pad texture width, padding size {} is not a multiple of pixel size {}", mPadding, mRequestedTextureDepth);
 				}
 			}
 		}
@@ -234,7 +234,7 @@ void LLPluginClassMedia::idle(void)
 				}
 				else
 				{
-					LL_WARNS("Plugin") << "Failed to get previously created shared memory address: " << mTextureSharedMemoryName << " size: " << mTextureSharedMemorySize << LL_ENDL;
+					ALOG_WARN("Failed to get previously created shared memory address: {} size: {}", mTextureSharedMemoryName, mTextureSharedMemorySize);
 				}
 
 				// We could do this to force an update, but textureValid() will still be returning false until the first roundtrip to the plugin,
@@ -266,7 +266,7 @@ void LLPluginClassMedia::idle(void)
 			message.setValueReal("background_a", mBackgroundColor.mV[VW]);
 			mPlugin->sendMessage(message);	// DO NOT just use sendMessage() here -- we want this to jump ahead of the queue.
 
-			LL_DEBUGS("Plugin") << "Sending size_change" << LL_ENDL;
+			ALOG_DEBUG("Sending size_change");
 		}
 	}
 
@@ -769,7 +769,7 @@ void LLPluginClassMedia::setPriority(EPriority priority)
 			mPlugin->setSleepTime(mSleepTime);
 		}
 
-		LL_DEBUGS("PluginPriority") << this << ": setting priority to " << priority_string << LL_ENDL;
+		ALOG_DEBUG("{}: setting priority to {}", fmt::ptr(this), priority_string);
 
 		// This may affect the calculated size, so recalculate it here.
 		setSizeInternal();
@@ -997,19 +997,10 @@ void LLPluginClassMedia::receivePluginMessage(const LLPluginMessage &message)
 					mDirtyRect.unionWith(newDirtyRect);
 				}
 
-#ifdef SHOW_DEBUG
-				LL_DEBUGS("Plugin") << "adjusted incoming rect is: ("
-					<< newDirtyRect.mLeft << ", "
-					<< newDirtyRect.mTop << ", "
-					<< newDirtyRect.mRight << ", "
-					<< newDirtyRect.mBottom << "), new dirty rect is: ("
-					<< mDirtyRect.mLeft << ", "
-					<< mDirtyRect.mTop << ", "
-					<< mDirtyRect.mRight << ", "
-					<< mDirtyRect.mBottom << ")"
-					<< LL_ENDL;
-#endif
-
+				ALOG_DEBUG("adjusted incoming rect is: ({}, {}, {}, {}), new dirty rect is: ({}, {}, {}, {})", 
+					newDirtyRect.mLeft, newDirtyRect.mTop, newDirtyRect.mRight, newDirtyRect.mBottom, 
+					mDirtyRect.mLeft, mDirtyRect.mTop, mDirtyRect.mRight, mDirtyRect.mBottom);
+	
 				mediaEvent(LLPluginClassMediaOwner::MEDIA_EVENT_CONTENT_UPDATED);
 			}
 
@@ -1064,7 +1055,7 @@ void LLPluginClassMedia::receivePluginMessage(const LLPluginMessage &message)
 		{
 			std::string status = message.getValue("status");
 
-			LL_DEBUGS("Plugin") << "Status changed to: " << status << LL_ENDL;
+			ALOG_DEBUG("Status changed to: {}", status);
 
 			if(status == "loading")
 			{
@@ -1194,7 +1185,7 @@ void LLPluginClassMedia::receivePluginMessage(const LLPluginMessage &message)
 		}
 		else
 		{
-			LL_WARNS("Plugin") << "Unknown " << message_name << " class message: " << message_name << LL_ENDL;
+			ALOG_WARN("Unknown {} class message: {}", message_name, message_name);
 		}
 	}
 	else if(message_class == LLPLUGIN_MESSAGE_CLASS_MEDIA_BROWSER)
@@ -1279,7 +1270,7 @@ void LLPluginClassMedia::receivePluginMessage(const LLPluginMessage &message)
 		}
 		else
 		{
-			LL_WARNS("Plugin") << "Unknown " << message_name << " class message: " << message_name << LL_ENDL;
+			ALOG_WARN("Unknown {} class message: {}", message_name, message_name);
 		}
 	}
 	else if(message_class == LLPLUGIN_MESSAGE_CLASS_MEDIA_TIME)
@@ -1292,7 +1283,7 @@ void LLPluginClassMedia::receivePluginMessage(const LLPluginMessage &message)
 //		}
 //		else
 		{
-			LL_WARNS("Plugin") << "Unknown " << message_name << " class message: " << message_name << LL_ENDL;
+			ALOG_WARN("Unknown {} class message: {}", message_name, message_name);
 		}
 	}
 
@@ -1556,5 +1547,5 @@ void LLPluginClassMedia::initializeUrlHistory(const LLSD& url_history)
 	message.setValueLLSD("history", url_history);
 	sendMessage(message);
 
-	LL_DEBUGS("Plugin") << "Sending history" << LL_ENDL;
+	ALOG_DEBUG("Sending history");
 }

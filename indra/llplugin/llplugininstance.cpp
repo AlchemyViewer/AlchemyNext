@@ -103,7 +103,7 @@ int LLPluginInstance::load(const std::string& plugin_dir, std::string &plugin_fi
 		char buf[1024];
 		apr_dso_error(mDSOHandle, buf, sizeof(buf));
 
-		LL_WARNS("Plugin") << "apr_dso_load of " << plugin_file << " failed with error " << result << " , additional info string: " << buf << LL_ENDL;
+		ALOG_WARN("apr_dso_load of {} failed with error {} , additional info string: {}", plugin_file, result, buf);
 		
 	}
 	
@@ -115,7 +115,7 @@ int LLPluginInstance::load(const std::string& plugin_dir, std::string &plugin_fi
 
 		if(result != APR_SUCCESS)
 		{
-			LL_WARNS("Plugin") << "apr_dso_sym failed with error " << result << LL_ENDL;
+			ALOG_WARN("apr_dso_sym failed with error {}", result);
 		}
 	}
 	
@@ -125,7 +125,7 @@ int LLPluginInstance::load(const std::string& plugin_dir, std::string &plugin_fi
 
 		if(result != APR_SUCCESS)
 		{
-			LL_WARNS("Plugin") << "call to init function failed with error " << result << LL_ENDL;
+			ALOG_WARN("call to init function failed with error {}", result);
 		}
 	}
 	
@@ -141,12 +141,12 @@ void LLPluginInstance::sendMessage(const std::string &message)
 {
 	if(mPluginSendMessageFunction)
 	{
-		LL_DEBUGS("Plugin") << "sending message to plugin: \"" << message << "\"" << LL_ENDL;
+		ALOG_DEBUG("sending message to plugin: \"{}\"", message);
 		mPluginSendMessageFunction(message.c_str(), &mPluginUserData);
 	}
 	else
 	{
-		LL_WARNS("Plugin") << "dropping message: \"" << message << "\"" << LL_ENDL;
+		ALOG_WARN("dropping message: \"{}\"", message);
 	}
 }
 
@@ -176,11 +176,11 @@ void LLPluginInstance::receiveMessage(const char *message_string)
 {
 	if(mOwner)
 	{
-		LL_DEBUGS("Plugin") << "processing incoming message: \"" << message_string << "\"" << LL_ENDL;		
+		ALOG_DEBUG("processing incoming message: \"{}\"", message_string);
 		mOwner->receivePluginMessage(message_string);
 	}
 	else
 	{
-		LL_WARNS("Plugin") << "dropping incoming message: \"" << message_string << "\"" << LL_ENDL;		
+		ALOG_WARN("dropping incoming message: \"{}\"", message_string);
 	}	
 }

@@ -75,7 +75,7 @@ bool LLPluginMessagePipeOwner::writeMessageRaw(const std::string &message)
 	}
 	else
 	{
-		LL_WARNS("Plugin") << "dropping message: " << message << LL_ENDL;
+		ALOG_WARN("dropping message: {}", message);
 		result = false;
 	}
 	
@@ -304,9 +304,8 @@ bool LLPluginMessagePipe::pumpInput(F64 timeout)
 
 				if(status == APR_SUCCESS)
 				{
-#ifdef SHOW_DEBUG
-					LL_DEBUGS("PluginSocket") << "success, read " << size << LL_ENDL;
-#endif
+					ALOG_DEBUG("success, read {}", size);
+
 					if(size != request_size)
 					{
 						// This was a short read, so we're done.
@@ -315,17 +314,15 @@ bool LLPluginMessagePipe::pumpInput(F64 timeout)
 				}
 				else if(APR_STATUS_IS_TIMEUP(status))
 				{
-#ifdef SHOW_DEBUG
-					LL_DEBUGS("PluginSocket") << "TIMEUP, read " << size << LL_ENDL;
-#endif
+					ALOG_DEBUG("TIMEUP, read {}", size);
+
 					// Timeout was hit.  Since the initial read is 1 byte, this should never be a partial read.
 					break;
 				}
 				else if(APR_STATUS_IS_EAGAIN(status))
 				{
-#ifdef SHOW_DEBUG
-					LL_DEBUGS("PluginSocket") << "EAGAIN, read " << size << LL_ENDL;
-#endif
+					ALOG_DEBUG("EAGAIN, read {}", size);
+
 					// Non-blocking read returned immediately.
 					break;
 				}
@@ -392,7 +389,7 @@ void LLPluginMessagePipe::processInput(void)
 		}
 		else
 		{
-			LL_WARNS("Plugin") << "!mOwner" << LL_ENDL;
+			ALOG_WARN("!mOwner");
 		}
 	}
 	mInputMutex.unlock();
