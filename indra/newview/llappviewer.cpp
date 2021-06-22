@@ -752,6 +752,8 @@ LLAppViewer::~LLAppViewer()
 
 	// If we got to this destructor somehow, the app didn't hang.
 	removeMarkerFiles();
+
+	ALLog::shutdown();
 }
 
 class LLUITranslationBridge : public LLTranslationBridge
@@ -2144,11 +2146,9 @@ bool LLAppViewer::cleanup()
 	// deleteSingleton() methods.
 	LLSingletonBase::deleteAll();
 
-	ALOG_INFO("Goodbye!");
-
-	ALLog::shutdown();
-
 	removeDumpDir();
+
+	ALOG_INFO("Goodbye!");
 
 	// return 0;
 	return true;
