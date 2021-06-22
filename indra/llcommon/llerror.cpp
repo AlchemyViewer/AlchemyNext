@@ -159,7 +159,7 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool 
 	sBufferChanged = false;
 	sFatalFunc = std::move(fatal_func);
 
-	spdlog::init_thread_pool(16384, 1);
+	spdlog::init_thread_pool(8192, 2);
 	spdlog::flush_every(std::chrono::seconds(1));
 
 	try
