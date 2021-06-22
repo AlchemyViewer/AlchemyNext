@@ -230,7 +230,7 @@ bool _ll_apr_warn_status(apr_status_t status, const char* file, int line)
 #if !LL_LINUX
 	char buf[MAX_STRING];	/* Flawfinder: ignore */
 	apr_strerror(status, buf, sizeof(buf));
-	LL_WARNS("APR") << "APR: " << file << ":" << line << " " << buf << LL_ENDL;
+	ALOG_WARN("APR: {}:{} {}", file, line, buf);
 #endif
 	return true;
 }
