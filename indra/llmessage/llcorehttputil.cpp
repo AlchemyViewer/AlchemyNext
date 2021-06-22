@@ -79,12 +79,12 @@ void setPropertyMethods(BoolSettingQuery_t queryfn, BoolSettingUpdate_t updatefn
 
 void logMessageSuccess(std::string logAuth, std::string url, std::string message)
 {
-    LL_INFOS() << logAuth << " Success '" << message << "' for " << url << LL_ENDL;
+    ALOG_NET_INFO("{} Success '{}' for {}", logAuth, message, url);
 }
 
 void logMessageFail(std::string logAuth, std::string url, std::string message)
 {
-    LL_WARNS("CoreHTTP") << logAuth << " Possible failure '" << message << "' for " << url << LL_ENDL;
+    ALOG_NET_WARN("{} Possible failure '{}' for {}", logAuth, message, url);
 }
 
 //=========================================================================
@@ -279,11 +279,7 @@ void HttpCoroHandler::onCompleted(LLCore::HttpHandle handle, LLCore::HttpRespons
         result = LLSD::emptyMap();
         LLCore::HttpStatus::type_enum_t errType = status.getType();
 
-        LL_WARNS("CoreHTTP")
-            << "Possible failure [" << status.toTerseString() << "] cannot "<< response->getRequestMethod() 
-            << " url '" << response->getRequestURL()
-            << "' because " << status.toString() 
-            << LL_ENDL;
+        ALOG_NET_WARN("Possible failure [{}] cannot {} url '{}' because {}", status.toTerseString(), response->getRequestMethod(), response->getRequestURL(), status.toString());
         if ((errType >= 400) && (errType < 500))
         {
             LLSD body = this->parseBody(response, parseSuccess);
@@ -321,7 +317,7 @@ void HttpCoroHandler::onCompleted(LLCore::HttpHandle handle, LLCore::HttpRespons
         if (getBoolSetting(HTTP_LOGBODY_KEY))
         {
             // commenting out, but keeping since this can be useful for debugging
-            LL_WARNS("CoreHTTP") << "Returned body=" << std::endl << httpStatus["error_body"].asString() << LL_ENDL;
+            ALOG_NET_WARN("Returned body=\n{}", httpStatus["error_body"].asString());
         }
     }
 
@@ -440,8 +436,8 @@ LLSD HttpCoroLLSDHandler::handleSuccess(LLCore::HttpResponse * response, LLCore:
         if (contentType && (HTTP_CONTENT_LLSD_XML == *contentType))
         {
             std::string thebody = LLCoreHttpUtil::responseToString(response);
-            LL_WARNS("CoreHTTP") << "Failed to deserialize . " << response->getRequestURL() << " [status:" << response->getStatus().toString() << "] "
-                << " body: " << thebody << LL_ENDL;
+            ALOG_NET_WARN("Failed to deserialize. {} [status:{}]  body: {}",
+                response->getRequestURL(), response->getStatus().toString(), thebody);
 
             // Replace the status with a new one indicating the failure.
             status = LLCore::HttpStatus(499, "Failed to deserialize LLSD.");
@@ -824,7 +820,7 @@ LLSD HttpCoroutineAdapter::postJsonAndSuspend(LLCore::HttpRequest::ptr_t request
         nlohmann::json root = LlsdToJson(body);
         std::string value = root.dump();
 
-        LL_WARNS("Http::post") << "JSON Generates: \"" << value << "\"" << LL_ENDL;
+        ALOG_NET_WARN("JSON Generates: \"{}\"", value);
 
         outs << value;
     }
@@ -883,7 +879,7 @@ LLSD HttpCoroutineAdapter::putJsonAndSuspend(LLCore::HttpRequest::ptr_t request,
         nlohmann::json root = LlsdToJson(body);
         std::string value = root.dump();
 
-        LL_WARNS("Http::put") << "JSON Generates: \"" << value << "\"" << LL_ENDL;
+        ALOG_NET_WARN("JSON Generates: \"{}\"", value);
         outs << value;
     }
 
@@ -1195,7 +1191,7 @@ void HttpCoroutineAdapter::cancelSuspendedOperation()
     if ((request) && (handler) && (mYieldingHandle != LLCORE_HTTP_HANDLE_INVALID))
     {
         cleanState();
-        LL_INFOS() << "Canceling yielding request!" << LL_ENDL;
+        ALOG_NET_INFO("Canceling yielding request!");
         request->requestCancel(mYieldingHandle, handler);
     }
 }
@@ -1220,8 +1216,7 @@ LLSD HttpCoroutineAdapter::buildImmediateErrorResult(const LLCore::HttpRequest::
     const std::string &url) 
 {
     LLCore::HttpStatus status = request->getStatus();
-    LL_WARNS("CoreHTTP") << "Error posting to " << url << " Status=" << status.getStatus() <<
-        " message = " << status.getMessage() << LL_ENDL;
+    ALOG_NET_WARN("Error posting to {} Status={} message = {}", url, status.getStatus(),status.getMessage());
 
     // Mimic the status results returned from an http error that we had 
     // to wait on 
@@ -1271,7 +1266,7 @@ void HttpCoroutineAdapter::trivialGetCoro(std::string url, LLCore::HttpRequest::
 
     httpOpts->setWantHeaders(true);
 
-    LL_INFOS("HttpCoroutineAdapter", "genericGetCoro") << "Generic GET for " << url << LL_ENDL;
+    ALOG_NET_INFO("Generic GET for {}", url);
 
     LLSD result = httpAdapter->getAndSuspend(httpRequest, url, httpOpts);
 
@@ -1322,7 +1317,7 @@ void HttpCoroutineAdapter::trivialPostCoro(std::string url, LLCore::HttpRequest:
 
     httpOpts->setWantHeaders(true);
 
-    LL_INFOS("HttpCoroutineAdapter", "genericPostCoro") << "Generic POST for " << url << LL_ENDL;
+    ALOG_NET_INFO("Generic POST for {}", url);
 
     LLSD result = httpAdapter->postAndSuspend(httpRequest, url, postData, httpOpts);
 

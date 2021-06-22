@@ -144,7 +144,7 @@ LLCoprocedureManager::poolPtr_t LLCoprocedureManager::initializePool(const std::
     std::string keyName = "PoolSize" + poolName;
     int size = 0;
 
-    LL_ERRS_IF(poolName.empty(), "CoprocedureManager") << "Poolname must not be empty" << LL_ENDL;
+    llassert_always_msg(!poolName.empty(), "Pool name must not be empty");
 
     if (mPropertyQueryFn)
     {
@@ -163,14 +163,14 @@ LLCoprocedureManager::poolPtr_t LLCoprocedureManager::initializePool(const std::
             mPropertyDefineFn(keyName, size, "Coroutine Pool size for " + poolName);
         }
 
-        LL_WARNS("CoProcMgr") << "LLCoprocedureManager: No setting for \"" << keyName << "\" setting pool size to default of " << size << LL_ENDL;
+        ALOG_NET_WARN("LLCoprocedureManager: No setting for \"{}\" setting pool size to default of {}", keyName, size);
     }
 
     poolPtr_t pool = boost::make_shared<LLCoprocedurePool>(poolName, size);
-    LL_ERRS_IF(!pool, "CoprocedureManager") << "Unable to create pool named \"" << poolName << "\" FATAL!" << LL_ENDL;
+    llassert_always_msg(pool, fmt::format("Unable to create pool named \"{}\" FATAL!", poolName));
 
     bool inserted = mPoolMap.emplace(poolName, pool).second;
-    LL_ERRS_IF(!inserted, "CoprocedureManager") << "Unable to add pool named \"" << poolName << "\" to map. FATAL!" << LL_ENDL;
+    llassert_always_msg(inserted, fmt::format("Unable to add pool named \"{}\" to map. FATAL!", poolName));
 
     return pool;
 }

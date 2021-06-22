@@ -102,12 +102,12 @@ void LLXfer_File::cleanup ()
 
 	if (mDeleteLocalOnCompletion)
 	{
-		LL_DEBUGS("Xfer") << "Removing file: " << mLocalFilename << LL_ENDL;
+		ALOG_NET_DEBUG("Removing file: {}", mLocalFilename);
 		LLFile::remove(mLocalFilename, ENOENT);
 	}
 	else
 	{
-		LL_DEBUGS("Xfer") << "Keeping local file: " << mLocalFilename << LL_ENDL;
+		ALOG_NET_DEBUG("Keeping local file: {}", mLocalFilename);
 	}
 
 	LLXfer::cleanup();
@@ -139,7 +139,7 @@ S32 LLXfer_File::initializeRequest(U64 xfer_id,
 	mCallbackDataHandle = user_data;
 	mCallbackResult = LL_ERR_NOERR;
 
-	LL_INFOS("Xfer") << "Requesting xfer from " << remote_host << " for file: " << mLocalFilename << LL_ENDL;
+	ALOG_NET_INFO("Requesting xfer from {} for file: {}", remote_host, mLocalFilename);
 
 	if (mBuffer)
 	{
@@ -225,7 +225,7 @@ S32 LLXfer_File::startSend (U64 xfer_id, const LLHost &remote_host)
 	}
 	else
 	{
-		LL_INFOS("Xfer") << "Warning: " << mLocalFilename << " not found." << LL_ENDL;
+		ALOG_NET_INFO("Warning: {} not found.", mLocalFilename);
 		return (LL_ERR_FILE_NOT_FOUND);
 	}
 
@@ -255,7 +255,7 @@ S32 LLXfer_File::reopenFileHandle()
 		mFp = LLFile::fopen(mLocalFilename,"rb");		/* Flawfinder : ignore */
 		if (mFp == NULL)
 		{
-			LL_INFOS("Xfer") << "Warning: " << mLocalFilename << " not found when re-opening file" << LL_ENDL;
+			ALOG_NET_INFO("Warning: {} not found when re-opening file", mLocalFilename);
 			retval = LL_ERR_FILE_NOT_FOUND;
 		}
 	}

@@ -160,7 +160,7 @@ void LLAppCoreHttp::init()
     std::string ca_file = gDirUtilp->getCAFile();
     if ( LLFile::isfile(ca_file) )
     {
-        LL_DEBUGS("Init") << "Setting CA File to " << ca_file << LL_ENDL;
+        ALOG_NET_DEBUG("Setting CA File to {}", ca_file);
         status = LLCore::HttpRequest::setStaticPolicyOption(LLCore::HttpRequest::PO_CA_FILE,
                                                             LLCore::HttpRequest::GLOBAL_POLICY_ID,
                                                             ca_file, NULL);
@@ -434,15 +434,11 @@ void LLAppCoreHttp::refreshSettings(bool initial)
 				if (LLCORE_HTTP_HANDLE_INVALID == handle)
 				{
 					status = mRequest->getStatus();
-					LL_WARNS("Init") << "Unable to set " << init_data[i].mUsage
-									 << " pipelining.  Reason:  " << status.toString()
-									 << LL_ENDL;
+					ALOG_NET_WARN("Unable to set {} pipelining.  Reason:  {}", init_data[i].mUsage, status.toString());
 				}
 				else
 				{
-					LL_DEBUGS("Init") << "Changed " << init_data[i].mUsage
-									  << " pipelining.  New value:  " << new_depth
-									  << LL_ENDL;
+					ALOG_NET_DEBUG("Changed {} pipelining.  New value:  {}", init_data[i].mUsage, new_depth);
 					mHttpClasses[app_policy].mPipelined = to_pipeline;
 				}
 			}

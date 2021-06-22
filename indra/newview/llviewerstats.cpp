@@ -615,8 +615,8 @@ void send_viewer_stats(bool include_preferences)
     misc["int_1"] = LLSD::Integer(0);
     misc["int_2"] = LLSD::Integer(0);
 
-    LL_INFOS() << "Misc Stats: int_1: " << misc["int_1"] << " int_2: " << misc["int_2"] << LL_ENDL;
-	LL_INFOS() << "Misc Stats: string_1: " << misc["string_1"] << " string_2: " << misc["string_2"] << LL_ENDL;
+	ALOG_INFO("Misc Stats: int_1: {} int_2: {}", misc["int_1"].asInteger(), misc["int_2"].asInteger());
+    ALOG_INFO("Misc Stats : string_1: {} string_2 : {}", misc["string_1"].asString(), misc["string_2"].asString());
 
 	body["DisplayNamesEnabled"] = gSavedSettings.getBOOL("UseDisplayNames");
 	body["DisplayNamesShowUsername"] = gSavedSettings.getBOOL("NameTagShowUsernames");
@@ -632,7 +632,7 @@ void send_viewer_stats(bool include_preferences)
 	body["MinimalSkin"] = false;
 
 
-	LL_INFOS("LogViewerStatsPacket") << "Sending viewer statistics: " << body << LL_ENDL;
+	ALOG_INFO("Sending viewer statistics: {}", body);
 	static bool enable_debug_log = debugLoggingEnabled("LogViewerStatsPacket");
 	if (enable_debug_log)
 	{
