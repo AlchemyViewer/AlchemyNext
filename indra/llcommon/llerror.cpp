@@ -195,6 +195,10 @@ void ALLog::shutdown()
 	sLineBuffer = nullptr;
 	sMutex.reset();
 
+	MEDIA_LOG = nullptr;
+	UI_LOG = nullptr;
+	IO_LOG = nullptr;
+	AUDIO_LOG = nullptr;
 	NETWORK_LOG = nullptr;
 	RENDER_LOG = nullptr;
 	MAIN_LOG = nullptr;
