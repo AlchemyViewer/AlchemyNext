@@ -154,49 +154,55 @@ std::atomic<bool> ALLog::sBufferChanged;
 LLLineBuffer* ALLog::sLineBuffer = nullptr;
 
 // static
-void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool log_to_stderr)
+void ALLog::init(const LogConfig& config)
 {
 	sMutex = std::make_unique<absl::Mutex>();
 	sFatalMutex = std::make_unique<absl::Mutex>();
 	sBufferChanged = false;
-	if (fatal_func)
+	if (config.fatal_func)
 	{
-		setFatalFunction(std::move(fatal_func));
+		setFatalFunction(config.fatal_func);
 	}
 	else
 	{
 		setFatalFunction(ALLog::crashAndLoop);
 	}
 
-	spdlog::init_thread_pool(8192, 2);
+	if (config.async_logging)
+	{
+		spdlog::init_thread_pool(8192, 2);
+	}
 	spdlog::flush_every(std::chrono::seconds(1));
 
 	try
 	{
 		const std::string default_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%n] [%l] [%s:%#] [%!] %v");
 		const std::string console_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%l] [%s:%#] %v");
-		if(!log_filename.empty())
+		if(!config.log_filename.empty())
 		{
-			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, true);
-			basic_file->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(default_fmt), spdlog::pattern_time_type::utc)));
+			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(config.log_filename, config.truncate_logfile);
+			basic_file->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(default_fmt, spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(basic_file));
 		}
+
 		{
 			auto linebuffer = std::make_shared<linebuffer_sink_mt>();
-			linebuffer->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(console_fmt), spdlog::pattern_time_type::local)));
+			linebuffer->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(console_fmt, spdlog::pattern_time_type::local)));
 			sSinks.emplace_back(std::move(linebuffer));
 		}
-		if (log_to_stderr && shouldLogToStderr())
+
+		if (config.log_to_stderr && shouldLogToStderr())
 		{
 			auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
-			stderr_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(console_fmt), spdlog::pattern_time_type::utc)));
+			stderr_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(console_fmt, spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(stderr_sink));
 		}
+
 #if LL_WINDOWS
 		if (IsDebuggerPresent())
 		{
 			auto msvc_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-			msvc_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(default_fmt), spdlog::pattern_time_type::utc)));
+			msvc_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(default_fmt, spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(msvc_sink));
 		}
 #endif
@@ -208,28 +214,45 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool 
 		}
 		sSinks.emplace_back(dup_filter);
 
-		MAIN_LOG = std::make_shared<spdlog::async_logger>("main", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		if (config.async_logging)
+		{
+			MAIN_LOG = std::make_shared<spdlog::async_logger>("main", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			RENDER_LOG = std::make_shared<spdlog::async_logger>("render", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			NETWORK_LOG = std::make_shared<spdlog::async_logger>("network", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			AUDIO_LOG = std::make_shared<spdlog::async_logger>("audio", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			IO_LOG = std::make_shared<spdlog::async_logger>("io", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			UI_LOG = std::make_shared<spdlog::async_logger>("ui", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			MEDIA_LOG = std::make_shared<spdlog::async_logger>("media", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+		}
+		else
+		{
+			MAIN_LOG = std::make_shared<spdlog::logger>("main", dup_filter);
+			RENDER_LOG = std::make_shared<spdlog::logger>("render", dup_filter);
+			NETWORK_LOG = std::make_shared<spdlog::logger>("network", dup_filter);
+			AUDIO_LOG = std::make_shared<spdlog::logger>("audio", dup_filter);
+			IO_LOG = std::make_shared<spdlog::logger>("io", dup_filter);
+			UI_LOG = std::make_shared<spdlog::logger>("ui", dup_filter);
+			MEDIA_LOG = std::make_shared<spdlog::logger>("media", dup_filter);
+		}
 		MAIN_LOG->flush_on(spdlog::level::err);
+		RENDER_LOG->flush_on(spdlog::level::err);
+		NETWORK_LOG->flush_on(spdlog::level::err);
+		AUDIO_LOG->flush_on(spdlog::level::err);
+		IO_LOG->flush_on(spdlog::level::err);
+		UI_LOG->flush_on(spdlog::level::err);
+		MEDIA_LOG->flush_on(spdlog::level::err);
+
+		// Register the loggers
 		spdlog::register_logger(MAIN_LOG);
-		spdlog::set_default_logger(MAIN_LOG);
-
-		RENDER_LOG = std::make_shared<spdlog::async_logger>("render", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(RENDER_LOG);
-
-		NETWORK_LOG = std::make_shared<spdlog::async_logger>("network", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(NETWORK_LOG);
-
-		AUDIO_LOG = std::make_shared<spdlog::async_logger>("audio", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(AUDIO_LOG);
-
-		IO_LOG = std::make_shared<spdlog::async_logger>("io", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(IO_LOG);
-
-		UI_LOG = std::make_shared<spdlog::async_logger>("ui", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(UI_LOG);
-
-		MEDIA_LOG = std::make_shared<spdlog::async_logger>("media", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		spdlog::register_logger(MEDIA_LOG);
+
+		// Now set the default logger to our main
+		spdlog::set_default_logger(MAIN_LOG);
 	}
 	catch (const spdlog::spdlog_ex& ex)
 	{
@@ -242,7 +265,6 @@ void ALLog::shutdown()
 {
 	sLineBuffer = nullptr;
 	sBufferChanged = true;
-	sMutex.reset();
 
 	MEDIA_LOG = nullptr;
 	UI_LOG = nullptr;
@@ -255,6 +277,7 @@ void ALLog::shutdown()
 
 	spdlog::shutdown();
 
+	sMutex.reset();
 	sFatalMutex.reset();
 }
 

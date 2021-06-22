@@ -2256,7 +2256,6 @@ void LLAppViewer::initLoggingAndGetLastDuration()
                                 ,gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "")
                                 );
 	LLError::setFatalFunction(errorCallback);
-	ALLog::setFatalFunction(errorCallback);
 	//LLError::setTimeFunction(getRuntime);
 
 	// Remove the last ".old" log file.
@@ -2324,7 +2323,12 @@ void LLAppViewer::initLoggingAndGetLastDuration()
 	LLFile::rename(spdlog_file, old_spdlog_file);
 
 	// Set the log file to SecondLife.log
-	ALLog::init(spdlog_file, errorCallback);
+	ALLog::LogConfig log_config = {};
+	log_config.log_filename = spdlog_file;
+	log_config.truncate_logfile = true;
+	log_config.async_logging = true;
+	log_config.fatal_func = errorCallback;
+	ALLog::init(log_config);
 	LLError::logToFile(log_file);
 	if (!duration_log_msg.empty())
 	{

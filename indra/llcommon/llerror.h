@@ -43,11 +43,20 @@ class LLLineBuffer;
 class ALLog
 {
 public:
+	using fatal_func_t = std::function<void(const std::string&)>;
 	using ELevel = spdlog::level::level_enum;
 
-	typedef std::function<void(const std::string&)> fatal_func_t;
+	struct LogConfig
+	{
+		std::string log_filename = "";
+		bool truncate_logfile = true;
+		ALLog::fatal_func_t fatal_func = fatal_func_t();
+		bool log_to_stderr = true;
+		bool async_logging = true;
+	};
 
-	static void init(const std::string& log_filename = "", fatal_func_t fatal_func = fatal_func_t(), bool log_to_stderr = true);
+
+	static void init(const LogConfig& config);
 	static void shutdown();
 
 	static ELevel getLevel(std::string logger = "");

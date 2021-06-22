@@ -164,6 +164,12 @@ int main(int argc, char **argv)
 		LLError::setDefaultLevel(LLError::LEVEL_INFO);
 //		LLError::setTagLevel("Plugin", LLError::LEVEL_DEBUG);
 //		LLError::logToFile("slplugin.log");
+
+		ALLog::LogConfig log_config = {};
+		log_config.async_logging = false;
+		ALLog::init(log_config);
+		ALLog::setLevel(ALLog::ELevel::info);
+		ALOG_INFO("Beep Beep I'm a sheep.");
 	}
 
 #if LL_WINDOWS
@@ -282,6 +288,7 @@ int main(int argc, char **argv)
 
 	ll_cleanup_apr();
 
+	ALLog::shutdown();
 
 	return 0;
 }
