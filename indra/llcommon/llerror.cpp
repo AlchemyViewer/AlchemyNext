@@ -164,16 +164,17 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool 
 
 	try
 	{
-		const std::string default_fmt("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%l] [%s:%#] [%!] %v");
+		const std::string default_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%n] [%l] [%s:%#] [%!] %v");
 		const std::string console_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%l] [%s:%#] %v");
+		if(!log_filename.empty())
 		{
 			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename, true);
-			basic_file->set_pattern(default_fmt);
+			basic_file->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(default_fmt), spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(basic_file));
 		}
 		{
 			auto linebuffer = std::make_shared<linebuffer_sink_mt>();
-			linebuffer->set_pattern(console_fmt);
+			linebuffer->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(console_fmt), spdlog::pattern_time_type::local)));
 			sSinks.emplace_back(std::move(linebuffer));
 		}
 		if (log_to_stderr && shouldLogToStderr())
@@ -186,7 +187,7 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool 
 		if (IsDebuggerPresent())
 		{
 			auto msvc_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-			msvc_sink->set_pattern(default_fmt);
+			msvc_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(std::move(default_fmt), spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(msvc_sink));
 		}
 #endif
@@ -225,8 +226,6 @@ void ALLog::init(const std::string& log_filename, fatal_func_t fatal_func, bool 
 	{
 		std::cout << "Log init failed: " << ex.what() << std::endl;
 	}
-
-	//spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%l] [%s:%#] [%!] %v");
 }
 
 // static
