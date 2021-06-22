@@ -832,6 +832,7 @@ bool LLAppViewer::init()
 		// fast_exit() rather than exit() because normal cleanup depends too
 		// much on successful startup!
 		LLError::setFatalFunction(boost::bind(fast_exit, rc));
+		ALLog::setFatalFunction(std::bind(fast_exit, rc));
 	}
 
     mAlloc.setProfilingEnabled(gSavedSettings.getBOOL("MemProfiling"));
@@ -2173,6 +2174,7 @@ void watchdog_llerrs_callback(const std::string &error_string)
 void watchdog_killer_callback()
 {
 	LLError::setFatalFunction(watchdog_llerrs_callback);
+	ALLog::setFatalFunction(watchdog_llerrs_callback);
 	LL_ERRS() << "Watchdog killer event" << LL_ENDL;
 }
 
@@ -2254,6 +2256,7 @@ void LLAppViewer::initLoggingAndGetLastDuration()
                                 ,gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "")
                                 );
 	LLError::setFatalFunction(errorCallback);
+	ALLog::setFatalFunction(errorCallback);
 	//LLError::setTimeFunction(getRuntime);
 
 	// Remove the last ".old" log file.

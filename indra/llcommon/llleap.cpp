@@ -52,6 +52,7 @@ public:
         mReplyPump(LLUUID::generateNewID().asString()),
         mExpect(0),
         mPrevFatalFunction(LLError::getFatalFunction()),
+        mPrevFatalFunctionAL(ALLog::getFatalFunction()),
         // Instantiate a distinct LLLeapListener for this plugin. (Every
         // plugin will want its own collection of managed listeners, etc.)
         // Pass it a callback to our connect() method, so it can send events
@@ -139,6 +140,7 @@ public:
 
         // For our lifespan, intercept any LL_ERRS so we can notify plugin
         LLError::setFatalFunction(boost::bind(&LLLeapImpl::fatalFunction, this, _1));
+        ALLog::setFatalFunction(boost::bind(&LLLeapImpl::fatalFunction, this, _1));
 
         // Send child a preliminary event reporting our own reply-pump name --
         // which would otherwise be pretty tricky to guess!
@@ -155,6 +157,7 @@ public:
     {
         ALOG_DEBUG("destroying LLLeap(\"{}\")", mDesc);
         // Restore original FatalFunction
+        ALLog::setFatalFunction(mPrevFatalFunctionAL);
         LLError::setFatalFunction(mPrevFatalFunction);
     }
 
@@ -409,6 +412,7 @@ private:
     std::unique_ptr<LLEventPump::Blocker> mBlocker;
     LLProcess::ReadPipe::size_type mExpect;
     LLError::FatalFunction mPrevFatalFunction;
+    ALLog::fatal_func_t mPrevFatalFunctionAL;
     std::unique_ptr<LLLeapListener> mListener;
 };
 

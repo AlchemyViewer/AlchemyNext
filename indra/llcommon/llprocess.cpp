@@ -81,7 +81,7 @@ public:
 		// incrementing, listen on "mainloop".
 		if (mCount++ == 0)
 		{
-			LL_DEBUGS("LLProcess") << "listening on \"mainloop\"" << LL_ENDL;
+			ALOG_DEBUG("listening on \"mainloop\"");
 			mConnection = LLEventPumps::instance().obtain("mainloop")
 				.listen("LLProcessListener", boost::bind(&LLProcessListener::tick, this, _1));
 		}
@@ -93,7 +93,7 @@ public:
 		// stop listening on "mainloop".
 		if (--mCount == 0)
 		{
-			LL_DEBUGS("LLProcess") << "disconnecting from \"mainloop\"" << LL_ENDL;
+			ALOG_DEBUG("disconnecting from \"mainloop\"");
 			mConnection.disconnect();
 		}
 	}
@@ -118,9 +118,7 @@ private:
 		// centralize such calls, using "mainloop" to ensure it happens once
 		// per frame, and refcounting running LLProcess objects to remain
 		// registered only while needed.
-#ifdef SHOW_DEBUG
-		LL_DEBUGS("LLProcess") << "calling apr_proc_other_child_refresh_all()" << LL_ENDL;
-#endif
+		ALOG_DEBUG("calling apr_proc_other_child_refresh_all()");
 		apr_proc_other_child_refresh_all(APR_OC_REASON_RUNNING);
 		return false;
 	}
@@ -204,8 +202,7 @@ public:
 					// Rather than waiting for data, it should return immediately.
 					if (! (err == APR_SUCCESS || APR_STATUS_IS_EAGAIN(err)))
 					{
-						LL_WARNS("LLProcess") << "apr_file_write(" << towrite << ") on " << mDesc
-											  << " got " << err << ":" << LL_ENDL;
+						ALOG_WARN("apr_file_write({}) on {} got {}:", towrite, mDesc, err);
 						ll_apr_warn_status(err);
 					}
 
@@ -217,13 +214,8 @@ public:
 					remainptr += written;
 					remainlen -= written;
 
-					char msgbuf[512];
-					LL_DEBUGS("LLProcess") << "wrote " << written << " of " << towrite
-										   << " bytes to " << mDesc
-										   << " (original " << total << "),"
-										   << " code " << err << ": "
-										   << apr_strerror(err, msgbuf, sizeof(msgbuf))
-										   << LL_ENDL;
+					ALOG_DEBUG("wrote {} of {} bytes to {} (original {}), code {}: {}",
+						written, towrite, mDesc, total, err, [=]()->std::string { char msgbuf[512]; apr_strerror(err, msgbuf, sizeof(msgbuf)); return std::string(msgbuf); });
 
 					// The parent end of this pipe is nonblocking. If we weren't able
 					// to write everything we wanted, don't keep banging on it -- that
@@ -386,12 +378,11 @@ public:
 					// Handle EOF specially: it's part of normal-case processing.
 					if (err == APR_EOF)
 					{
-						LL_DEBUGS("LLProcess") << "EOF on " << mDesc << LL_ENDL;
+						ALOG_DEBUG("EOF on {}", mDesc);
 					}
 					else
 					{
-						LL_WARNS("LLProcess") << "apr_file_read(" << toread << ") on " << mDesc
-											  << " got " << err << ":" << LL_ENDL;
+						ALOG_WARN("apr_file_read({}) on {} got {}:", toread, mDesc, err);
 						ll_apr_warn_status(err);
 					}
 					// Either way, though, we won't need any more tick() calls.
@@ -406,8 +397,7 @@ public:
 				// received. Make sure we commit those later. (Don't commit them
 				// now, that would invalidate the buffer iterator sequence!)
 				tocommit += gotten;
-				LL_DEBUGS("LLProcess") << "filled " << gotten << " of " << toread
-									   << " bytes from " << mDesc << LL_ENDL;
+				ALOG_DEBUG("filled {} of {} bytes from {}", gotten, toread, mDesc);
 
 				// The parent end of this pipe is nonblocking. If we weren't even
 				// able to fill this buffer, don't loop to try to fill the next --
@@ -486,7 +476,7 @@ LLProcessPtr LLProcess::create(const LLSDOrParams& params)
 	}
 	catch (const LLProcessError& e)
 	{
-		LL_WARNS("LLProcess") << e.what() << LL_ENDL;
+		ALOG_WARN(e.what());
 
 		// If caller is requesting an event on process termination, send one
 		// indicating bad launch. This may prevent someone waiting forever for
@@ -694,7 +684,7 @@ LLProcess::LLProcess(const LLSDOrParams& params):
 	mStatus.mState = RUNNING;
 
 	mDesc = STRINGIZE(getDesc(params) << " (" << mProcess.pid << ')');
-	LL_INFOS("LLProcess") << mDesc << ": launched " << params << LL_ENDL;
+	ALOG_INFO("{}: launched {}", mDesc, params);
 
 	// Unless caller explicitly turned off autokill (child should persist),
 	// take steps to terminate the child. This is all suspenders-and-belt: in
@@ -813,7 +803,7 @@ bool LLProcess::kill(const std::string& who)
 {
 	if (isRunning())
 	{
-		LL_INFOS("LLProcess") << who << " killing " << mDesc << LL_ENDL;
+		ALOG_INFO("{} killing {}", who, mDesc);
 
 #if LL_WINDOWS
 		int sig = -1;
@@ -1003,7 +993,7 @@ void LLProcess::handle_status(int reason, int status)
 	// straight from the OS wait() call, which means we have to decode it by
 	// hand.
 	mStatus = interpret_status(status);
-	LL_INFOS("LLProcess") << getStatusString() << LL_ENDL;
+	ALOG_INFO(getStatusString());
 
 	// If caller requested notification on child termination, send it.
 	if (! mPostend.empty())
@@ -1084,7 +1074,7 @@ boost::optional<PIPETYPE&> LLProcess::getOptPipe(FILESLOT slot)
 	PIPETYPE* wp = getPipePtr<PIPETYPE>(error, slot);
 	if (! wp)
 	{
-		LL_DEBUGS("LLProcess") << error << LL_ENDL;
+		ALOG_DEBUG(error);
 		return boost::optional<PIPETYPE&>();
 	}
 	return *wp;
@@ -1169,12 +1159,10 @@ LLProcess::handle LLProcess::isRunning(handle h, const std::string& desc)
 			DWORD status = 0;
 			if (! GetExitCodeProcess(h, &status))
 			{
-				LL_WARNS("LLProcess") << desc << " terminated, but "
-									  << WindowsErrorString("GetExitCodeProcess()") << LL_ENDL;
+				ALOG_WARN("{} terminated, but {}", desc, WindowsErrorString("GetExitCodeProcess()"));
 			}
 			{
-				LL_INFOS("LLProcess") << getStatusString(desc, interpret_status(status))
-									  << LL_ENDL;
+				ALOG_INFO(getStatusString(desc, interpret_status(status)));
 			}
 		}
 		CloseHandle(h);
@@ -1308,7 +1296,7 @@ LLProcess::id LLProcess::isRunning(id pid, const std::string& desc)
 			{
 				statstr = getStatusString(desc, status);
 			}
-			LL_INFOS("LLProcess") << statstr << LL_ENDL;
+			ALOG_INFO(statstr);
 		}
 		return 0;
 	}
