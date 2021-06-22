@@ -97,7 +97,7 @@ void HTTPStats::dumpStats()
         out << (*it).first << " " << (*it).second << std::endl;
     }
 
-    LL_WARNS("HTTPCore") << out.str() << LL_ENDL;
+    ALOG_NET_WARN("{}", out.str());
 }
 
 

@@ -2665,7 +2665,7 @@ void end_messaging_system(bool print_summary)
 		{
 			std::ostringstream str;
 			gMessageSystem->summarizeLogs(str);
-			LL_INFOS("Messaging") << str.str().c_str() << LL_ENDL;
+			ALOG_NET_INFO(str.str());
 		}
 
 		delete static_cast<LLMessageSystem*>(gMessageSystem);

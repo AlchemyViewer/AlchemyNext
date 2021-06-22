@@ -423,7 +423,7 @@ std::string LLViewerMedia::getCurrentUserAgent()
 	codec << "SecondLife/";
 	codec << LLVersionInfo::instance().getVersion();
 	codec << " (" << channel << "; " << skin_name << " skin)";
-	LL_INFOS() << codec.str() << LL_ENDL;
+	ALOG_MEDIA_INFO("{}", codec.str());
 
 	return codec.str();
 }
@@ -2499,11 +2499,11 @@ void LLViewerMediaImpl::navigateTo(const std::string& url, const std::string& mi
             // Do not log the query parts
             LLURI u(url);
             std::string sanitized_url = (u.query().empty() ? url : u.scheme() + "://" + u.authority() + u.path());
-            LL_INFOS() << "NOT LOADING media id= " << mTextureId << " url=" << sanitized_url << ", mime_type=" << mime_type << LL_ENDL;
+			ALOG_MEDIA_INFO("NOT LOADING media id= {} url={}, mime_type={}", mTextureId, sanitized_url, mime_type);
         }
 
 		// This impl should not be loaded at this time.
-		LL_DEBUGS("PluginPriority") << this << "Not loading (PRIORITY_UNLOADED)" << LL_ENDL;
+		ALOG_MEDIA_DEBUG("{} Not loading (PRIORITY_UNLOADED)", fmt::ptr(this));
 
 		return;
 	}
@@ -2519,12 +2519,12 @@ void LLViewerMediaImpl::navigateInternal()
         // Do not log the query parts
         LLURI u(mMediaURL);
         std::string sanitized_url = (u.query().empty() ? mMediaURL : u.scheme() + "://" + u.authority() + u.path());
-        LL_INFOS() << "media id= " << mTextureId << " url=" << sanitized_url << ", mime_type=" << mMimeType << LL_ENDL;
+		ALOG_MEDIA_INFO("media id= {} url={}, mime_type={}", mTextureId.asString(), sanitized_url, mMimeType);
     }
 
 	if(mNavigateSuspended)
 	{
-		LL_WARNS() << "Deferring navigate." << LL_ENDL;
+		ALOG_MEDIA_WARN("Deferring navigate.");
 		mNavigateSuspendedDeferred = true;
 		return;
 	}
@@ -2532,7 +2532,7 @@ void LLViewerMediaImpl::navigateInternal()
     
     if (!mMimeProbe.expired())
 	{
-		LL_WARNS() << "MIME type probe already in progress -- bailing out." << LL_ENDL;
+		ALOG_MEDIA_WARN("MIME type probe already in progress -- bailing out.");
 		return;
 	}
 

@@ -513,7 +513,7 @@ void LLQueuedThread::run()
 		}
 		//LLThread::yield(); // thread should yield after each request		
 	}
-	LL_INFOS() << "LLQueuedThread " << mName << " EXITING." << LL_ENDL;
+	ALOG_INFO("LLQueuedThread {} EXITING.", mName);
 }
 
 // virtual

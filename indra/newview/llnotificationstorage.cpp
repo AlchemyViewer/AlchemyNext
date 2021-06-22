@@ -93,7 +93,7 @@ bool LLNotificationStorage::writeNotifications(const LLSD& pNotificationData) co
 
 	if (!didFileOpen)
 	{
-		LL_WARNS("LLNotificationStorage") << "Failed to open file '" << mFileName << "'" << LL_ENDL;
+		ALOG_UI_WARN("Failed to open file '{}'", mFileName);
 	}
 	else
 	{
@@ -108,7 +108,7 @@ bool LLNotificationStorage::readNotifications(LLSD& pNotificationData, bool is_n
 {
 	std::string filename = is_new_filename? mFileName : mOldFileName;
 
-	LL_INFOS("LLNotificationStorage") << "starting read '" << filename << "'" << LL_ENDL;
+	ALOG_UI_INFO("starting read '{}'", filename);
 
 	bool didFileRead;
 
@@ -118,7 +118,7 @@ bool LLNotificationStorage::readNotifications(LLSD& pNotificationData, bool is_n
 	didFileRead = notifyFile.is_open();
 	if (!didFileRead)
 	{
-		LL_WARNS("LLNotificationStorage") << "Failed to open file '" << filename << "'" << LL_ENDL;
+		ALOG_UI_WARN("Failed to open file '{}'", filename);
 	}
 	else
 	{
@@ -128,11 +128,9 @@ bool LLNotificationStorage::readNotifications(LLSD& pNotificationData, bool is_n
 
 		if (!didFileRead)
 		{
-			LL_WARNS("LLNotificationStorage") << "Failed to parse open notifications from file '" << mFileName 
-                                              << "'" << LL_ENDL;
+			ALOG_UI_WARN("Failed to parse open notifications from file '{}'", mFileName);
             LLFile::remove(filename);
-			LL_WARNS("LLNotificationStorage") << "Removed invalid open notifications file '" << mFileName 
-                                              << "'" << LL_ENDL;
+			ALOG_UI_WARN("Removed invalid open notifications file '{}'", mFileName);
 		}
 	}
     

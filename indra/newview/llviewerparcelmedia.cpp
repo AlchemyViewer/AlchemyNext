@@ -497,115 +497,115 @@ void LLViewerParcelMedia::handleMediaEvent(LLPluginClassMedia* self, EMediaEvent
 		
 		case MEDIA_EVENT_SIZE_CHANGED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_SIZE_CHANGED " << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_SIZE_CHANGED ");
 		};
 		break;
 		
 		case MEDIA_EVENT_CURSOR_CHANGED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_CURSOR_CHANGED, new cursor is " << self->getCursorName() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_CURSOR_CHANGED, new cursor is {}", self->getCursorName());
 		};
 		break;
 		
 		case MEDIA_EVENT_NAVIGATE_BEGIN:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_NAVIGATE_BEGIN " << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_NAVIGATE_BEGIN ");
 		};
 		break;
 		
 		case MEDIA_EVENT_NAVIGATE_COMPLETE:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_NAVIGATE_COMPLETE, result string is: " << self->getNavigateResultString() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_NAVIGATE_COMPLETE, result string is: {}", self->getNavigateResultString());
 		};
 		break;
 
 		case MEDIA_EVENT_PROGRESS_UPDATED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_PROGRESS_UPDATED, loading at " << self->getProgressPercent() << "%" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_PROGRESS_UPDATED, loading at {}%", self->getProgressPercent());
 		};
 		break;
 
 		case MEDIA_EVENT_STATUS_TEXT_CHANGED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_STATUS_TEXT_CHANGED, new status text is: " << self->getStatusText() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_STATUS_TEXT_CHANGED, new status text is: {}", self->getStatusText());
 		};
 		break;
 
 		case MEDIA_EVENT_LOCATION_CHANGED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_LOCATION_CHANGED, new uri is: " << self->getLocation() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_LOCATION_CHANGED, new uri is: {}", self->getLocation());
 		};
 		break;
 
 		case MEDIA_EVENT_NAVIGATE_ERROR_PAGE:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_NAVIGATE_ERROR_PAGE" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_NAVIGATE_ERROR_PAGE");
 		};
 		break;
 
 		case MEDIA_EVENT_CLICK_LINK_HREF:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_CLICK_LINK_HREF, target is \"" << self->getClickTarget() << "\", uri is " << self->getClickURL() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_CLICK_LINK_HREF, target is \"{}\", uri is {}", self->getClickTarget(), self->getClickURL());
 		};
 		break;
 		
 		case MEDIA_EVENT_CLICK_LINK_NOFOLLOW:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_CLICK_LINK_NOFOLLOW, uri is " << self->getClickURL() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_CLICK_LINK_NOFOLLOW, uri is {}", self->getClickURL());
 		};
 		break;
 
 		case MEDIA_EVENT_PLUGIN_FAILED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_PLUGIN_FAILED" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_PLUGIN_FAILED");
 		};
 		break;
 		
 		case MEDIA_EVENT_PLUGIN_FAILED_LAUNCH:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_PLUGIN_FAILED_LAUNCH" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_PLUGIN_FAILED_LAUNCH");
 		};
 		break;
 		
 		case MEDIA_EVENT_NAME_CHANGED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_NAME_CHANGED" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_NAME_CHANGED");
 		};
 		break;
 
 		case MEDIA_EVENT_CLOSE_REQUEST:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_CLOSE_REQUEST" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_CLOSE_REQUEST");
 		}
 		break;
 		
 		case MEDIA_EVENT_PICK_FILE_REQUEST:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_PICK_FILE_REQUEST" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_PICK_FILE_REQUEST");
 		}
 		break;
 		
 		case MEDIA_EVENT_FILE_DOWNLOAD:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_FILE_DOWNLOAD" << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_FILE_DOWNLOAD");
 		}
 		break;
 		
 		case MEDIA_EVENT_GEOMETRY_CHANGE:
 		{
-			LL_DEBUGS("Media") << "Media event:  MEDIA_EVENT_GEOMETRY_CHANGE, uuid is " << self->getClickUUID() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_GEOMETRY_CHANGE, uuid is {}", self->getClickUUID());
 		}
 		break;
 
 		case MEDIA_EVENT_AUTH_REQUEST:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_AUTH_REQUEST, url " << self->getAuthURL() << ", realm " << self->getAuthRealm() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_AUTH_REQUEST, url {}, realm {}", self->getAuthURL(), self->getAuthRealm());
 		}
 		break;
 
 		case MEDIA_EVENT_LINK_HOVERED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_LINK_HOVERED, hover text is: " << self->getHoverText() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_LINK_HOVERED, hover text is: {}", self->getHoverText());
 		};
 		break;
 	};

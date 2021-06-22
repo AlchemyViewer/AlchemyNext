@@ -2351,7 +2351,7 @@ void LLViewerWindow::shutdownViews()
 {
 	// clean up warning logger
 	RecordToChatConsole::getInstance()->stopRecorder();
-	LL_INFOS() << "Warning logger is cleaned." << LL_ENDL ;
+	ALOG_INFO("Warning logger is cleaned.");
 
 	gFocusMgr.unlockFocus();
 	gFocusMgr.setMouseCapture(NULL);
@@ -2365,35 +2365,35 @@ void LLViewerWindow::shutdownViews()
 	delete mDebugText;
 	mDebugText = NULL;
 	
-	LL_INFOS() << "DebugText deleted." << LL_ENDL ;
+	ALOG_INFO("DebugText deleted.");
 
 	// Cleanup global views
 	if (gMorphView)
 	{
 		gMorphView->setVisible(FALSE);
 	}
-	LL_INFOS() << "Global views cleaned." << LL_ENDL ;
+	ALOG_INFO("Global views cleaned.");
 	
 	LLNotificationsUI::LLToast::cleanupToasts();
-	LL_INFOS() << "Leftover toast cleaned up." << LL_ENDL;
+	ALOG_INFO("Leftover toast cleaned up.");
 
 	// DEV-40930: Clear sModalStack. Otherwise, any LLModalDialog left open
 	// will crump with LL_ERRS.
 	LLModalDialog::shutdownModals();
-	LL_INFOS() << "LLModalDialog shut down." << LL_ENDL; 
+	ALOG_INFO("LLModalDialog shut down.");
 
 	// destroy the nav bar, not currently part of gViewerWindow
 	// *TODO: Make LLNavigationBar part of gViewerWindow
 	LLNavigationBar::deleteSingleton();
-	LL_INFOS() << "LLNavigationBar destroyed." << LL_ENDL ;
+	ALOG_INFO("LLNavigationBar destroyed.");
 	
 	// destroy menus after instantiating navbar above, as it needs
 	// access to gMenuHolder
 	cleanup_menus();
-	LL_INFOS() << "menus destroyed." << LL_ENDL ;
+	ALOG_INFO("menus destroyed.");
 
 	view_listener_t::cleanup();
-	LL_INFOS() << "view listeners destroyed." << LL_ENDL ;
+	ALOG_INFO("view listeners destroyed.");
 
 	// Clean up pointers that are going to be invalid. (todo: check sMenuContainer)
 	mProgressView = NULL;
@@ -2402,7 +2402,7 @@ void LLViewerWindow::shutdownViews()
 	// Delete all child views.
 	delete mRootView;
 	mRootView = NULL;
-	LL_INFOS() << "RootView deleted." << LL_ENDL ;
+	ALOG_INFO("RootView deleted.");
 	
 	LLMenuOptionPathfindingRebakeNavmesh::getInstance()->quit();
 
@@ -2430,12 +2430,12 @@ void LLViewerWindow::shutdownGL()
 	gSky.cleanup();
 	stop_glerror();
 
-	LL_INFOS() << "Cleaning up pipeline" << LL_ENDL;
+	ALOG_INFO("Cleaning up pipeline");
 	gPipeline.cleanup();
 	stop_glerror();
 
 	//MUST clean up pipeline before cleaning up wearables
-	LL_INFOS() << "Cleaning up wearables" << LL_ENDL;
+	ALOG_INFO("Cleaning up wearables");
 	LLWearableList::instance().cleanup() ;
 
 	gTextureList.shutdown();
@@ -2449,12 +2449,12 @@ void LLViewerWindow::shutdownGL()
 	LLViewerTextureManager::cleanup() ;
 	SUBSYSTEM_CLEANUP(LLImageGL) ;
 
-	LL_INFOS() << "All textures and llimagegl images are destroyed!" << LL_ENDL ;
+	ALOG_INFO("All textures and llimagegl images are destroyed!");
 
-	LL_INFOS() << "Cleaning up select manager" << LL_ENDL;
+	ALOG_INFO("Cleaning up select manager");
 	LLSelectMgr::getInstance()->cleanup();	
 
-	LL_INFOS() << "Stopping GL during shutdown" << LL_ENDL;
+	ALOG_INFO("Stopping GL during shutdown");
 	stopGL(FALSE);
 	stop_glerror();
 
@@ -2462,13 +2462,13 @@ void LLViewerWindow::shutdownGL()
 
 	SUBSYSTEM_CLEANUP(LLVertexBuffer);
 
-	LL_INFOS() << "LLVertexBuffer cleaned." << LL_ENDL ;
+	ALOG_INFO("LLVertexBuffer cleaned.");
 }
 
 // shutdownViews() and shutdownGL() need to be called first
 LLViewerWindow::~LLViewerWindow()
 {
-	LL_INFOS() << "Destroying Window" << LL_ENDL;
+	ALOG_INFO("Destroying Window");
 	destroyWindow();
 
 	delete mDebugText;
@@ -5615,7 +5615,7 @@ void LLViewerWindow::stopGL(BOOL save_state)
 	//especially be careful to put anything behind gTextureList.destroyGL(save_state);
 	if (!gGLManager.mIsDisabled)
 	{
-		LL_INFOS() << "Shutting down GL..." << LL_ENDL;
+		ALOG_INFO("Shutting down GL...");
 
 		// Pause texture decode threads (will get unpaused during main loop)
 		LLAppViewer::getTextureCache()->pause();
@@ -5676,7 +5676,7 @@ void LLViewerWindow::stopGL(BOOL save_state)
 
 		stop_glerror();
 		
-		LL_INFOS() << "Remaining allocated texture memory: " << LLImageGL::sGlobalTextureMemory.value() << " bytes" << LL_ENDL;
+		ALOG_INFO("Remaining allocated texture memory: {} bytes", LLImageGL::sGlobalTextureMemory.value());;
 	}
 }
 
@@ -5688,7 +5688,7 @@ void LLViewerWindow::restoreGL(const std::string& progress_message)
 	//especially, be careful to put something before gTextureList.restoreGL();
 	if (gGLManager.mIsDisabled)
 	{
-		LL_INFOS() << "Restoring GL..." << LL_ENDL;
+		ALOG_INFO("Restoring GL...");
 		gGLManager.mIsDisabled = FALSE;
 		
 		gGL.init();
@@ -5727,10 +5727,10 @@ void LLViewerWindow::restoreGL(const std::string& progress_message)
 			setShowProgress(TRUE);
 			setProgressString(progress_message);
 		}
-		LL_INFOS() << "...Restoring GL done" << LL_ENDL;
+		ALOG_INFO("...Restoring GL done");
 		if(!LLAppViewer::instance()->restoreErrorTrap())
 		{
-			LL_WARNS() << " Someone took over my signal/exception handler (post restoreGL)!" << LL_ENDL;
+			ALOG_WARN("Someone took over my signal/exception handler (post restoreGL)!");
 		}
 
 	}

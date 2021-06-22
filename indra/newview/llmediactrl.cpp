@@ -1145,7 +1145,7 @@ void LLMediaCtrl::handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event)
 
 		case MEDIA_EVENT_LINK_HOVERED:
 		{
-			LL_DEBUGS("Media") <<  "Media event:  MEDIA_EVENT_LINK_HOVERED, hover text is: " << self->getHoverText() << LL_ENDL;
+			ALOG_MEDIA_DEBUG("Media event:  MEDIA_EVENT_LINK_HOVERED, hover text is: {}", self->getHoverText());
 			mHoverTextChanged = true;
 		};
 		break;
@@ -1162,15 +1162,15 @@ void LLMediaCtrl::handleMediaEvent(LLPluginClassMedia* self, EMediaEvent event)
 			std::string level = self->getDebugMessageLevel();
 			if (level == "debug")
 			{
-				LL_DEBUGS("Media") << self->getDebugMessageText() << LL_ENDL;
+				ALOG_MEDIA_DEBUG("{}", self->getDebugMessageText());
 			}
 			else if (level == "info")
 			{
-				LL_INFOS("Media") << self->getDebugMessageText() << LL_ENDL;
+				ALOG_MEDIA_INFO("{}", self->getDebugMessageText());
 			}
 			else
 			{
-				LL_WARNS("Media") << self->getDebugMessageText() << LL_ENDL;
+				ALOG_MEDIA_WARN("{}", self->getDebugMessageText());
 			}
 
 		};

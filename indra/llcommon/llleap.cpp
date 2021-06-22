@@ -153,7 +153,7 @@ public:
     // Normally we'd expect to arrive here only via done()
     virtual ~LLLeapImpl()
     {
-        LL_DEBUGS("LLLeap") << "destroying LLLeap(\"" << mDesc << "\")" << LL_ENDL;
+        ALOG_DEBUG("destroying LLLeap(\"{}\")", mDesc);
         // Restore original FatalFunction
         LLError::setFatalFunction(mPrevFatalFunction);
     }
@@ -161,7 +161,7 @@ public:
     // Listener for failed launch attempt
     bool bad_launch(const LLSD& data)
     {
-        LL_WARNS("LLLeap") << data["string"].asString() << LL_ENDL;
+        ALOG_WARN("{}", data["string"].asString());
         return false;
     }
 
@@ -169,7 +169,7 @@ public:
     bool done(const LLSD& data)
     {
         // Log the termination
-        LL_INFOS("LLLeap") << data["string"].asString() << LL_ENDL;
+        ALOG_INFO("{}", data["string"].asString());
 
         // Any leftover data at this moment are because protocol was not
         // satisfied. Possibly the child was interrupted in the middle of
@@ -181,8 +181,7 @@ public:
         {
             LLProcess::ReadPipe::size_type
                 peeklen((std::min)(LLProcess::ReadPipe::size_type(50), childout.size()));
-            LL_WARNS("LLLeap") << "Discarding final " << childout.size() << " bytes: "
-                               << childout.peek(0, peeklen) << "..." << LL_ENDL;
+            ALOG_WARN("Discarding final {} bytes: {}...", childout.size(), childout.peek(0, peeklen));
         }
 
         // Kill this instance. MUST BE LAST before return!
@@ -223,17 +222,15 @@ public:
         }
 |*==========================================================================*/
 
-        LL_DEBUGS("EventHost") << "Sending: " << buffer.tellp() << ':';
-        std::string::size_type truncate(80);
+         std::string::size_type truncate(80);
         if (buffer.tellp() <= truncate)
         {
-            LL_CONT << buffer.str();
+            ALOG_DEBUG("Sending: {}:{}", buffer.tellp(), buffer.str());
         }
         else
         {
-            LL_CONT << buffer.str().substr(0, truncate) << "...";
+            ALOG_DEBUG("Sending: {}:{}...", buffer.tellp(), buffer.str().substr(0, truncate));
         }
-        LL_CONT << LL_ENDL;
 
         LLProcess::WritePipe& childin(mChild->getWritePipe(LLProcess::STDIN));
         childin.get_ostream() << buffer.tellp() << ':' << buffer.str() << std::flush;
@@ -268,8 +265,7 @@ public:
                 // Saw length prefix, saw colon, life is good. Now wait for
                 // that length of data to arrive.
                 mExpect = expect;
-                LL_DEBUGS("LLLeap") << "got length, waiting for "
-                                    << mExpect << " bytes of data" << LL_ENDL;
+                ALOG_DEBUG("got length, waiting for {} bytes of data", mExpect);
                 // Block calls to this method; resetting mBlocker unblocks
                 // calls to the other method.
                 mBlocker.reset(new LLEventPump::Blocker(mStdoutConnection));
@@ -301,8 +297,7 @@ public:
         if (childout.size() >= mExpect)
         {
             // Ready to rock and roll.
-            LL_DEBUGS("LLLeap") << "needed " << mExpect << " bytes, got "
-                                << childout.size() << ", parsing LLSD" << LL_ENDL;
+            ALOG_DEBUG("needed {} bytes, got {}, parsing LLSD", mExpect, childout.size());
             LLSD data;
             LLPointer<LLSDParser> parser(new LLSDNotationParser());
             S32 parse_status(parser->parse(childout.get_istream(), data, mExpect));
@@ -337,7 +332,7 @@ public:
 
     void bad_protocol(const std::string& data)
     {
-        LL_WARNS("LLLeap") << mDesc << ": invalid protocol: " << data << LL_ENDL;
+        ALOG_WARN("{}: invalid protocol: {}", mDesc, data);
         // No point in continuing to run this child.
         mChild->kill();
     }
@@ -357,14 +352,14 @@ public:
             // Log the received line. Prefix it with the desc so we know which
             // plugin it's from. This method name rstderr() is intentionally
             // chosen to further qualify the log output.
-            LL_INFOS("LLLeap") << mDesc << ": " << line << LL_ENDL;
+            ALOG_INFO("{}: {}", mDesc, line);
         }
         // What if child writes a final partial line to stderr?
         if (data["eof"].asBoolean() && childerr.size())
         {
             std::string rest(childerr.read(childerr.size()));
             // Read all remaining bytes and log.
-            LL_INFOS("LLLeap") << mDesc << ": " << rest << LL_ENDL;
+            ALOG_INFO("{}: {}", mDesc, rest);
         }
         return false;
     }
