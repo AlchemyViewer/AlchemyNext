@@ -201,7 +201,7 @@ void ALLog::init(const LogConfig& config)
 		}
 
 #if LL_WINDOWS
-		if (IsDebuggerPresent())
+		//if (IsDebuggerPresent())
 		{
 			auto msvc_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
 			msvc_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(default_fmt, spdlog::pattern_time_type::utc)));
