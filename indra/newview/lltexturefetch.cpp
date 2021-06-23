@@ -1034,7 +1034,7 @@ void LLTextureFetchWorker::setupPacketData()
 		mFirstPacket = (data_size - FIRST_PACKET_SIZE) / MAX_IMG_PACKET_SIZE + 1;
 		if (FIRST_PACKET_SIZE + (mFirstPacket-1) * MAX_IMG_PACKET_SIZE != data_size)
 		{
-			LL_WARNS(LOG_TXT) << "Bad CACHED TEXTURE size: " << data_size << " removing." << LL_ENDL;
+			ALOG_TXTR_WARN(FMT_STRING("Bad CACHED TEXTURE size: {:d} removing."), data_size);
 			removeFromCache();
 			resetFormattedData();
 			clearPackets();
@@ -1166,7 +1166,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 	if(mState > CACHE_POST && !mCanUseNET && !mCanUseHTTP)
 	{
 		//nowhere to get data, abort.
-		LL_WARNS(LOG_TXT) << mID << " abort, nowhere to get data" << LL_ENDL;
+		ALOG_TXTR_WARN(FMT_STRING("{} abort, nowhere to get data"), mID);
 		return true ;
 	}
 
@@ -1308,8 +1308,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 			mLoadedDiscard = mDesiredDiscard;
 			if (mLoadedDiscard < 0)
 			{
-				LL_WARNS(LOG_TXT) << mID << " mLoadedDiscard is " << mLoadedDiscard
-								  << ", should be >=0" << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{} mLoadedDiscard is {:d}, should be >=0"), mID, mLoadedDiscard);
 			}
 			setState(DECODE_IMAGE);
 			mInCache = TRUE;
@@ -1326,7 +1325,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 			if (mUrl.compare(0, 7, "file://") == 0)
 			{
 				// failed to load local file, we're done.
-				LL_WARNS(LOG_TXT) << mID << ": abort, failed to load local file " << mUrl << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{}: abort, failed to load local file {:s}"), mID, mUrl);
 				return true;
 			}
 			// need more data
@@ -1350,7 +1349,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 		{
 			if (wait_seconds <= 0.0)
 			{
-				LL_INFOS(LOG_TXT) << mID << " retrying now" << LL_ENDL;
+				ALOG_TXTR_INFO(FMT_STRING("{} retrying now"), mID);
 			}
 			else
 			{
@@ -1377,7 +1376,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 				{
 					if (mFTType != FTT_DEFAULT)
 					{
-						LL_WARNS(LOG_TXT) << "trying to seek a non-default texture on the sim. Bad!" << LL_ENDL;
+						ALOG_TXTR_WARN("trying to seek a non-default texture on the sim. Bad!");
 					}
 					absl::StrAppend(&http_url, "/?texture_id=", mID.asString());
 					setUrl(std::move(http_url));
@@ -1476,14 +1475,13 @@ bool LLTextureFetchWorker::doWork(S32 param)
 			{
 				// processSimulatorPackets() failed
 // 				LL_WARNS(LOG_TXT) << "processSimulatorPackets() failed to load buffer" << LL_ENDL;
-				LL_WARNS(LOG_TXT) << mID << " processSimulatorPackets() failed to load buffer" << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{} processSimulatorPackets() failed to load buffer"), mID);
 				return true; // failed
 			}
 			setPriority(LLWorkerThread::PRIORITY_HIGH | mWorkPriority);
 			if (mLoadedDiscard < 0)
 			{
-				LL_WARNS(LOG_TXT) << mID << " mLoadedDiscard is " << mLoadedDiscard
-								  << ", should be >=0" << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{} mLoadedDiscard is {:d}, should be >=0"), mID, mLoadedDiscard);
 			}
 			setState(DECODE_IMAGE);
 			mWriteToCacheState = SHOULD_WRITE;
@@ -1537,7 +1535,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 		if (! mCanUseHTTP)
 		{
 			releaseHttpSemaphore();
-			LL_WARNS(LOG_TXT) << mID << " abort: SEND_HTTP_REQ but !mCanUseHTTP" << LL_ENDL;
+			ALOG_TXTR_WARN(FMT_STRING("{} abort: SEND_HTTP_REQ but !mCanUseHTTP"), mID);
 			return true; // abort
 		}
 
@@ -1556,8 +1554,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 					setPriority(LLWorkerThread::PRIORITY_HIGH | mWorkPriority);
 					if (mLoadedDiscard < 0)
 					{
-						LL_WARNS(LOG_TXT) << mID << " mLoadedDiscard is " << mLoadedDiscard
-										  << ", should be >=0" << LL_ENDL;
+						ALOG_TXTR_WARN(FMT_STRING("{} mLoadedDiscard is {:d}, should be >=0"), mID, mLoadedDiscard);
 					}
 					setState(DECODE_IMAGE);
 					releaseHttpSemaphore();
@@ -1566,7 +1563,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 				else
 				{
 					releaseHttpSemaphore();
-					LL_WARNS(LOG_TXT) << mID << " SEND_HTTP_REQ abort: cur_size " << cur_size << " <=0" << LL_ENDL;
+					ALOG_TXTR_WARN(FMT_STRING("{} SEND_HTTP_REQ abort: cur_size {:d} <=0"), mID, cur_size);
 					return true; // abort.
 				}
 			}
@@ -1596,8 +1593,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 			// *FIXME:  This should not be reachable except it has become
 			// so after some recent 'work'.  Need to track this down
 			// and illuminate the unenlightened.
-			LL_WARNS(LOG_TXT) << "HTTP GET request failed for " << mID
-							  << " on empty URL." << LL_ENDL;
+			ALOG_TXTR_WARN(FMT_STRING("HTTP GET request failed for {} on empty URL."), mID);
 			resetFormattedData();
 			releaseHttpSemaphore();
 			return true; // failed
@@ -1646,10 +1642,8 @@ bool LLTextureFetchWorker::doWork(S32 param)
 		if (LLCORE_HTTP_HANDLE_INVALID == mHttpHandle)
 		{
 			LLCore::HttpStatus status(mFetcher->mHttpRequest->getStatus());
-			LL_WARNS(LOG_TXT) << "HTTP GET request failed for " << mID
-							  << ", Status: " << status.toTerseString()
-							  << " Reason: '" << status.toString() << "'"
-							  << LL_ENDL;
+			ALOG_TXTR_WARN(FMT_STRING("HTTP GET request failed for {}, Status: {:s} Reason: '{:s}'"), 
+				mID, status.toTerseString(), status.toString());
 			resetFormattedData();
 			releaseHttpSemaphore();
 			return true; // failed
@@ -1677,7 +1671,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 				{
 					if (mFTType != FTT_MAP_TILE)
 					{
-						LL_WARNS(LOG_TXT) << "Texture missing from server (404): " << mUrl << LL_ENDL;
+						ALOG_TXTR_WARN(FMT_STRING("Texture missing from server (404): {:s}"), mUrl);
 					}
 
 					if(mWriteToCacheState == NOT_WRITE) //map tiles or server bakes
@@ -1686,7 +1680,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 						releaseHttpSemaphore();
 						if (mFTType != FTT_MAP_TILE)
 						{
-							LL_WARNS(LOG_TXT) << mID << " abort: WAIT_HTTP_REQ not found" << LL_ENDL;
+							ALOG_TXTR_WARN(FMT_STRING("{} abort: WAIT_HTTP_REQ not found"), mID);
 						}
 						return true; 
 					}
@@ -1704,7 +1698,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 				}
 				else if (http_service_unavail == mGetStatus)
 				{
-					LL_INFOS_ONCE(LOG_TXT) << "Texture server busy (503): " << mUrl << LL_ENDL;
+					ALOG_TXTR_INFO(FMT_STRING("Texture server busy (503): {:s}"), mUrl);
 				}
 				else if (http_not_sat == mGetStatus)
 				{
@@ -1713,10 +1707,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 				}
 				else
 				{
-					LL_INFOS(LOG_TXT) << "HTTP GET failed for: " << mUrl
-									  << " Status: " << mGetStatus.toTerseString()
-									  << " Reason: '" << mGetReason << "'"
-									  << LL_ENDL;
+					ALOG_TXTR_INFO(FMT_STRING("HTTP GET failed for: {:s} Status: {:s} Reason: '{:s}'"), mUrl, mGetStatus.toTerseString(), mGetReason);
 				}
 
 				if (mFTType != FTT_SERVER_BAKE)
@@ -1730,8 +1721,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 					setPriority(LLWorkerThread::PRIORITY_HIGH | mWorkPriority);
 					if (mLoadedDiscard < 0)
 					{
-						LL_WARNS(LOG_TXT) << mID << " mLoadedDiscard is " << mLoadedDiscard
-										  << ", should be >=0" << LL_ENDL;
+						ALOG_TXTR_WARN(FMT_STRING("{} mLoadedDiscard is {:d}, should be >=0"), mID, mLoadedDiscard);
 					}
 					setState(DECODE_IMAGE);
 					releaseHttpSemaphore();
@@ -1742,7 +1732,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 				resetFormattedData();
 				setState(DONE);
 				releaseHttpSemaphore();
-				LL_WARNS(LOG_TXT) << mID << " abort: fail harder" << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{} abort: fail harder"), mID);
 				return true; // failed
 			}
 			
@@ -1766,7 +1756,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 
 				// abort.
 				setState(DONE);
-				LL_WARNS(LOG_TXT) << mID << " abort: no data received" << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{} abort: no data received"), mID);
 				releaseHttpSemaphore();
 				return true;
 			}
@@ -1782,8 +1772,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 				// Get back into alignment.
 				if ( (mHttpReplyOffset > cur_size) || (cur_size > mHttpReplyOffset + append_size))
 				{
-					LL_WARNS(LOG_TXT) << "Partial HTTP response produces break in image data for texture "
-									  << mID << ".  Aborting load."  << LL_ENDL;
+					ALOG_TXTR_WARN(FMT_STRING("Partial HTTP response produces break in image data for texture {}.  Aborting load."), mID);
 					setState(DONE);
 					releaseHttpSemaphore();
 					return true;
@@ -1800,7 +1789,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 			{
 				// abort. If we have no space for packet, we have not enough space to decode image
 				setState(DONE);
-				LL_WARNS(LOG_TXT) << mID << " abort: out of memory" << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{} abort: out of memory"), mID);
 				releaseHttpSemaphore();
 				return true;
 			}
@@ -1844,8 +1833,7 @@ bool LLTextureFetchWorker::doWork(S32 param)
 			mLoadedDiscard = mRequestedDiscard;
 			if (mLoadedDiscard < 0)
 			{
-				LL_WARNS(LOG_TXT) << mID << " mLoadedDiscard is " << mLoadedDiscard
-								  << ", should be >=0" << LL_ENDL;
+				ALOG_TXTR_WARN(FMT_STRING("{} mLoadedDiscard is {:d}, should be >=0"), mID, mLoadedDiscard);
 			}
 			setState(DECODE_IMAGE);
 			if (mWriteToCacheState != NOT_WRITE)
@@ -2093,8 +2081,7 @@ void LLTextureFetchWorker::onCompleted(LLCore::HttpHandle handle, LLCore::HttpRe
 	F32 rate = fake_failure_rate;
 	if (mFTType == FTT_SERVER_BAKE && (fake_failure_rate > 0.0) && (rand_val < fake_failure_rate))
 	{
-		LL_WARNS(LOG_TXT) << mID << " for debugging, setting fake failure status for texture " << mID
-						  << " (rand was " << rand_val << "/" << rate << ")" << LL_ENDL;
+		ALOG_TXTR_WARN(FMT_STRING("{} for debugging, setting fake failure status for texture {} (rand was {:g}/{:g})"), mID, mID, rand_val, rate);
 		response->setStatus(LLCore::HttpStatus(503));
 	}
 	bool success = true;
@@ -2102,12 +2089,12 @@ void LLTextureFetchWorker::onCompleted(LLCore::HttpHandle handle, LLCore::HttpRe
 	LLCore::HttpStatus status(response->getStatus());
 	if (!status && (mFTType == FTT_SERVER_BAKE))
 	{
-		LL_INFOS(LOG_TXT) << mID << " state " << e_state_name[mState] << LL_ENDL;
+		ALOG_TXTR_INFO(FMT_COMPILE("{} state {:s}"), mID, e_state_name[mState]);
 		mFetchRetryPolicy.onFailure(response);
 		F32 retry_after;
 		if (mFetchRetryPolicy.shouldRetry(retry_after))
 		{
-			LL_INFOS(LOG_TXT) << mID << " will retry after " << retry_after << " seconds, resetting state to LOAD_FROM_NETWORK" << LL_ENDL;
+			ALOG_TXTR_INFO(FMT_COMPILE("{} will retry after {:g} seconds, resetting state to LOAD_FROM_NETWORK"), mID, retry_after);
 			mFetcher->removeFromHTTPQueue(mID, S32Bytes(0));
 			std::string reason(status.toString());
 			setGetStatus(status, reason);
@@ -2117,7 +2104,7 @@ void LLTextureFetchWorker::onCompleted(LLCore::HttpHandle handle, LLCore::HttpRe
 		}
 		else
 		{
-			LL_INFOS(LOG_TXT) << mID << " will not retry" << LL_ENDL;
+			ALOG_TXTR_INFO(FMT_COMPILE("{} will not retry"), mID);
 		}
 	}
 	else
@@ -2139,8 +2126,7 @@ void LLTextureFetchWorker::onCompleted(LLCore::HttpHandle handle, LLCore::HttpRe
 		success = false;
 		if (mFTType != FTT_MAP_TILE) // missing map tiles are normal, don't complain about them.
 		{
-			LL_WARNS(LOG_TXT) << "CURL GET FAILED, status: " << status.toTerseString()
-							  << " reason: " << reason << LL_ENDL;
+			ALOG_TXTR_WARN(FMT_STRING("CURL GET FAILED, status: {:s} reason: {:s}"), status.toTerseString(), reason);
 		}
 	}
 	else
@@ -3109,9 +3095,7 @@ void LLTextureFetch::commonUpdate()
 	LLCore::HttpStatus status = mHttpRequest->update(0);
 	if (! status)
 	{
-		LL_INFOS_ONCE(LOG_TXT) << "Problem during HTTP servicing.  Reason:  "
-							   << status.toString()
-							   << LL_ENDL;
+		ALOG_TXTR_INFO(FMT_STRING("Problem during HTTP servicing.  Reason:  {:s}"), status.toString());
 	}
 }
 
@@ -3188,11 +3172,8 @@ void LLTextureFetch::startThread()
 // Threads:  Ttf
 void LLTextureFetch::endThread()
 {
-	LL_INFOS(LOG_TXT) << "CacheReads:  " << mTotalCacheReadCount
-					  << ", CacheWrites:  " << mTotalCacheWriteCount
-					  << ", ResWaits:  " << mTotalResourceWaitCount
-					  << ", TotalHTTPReq:  " << getTotalNumHTTPRequests()
-					  << LL_ENDL;
+	ALOG_TXTR_INFO(FMT_STRING("CacheReads:  {:d}, CacheWrites:  {:d}, ResWaits:  {:d}, TotalHTTPReq:  {:d}"),
+		mTotalCacheReadCount, mTotalCacheWriteCount, mTotalResourceWaitCount, getTotalNumHTTPRequests());
 
 	mTextureInfo.stopRecording();
 }

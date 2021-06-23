@@ -117,7 +117,7 @@ namespace Details
             std::string coroname =
                 LLCoros::instance().launch("LLEventPollImpl::eventPollCoro",
                 boost::bind(&LLEventPollImpl::eventPollCoro, this->shared_from_this(), url));
-            LL_INFOS("LLEventPollImpl") << coroname << " with  url '" << url << LL_ENDL;
+            ALOG_NET_INFO(FMT_STRING("{:s} with  url '{:s}'"), std::move(coroname), url);
         }
     }
 
@@ -128,13 +128,13 @@ namespace Details
         LLCoreHttpUtil::HttpCoroutineAdapter::ptr_t adapter = mAdapter.lock();
         if (adapter)
         {
-            LL_INFOS() << "requesting stop for event poll coroutine <" << mCounter << ">" << LL_ENDL;
+            ALOG_NET_INFO(FMT_STRING("requesting stop for event poll coroutine <{:d}>"), mCounter);
             // cancel the yielding operation if any.
             adapter->cancelSuspendedOperation();
         }
         else
         {
-            LL_INFOS() << "Coroutine for poll <" << mCounter << "> previously stopped.  No action taken." << LL_ENDL;
+            ALOG_NET_INFO(FMT_STRING("Coroutine for poll <{:d}> previously stopped.  No action taken."), mCounter);
         }
     }
 
@@ -145,7 +145,7 @@ namespace Details
         int errorCount = 0;
         int counter = mCounter; // saved on the stack for logging. 
 
-        LL_DEBUGS("LLEventPollImpl") << " <" << counter << "> entering coroutine." << LL_ENDL;
+        ALOG_NET_DEBUG(FMT_STRING("<{:d}> entering coroutine."), counter);
 
         mAdapter = httpAdapter;
 
@@ -160,7 +160,7 @@ namespace Details
 //          LL_DEBUGS("LLEventPollImpl::eventPollCoro") << "<" << counter << "> request = "
 //              << LLSDXMLStreamer(request) << LL_ENDL;
 
-            LL_DEBUGS("LLEventPollImpl") << " <" << counter << "> posting and yielding." << LL_ENDL;
+            ALOG_NET_DEBUG(FMT_STRING("<{:d}> posting and yielding."), counter);
             LLSD result = httpAdapter->postAndSuspend(mHttpRequest, url, request);
 
 //          LL_DEBUGS("LLEventPollImpl::eventPollCoro") << "<" << counter << "> result = "
@@ -170,7 +170,7 @@ namespace Details
             {
                 // Lost connection or disconnected during quit, don't process sim/region update
                 // messages, they might populate some cleaned up classes (LLWorld, region and object list)
-                LL_INFOS("LLEventPollImpl") << "Dropping event messages" << LL_ENDL;
+                ALOG_NET_INFO("Dropping event messages");
                 break;
             }
 
@@ -181,7 +181,7 @@ namespace Details
             {
                 if (status == LLCore::HttpStatus(LLCore::HttpStatus::EXT_CURL_EASY, CURLE_OPERATION_TIMEDOUT))
                 {   // A standard timeout response we get this when there are no events.
-                    LL_DEBUGS("LLEventPollImpl") << "All is very quiet on target server. It may have gone idle?" << LL_ENDL;
+                    ALOG_NET_DEBUG("All is very quiet on target server. It may have gone idle?");
                     errorCount = 0;
                     continue;
                 }
@@ -191,17 +191,17 @@ namespace Details
                     // some cases the server gets ahead of the viewer and will 
                     // return a 404 error (Not Found) before the cancel event
                     // comes back in the queue
-                    LL_WARNS("LLEventPollImpl") << "Canceling coroutine" << LL_ENDL;
+                    ALOG_NET_WARN("Canceling coroutine");
                     break;
                 }
                 else if (!status.isHttpStatus())
                 {
                     /// Some LLCore or LIBCurl error was returned.  This is unlikely to be recoverable
-                    LL_WARNS("LLEventPollImpl") << "Critical error from poll request returned from libraries.  Canceling coroutine." << LL_ENDL;
+                    ALOG_NET_WARN("Critical error from poll request returned from libraries.  Canceling coroutine.");
                     break;
                 }
-                LL_WARNS("LLEventPollImpl") << "<" << counter << "> Error result from LLCoreHttpUtil::HttpCoroHandler. Code "
-                    << status.toTerseString() << ": '" << httpResults["message"] << "'" << LL_ENDL;
+                ALOG_NET_WARN(FMT_STRING("<{:d}> Error result from LLCoreHttpUtil::HttpCoroHandler. Code {:s}: '{}'"), 
+                    counter, status.toTerseString(), httpResults["message"]);
 
                 if (errorCount < MAX_EVENT_POLL_HTTP_ERRORS)
                 {   // An unanticipated error has been received from our poll 
@@ -213,14 +213,13 @@ namespace Details
                     F32 waitToRetry = EVENT_POLL_ERROR_RETRY_SECONDS
                         + errorCount * EVENT_POLL_ERROR_RETRY_SECONDS_INC;
 
-                    LL_WARNS("LLEventPollImpl") << "<" << counter << "> Retrying in " << waitToRetry <<
-                        " seconds, error count is now " << errorCount << LL_ENDL;
+                    ALOG_NET_WARN(FMT_STRING("<{:d}> Retrying in {:g} seconds, error count is now {:d}"), counter, waitToRetry, errorCount);
 
                     llcoro::suspendUntilTimeout(waitToRetry);
                     
                     if (mDone || gDisconnected)
                         break;
-                    LL_INFOS("LLEventPollImpl") << "<" << counter << "> About to retry request." << LL_ENDL;
+                    ALOG_NET_INFO(FMT_STRING("<{:d}> About to retry request."), counter);
                     continue;
                 }
                 else
@@ -237,7 +236,7 @@ namespace Details
                     // continue running.
                     if (gAgent.getRegion() && gAgent.getRegion()->getHost().getIPandPort() == mSenderIp)
                     {
-                        LL_WARNS("LLEventPollImpl") << "< " << counter << "> Forcing disconnect due to stalled main region event poll." << LL_ENDL;
+                        ALOG_NET_WARN(FMT_STRING("<{:d}> Forcing disconnect due to stalled main region event poll."), counter);
                         LLAppViewer::instance()->forceDisconnect(LLTrans::getString("AgentLostConnection"));
                     }
                     break;
@@ -250,7 +249,7 @@ namespace Details
                 !result.get("events") ||
                 !result.get("id"))
             {
-                LL_WARNS("LLEventPollImpl") << " <" << counter << "> received event poll with no events or id key: " << result << LL_ENDL;
+                ALOG_NET_WARN(FMT_STRING("<{:d}> received event poll with no events or id key: {}"), counter, result);
                 continue;
             }
 
@@ -259,11 +258,11 @@ namespace Details
 
             if (acknowledge.isUndefined())
             {
-                LL_WARNS("LLEventPollImpl") << " id undefined" << LL_ENDL;
+                ALOG_NET_WARN("id undefined");
             }
 
             // was LL_INFOS() but now that CoarseRegionUpdate is TCP @ 1/second, it'd be too verbose for viewer logs. -MG
-            LL_DEBUGS("LLEventPollImpl") << " <" << counter << "> " << events.size() << "events (id " << acknowledge << ")" << LL_ENDL;
+            ALOG_NET_DEBUG(FMT_STRING("<{:d}> {:d} events(id {})"), counter, events.size(), acknowledge);
 
             LLSD::array_const_iterator i = events.beginArray();
             LLSD::array_const_iterator end = events.endArray();
@@ -275,7 +274,7 @@ namespace Details
                 }
             }
         }
-        LL_DEBUGS("LLEventPollImpl") << " <" << counter << "> Leaving coroutine." << LL_ENDL;
+        ALOG_NET_DEBUG(FMT_STRING("<{:d}> Leaving coroutine."), counter);
     }
 
 }

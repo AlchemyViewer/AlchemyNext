@@ -91,12 +91,14 @@ public:
 	static void setLineBuffer(LLLineBuffer*);
 
 	static std::shared_ptr<spdlog::logger> MAIN_LOG;
-	static std::shared_ptr<spdlog::logger> RENDER_LOG;
-	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
+	static std::shared_ptr<spdlog::logger> ASSET_LOG;
 	static std::shared_ptr<spdlog::logger> AUDIO_LOG;
 	static std::shared_ptr<spdlog::logger> IO_LOG;
-	static std::shared_ptr<spdlog::logger> UI_LOG;
 	static std::shared_ptr<spdlog::logger> MEDIA_LOG;
+	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
+	static std::shared_ptr<spdlog::logger> RENDER_LOG;
+	static std::shared_ptr<spdlog::logger> TEXTURE_LOG;
+	static std::shared_ptr<spdlog::logger> UI_LOG;
 
 	static std::vector<spdlog::sink_ptr> sSinks;
 	static std::atomic<bool> sBufferChanged;
@@ -205,6 +207,36 @@ public:
 #define ALOG_MEDIA_CRITICAL(...) \
 	{ \
 		SPDLOG_LOGGER_CRITICAL(ALLog::MEDIA_LOG, __VA_ARGS__); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
+	}
+#else
+#define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#endif
+
+#define ALOG_ASSET_TRACE(...) SPDLOG_LOGGER_TRACE(ALLog::ASSET_LOG, __VA_ARGS__)
+#define ALOG_ASSET_DEBUG(...) SPDLOG_LOGGER_DEBUG(ALLog::ASSET_LOG, __VA_ARGS__)
+#define ALOG_ASSET_INFO(...) SPDLOG_LOGGER_INFO(ALLog::ASSET_LOG, __VA_ARGS__)
+#define ALOG_ASSET_WARN(...) SPDLOG_LOGGER_WARN(ALLog::ASSET_LOG, __VA_ARGS__)
+#define ALOG_ASSET_ERROR(...) SPDLOG_LOGGER_ERROR(ALLog::ASSET_LOG, __VA_ARGS__)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_CRITICAL
+#define ALOG_ASSET_CRITICAL(...) \
+	{ \
+		SPDLOG_LOGGER_CRITICAL(ALLog::ASSET_LOG, __VA_ARGS__); \
+		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
+	}
+#else
+#define ALOG_IO_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#endif
+
+#define ALOG_TXTR_TRACE(...) SPDLOG_LOGGER_TRACE(ALLog::TEXTURE_LOG, __VA_ARGS__)
+#define ALOG_TXTR_DEBUG(...) SPDLOG_LOGGER_DEBUG(ALLog::TEXTURE_LOG, __VA_ARGS__)
+#define ALOG_TXTR_INFO(...) SPDLOG_LOGGER_INFO(ALLog::TEXTURE_LOG, __VA_ARGS__)
+#define ALOG_TXTR_WARN(...) SPDLOG_LOGGER_WARN(ALLog::TEXTURE_LOG, __VA_ARGS__)
+#define ALOG_TXTR_ERROR(...) SPDLOG_LOGGER_ERROR(ALLog::TEXTURE_LOG, __VA_ARGS__)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_CRITICAL
+#define ALOG_TXTR_CRITICAL(...) \
+	{ \
+		SPDLOG_LOGGER_CRITICAL(ALLog::TEXTURE_LOG, __VA_ARGS__); \
 		ALLog::fatalError(fmt::format(__VA_ARGS__)); \
 	}
 #else
