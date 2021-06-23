@@ -302,7 +302,7 @@ BOOL LLPolyMeshSharedData::loadMesh( const std::string& fileName )
         BOOL status = FALSE;
         if ( strncmp(header, HEADER_BINARY, strlen(HEADER_BINARY)) == 0 )       /*Flawfinder: ignore*/
         {
-                LL_DEBUGS() << "Loading " << fileName << LL_ENDL;
+                ALOG_DEBUG("Loading {}", fileName);
 
                 //----------------------------------------------------------------
                 // File Header (seek past it)

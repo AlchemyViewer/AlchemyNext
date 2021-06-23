@@ -88,8 +88,7 @@ bool LLAudioEngine_FMODSTUDIO::init(const S32 num_channels, void* userdata, cons
 
 	if (version < FMOD_VERSION)
 	{
-		LL_WARNS("AppInit") << "Error : You are using the wrong FMOD Studio version (" << version
-			<< ")!  You should be using FMOD Studio" << FMOD_VERSION << LL_ENDL;
+		ALOG_AUDIO_WARN("Error : You are using the wrong FMOD Studio version ({})!  You should be using FMOD Studio {}", version, FMOD_VERSION);
 	}
 
 	// In this case, all sounds, PLUS wind and stream will be software.
@@ -128,11 +127,11 @@ bool LLAudioEngine_FMODSTUDIO::init(const S32 num_channels, void* userdata, cons
 	{
 		if (NULL == getenv("LL_BAD_FMOD_PULSEAUDIO")) /*Flawfinder: ignore*/
 		{
-			LL_DEBUGS("AppInit") << "Trying PulseAudio audio output..." << LL_ENDL;
+			ALOG_AUDIO_DEBUG("Trying PulseAudio audio output...");
 			if((result = mSystem->setOutput(FMOD_OUTPUTTYPE_PULSEAUDIO)) == FMOD_OK &&
 				(result = mSystem->init(num_channels + EXTRA_SOUND_CHANNELS, fmod_flags, const_cast<char*>(app_title.c_str()))) == FMOD_OK)
 			{
-				LL_DEBUGS("AppInit") << "PulseAudio output initialized OKAY"	<< LL_ENDL;
+				ALOG_AUDIO_DEBUG("PulseAudio output initialized OKAY");
 				audio_ok = true;
 			}
 			else 
@@ -142,18 +141,18 @@ bool LLAudioEngine_FMODSTUDIO::init(const S32 num_channels, void* userdata, cons
 		} 
 		else 
 		{
-			LL_DEBUGS("AppInit") << "PulseAudio audio output SKIPPED" << LL_ENDL;
+			ALOG_AUDIO_DEBUG("PulseAudio audio output SKIPPED");
 		}	
 	}
 	if (!audio_ok)
 	{
 		if (NULL == getenv("LL_BAD_FMOD_ALSA"))		/*Flawfinder: ignore*/
 		{
-			LL_DEBUGS("AppInit") << "Trying ALSA audio output..." << LL_ENDL;
+			ALOG_AUDIO_DEBUG("Trying ALSA audio output...");
 			if((result = mSystem->setOutput(FMOD_OUTPUTTYPE_ALSA)) == FMOD_OK &&
 			    (result = mSystem->init(num_channels + EXTRA_SOUND_CHANNELS, fmod_flags, 0)) == FMOD_OK)
 			{
-				LL_DEBUGS("AppInit") << "ALSA audio output initialized OKAY" << LL_ENDL;
+				ALOG_AUDIO_DEBUG("ALSA audio output initialized OKAY");
 				audio_ok = true;
 			} 
 			else 
@@ -163,12 +162,12 @@ bool LLAudioEngine_FMODSTUDIO::init(const S32 num_channels, void* userdata, cons
 		} 
 		else 
 		{
-			LL_DEBUGS("AppInit") << "ALSA audio output SKIPPED" << LL_ENDL;
+			ALOG_AUDIO_DEBUG("ALSA audio output SKIPPED");
 		}
 	}
 	if (!audio_ok)
 	{
-		LL_WARNS("AppInit") << "Overall audio init failure." << LL_ENDL;
+		ALOG_AUDIO_WARN("Overall audio init failure.");
 		return false;
 	}
 
@@ -180,13 +179,13 @@ bool LLAudioEngine_FMODSTUDIO::init(const S32 num_channels, void* userdata, cons
 		switch (output_type)
 		{
 			case FMOD_OUTPUTTYPE_NOSOUND: 
-				LL_INFOS("AppInit") << "Audio output: NoSound" << LL_ENDL; break;
+				ALOG_AUDIO_INFO("Audio output: NoSound"); break;
 			case FMOD_OUTPUTTYPE_PULSEAUDIO:	
-				LL_INFOS("AppInit") << "Audio output: PulseAudio" << LL_ENDL; break;
+				ALOG_AUDIO_INFO("Audio output: PulseAudio"); break;
 			case FMOD_OUTPUTTYPE_ALSA: 
-				LL_INFOS("AppInit") << "Audio output: ALSA" << LL_ENDL; break;
+				ALOG_AUDIO_INFO("Audio output: ALSA"); break;
 			default:
-				LL_INFOS("AppInit") << "Audio output: Unknown!" << LL_ENDL; break;
+				ALOG_AUDIO_INFO("Audio output: Unknown!"); break;
 		};
 	}
 #else // LL_LINUX
@@ -452,7 +451,7 @@ bool LLAudioChannelFMODSTUDIO::updateBuffer()
 			{
 				// This is bad, there should ALWAYS be a sound associated with a legit
 				// buffer.
-				LL_ERRS() << "No FMOD sound!" << LL_ENDL;
+				ALOG_AUDIO_CRITICAL("No FMOD sound!");
 				return false;
 			}
 
@@ -464,8 +463,6 @@ bool LLAudioChannelFMODSTUDIO::updateBuffer()
 				FMOD_RESULT result = getSystem()->playSound(soundp, nullptr, true, &mChannelp);
 				Check_FMOD_Error(result, "FMOD::System::playSound");
 			}
-
-			//LL_INFOS() << "Setting up channel " << std::hex << mChannelID << std::dec << LL_ENDL;
 		}
 
 		//FMOD_RESULT result;
@@ -554,11 +551,10 @@ void LLAudioChannelFMODSTUDIO::cleanup()
 {
 	if (!mChannelp)
 	{
-		//LL_INFOS() << "Aborting cleanup with no channel handle." << LL_ENDL;
+		//ALOG_AUDIO_INFO("Aborting cleanup with no channel handle.");
 		return;
 	}
 
-	//LL_INFOS() << "Cleaning up channel: " << mChannelID << LL_ENDL;
 	Check_FMOD_Error(mChannelp->stop(),"FMOD::Channel::stop");
 
 	mCurrentBufferp = nullptr;

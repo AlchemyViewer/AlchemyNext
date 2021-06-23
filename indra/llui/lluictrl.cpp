@@ -142,9 +142,7 @@ void LLUICtrl::initFromParams(const Params& p)
 			}
 			else
 			{
-				LL_WARNS() << "Failed to assign 'enabled' control variable to " << getName()
-							<< ": control " << p.enabled_controls.enabled()
-							<< " does not exist." << LL_ENDL;
+				ALOG_UI_WARN("Failed to assign 'enabled' control variable to {}: control {} does not exist.", getName(), p.enabled_controls.enabled());
 			}
 		}
 		else if(p.enabled_controls.disabled.isChosen())
@@ -156,9 +154,7 @@ void LLUICtrl::initFromParams(const Params& p)
 			}
 			else
 			{
-				LL_WARNS() << "Failed to assign 'disabled' control variable to " << getName() 
-							<< ": control " << p.enabled_controls.disabled()
-							<< " does not exist." << LL_ENDL;
+				ALOG_UI_WARN("Failed to assign 'disabled' control variable to {}: control {} does not exist.", getName(), p.enabled_controls.disabled());
 			}
 		}
 	}
@@ -173,9 +169,7 @@ void LLUICtrl::initFromParams(const Params& p)
 			}
 			else
 			{
-				LL_WARNS() << "Failed to assign visibility control variable to " << getName()
-							<< ": control " << p.controls_visibility.visible()
-							<< " does not exist." << LL_ENDL;
+				ALOG_UI_WARN("Failed to assign visibility control variable to {}: control {} does not exist.", getName(), p.controls_visibility.visible());
 			}
 		}
 		else if (p.controls_visibility.invisible.isChosen())
@@ -187,9 +181,7 @@ void LLUICtrl::initFromParams(const Params& p)
 			}
 			else
 			{
-				LL_WARNS() << "Failed to assign invisibility control variable to " << getName()
-							<< ": control " << p.controls_visibility.invisible()
-							<< " does not exist." << LL_ENDL;
+				ALOG_UI_WARN("Failed to assign invisibility control variable to {}: control {} does not exist.", getName(), p.controls_visibility.invisible());
 			}
 		}
 	}
@@ -246,7 +238,7 @@ LLUICtrl::~LLUICtrl()
 
 	if( gFocusMgr.getTopCtrl() == this )
 	{
-		LL_WARNS() << "UI Control holding top ctrl deleted: " << getName() << ".  Top view removed." << LL_ENDL;
+		ALOG_UI_WARN("UI Control holding top ctrl deleted: {}.  Top view removed.", getName());
 		gFocusMgr.removeTopCtrlWithoutCallback( this );
 	}
 
@@ -292,7 +284,7 @@ LLUICtrl::commit_signal_t::slot_type LLUICtrl::initCommitCallback(const CommitCa
 		}
 		else if (!function_name.empty())
 		{
-			LL_WARNS() << "No callback found for: '" << function_name << "' in control: " << getName() << LL_ENDL;
+			ALOG_UI_WARN("No callback found for: '{}' in control: {}", function_name, getName());
 		}			
 	}
 	return default_commit_handler;
@@ -542,8 +534,7 @@ void LLUICtrl::setControlName(const std::string& control_name, LLView *context)
 		LLControlVariable* control = context->findControl(control_name);
 		if (!control)
 		{
-			LL_WARNS() << "Failed to assign control variable to " << getName()
-						<< ": control "<< control_name << " does not exist." << LL_ENDL;
+			ALOG_UI_WARN("Failed to assign control variable to {}: control {} does not exist.", getName(), control_name);
 		}
 		setControlVariable(control);
 	}

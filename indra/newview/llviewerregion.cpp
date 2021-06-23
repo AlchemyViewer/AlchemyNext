@@ -110,7 +110,7 @@ namespace
 
 void newRegionEntry(LLViewerRegion& region)
 {
-    LL_INFOS("LLViewerRegion") << "Entering region [" << region.getName() << "]" << LL_ENDL;
+	ALOG_INFO("Entering region[{}]", region.getName());
     gDebugInfo["CurrentRegion"] = region.getName();
     LLAppViewer::instance()->writeDebugInfo();
 }
@@ -2223,8 +2223,7 @@ void LLViewerRegion::getInfo(LLSD& info)
 
 void LLViewerRegion::requestSimulatorFeatures()
 {
-    LL_DEBUGS("SimulatorFeatures") << "region " << getName() << " ptr " << this
-                                   << " trying to request SimulatorFeatures" << LL_ENDL;
+	ALOG_DEBUG("region {} ptr {} trying to request SimulatorFeatures", getName(), fmt::ptr(this));
     // kick off a request for simulator features
     std::string url = getCapability("SimulatorFeatures");
     if (!url.empty())
@@ -2233,11 +2232,11 @@ void LLViewerRegion::requestSimulatorFeatures()
             LLCoros::instance().launch("LLViewerRegionImpl::requestSimulatorFeatureCoro",
                                        boost::bind(&LLViewerRegionImpl::requestSimulatorFeatureCoro, mImpl, url, getHandle()));
         
-        LL_INFOS("AppInit", "SimulatorFeatures") << "Launching " << coroname << " requesting simulator features from " << url << " for region " << getRegionID() << LL_ENDL;
+		ALOG_INFO("Launching {} requesting simulator features from {} for region {}", coroname, url, getRegionID());
     }
     else
     {
-        LL_WARNS("AppInit", "SimulatorFeatures") << "SimulatorFeatures cap not set" << LL_ENDL;
+        ALOG_WARN("SimulatorFeatures cap not set");
     }
 }
 
@@ -2272,7 +2271,7 @@ void LLViewerRegion::setSimulatorFeatures(const LLSD& sim_features)
 	std::stringstream str;
 	
 	LLSDSerialize::toPrettyXML(sim_features, str);
-	LL_INFOS() << "region " << getName() << " "  << str.str() << LL_ENDL;
+	ALOG_INFO("region {} {}", getName(), str.str());
 	mSimulatorFeatures = sim_features;
 
 	setSimulatorFeaturesReceived(true);

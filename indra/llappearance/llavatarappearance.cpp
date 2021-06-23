@@ -459,13 +459,13 @@ void LLAvatarAppearance::compareJointStateMaps(joint_state_map_t& last_state,
             const std::string& key = it->first;
             if (last_state[key] != curr_state[key])
             {
-                LL_DEBUGS("AvatarBodySize") << "BodySize change " << key << " " << last_state[key] << "->" << curr_state[key] << LL_ENDL;
+                ALOG_DEBUG("BodySize change {} {}->{}", key, last_state[key], curr_state[key]);
                 diff_count++;
             }
         }
         if (diff_count > 0)
         {
-            LL_DEBUGS("AvatarBodySize") << "Total of BodySize changes " << diff_count << LL_ENDL;
+			ALOG_DEBUG("Total of BodySize changes {}", diff_count);
         }
         
     }
@@ -704,12 +704,12 @@ BOOL LLAvatarAppearance::allocateCharacterJoints( U32 num )
 //-----------------------------------------------------------------------------
 BOOL LLAvatarAppearance::buildSkeleton(const LLAvatarSkeletonInfo *info)
 {
-    LL_DEBUGS("BVH") << "numBones " << info->mNumBones << " numCollisionVolumes " << info->mNumCollisionVolumes << LL_ENDL;
+	ALOG_DEBUG("numBones {} numCollisionVolumes {}", info->mNumBones, info->mNumCollisionVolumes);
 
 	// allocate joints
 	if (!allocateCharacterJoints(info->mNumBones))
 	{
-		LL_ERRS() << "Can't allocate " << info->mNumBones << " joints" << LL_ENDL;
+		ALOG_CRITICAL("Can't allocate {} joints", info->mNumBones);
 		return FALSE;
 	}
 	
@@ -718,7 +718,7 @@ BOOL LLAvatarAppearance::buildSkeleton(const LLAvatarSkeletonInfo *info)
 	{
 		if (!allocateCollisionVolumes(info->mNumCollisionVolumes))
 		{
-			LL_ERRS() << "Can't allocate " << info->mNumCollisionVolumes << " collision volumes" << LL_ENDL;
+			ALOG_CRITICAL("Can't allocate {} collision volumes", info->mNumCollisionVolumes);
 			return FALSE;
 		}
 	}
@@ -827,17 +827,17 @@ void LLAvatarAppearance::buildCharacter()
 	stop_glerror();
 
 // 	gPrintMessagesThisFrame = TRUE;
-	LL_DEBUGS() << "Avatar load took " << timer.getElapsedTimeF32() << " seconds." << LL_ENDL;
+	ALOG_DEBUG("Avatar load took {} seconds.", timer.getElapsedTimeF32());
 
 	if (!status)
 	{
 		if (isSelf())
 		{
-			LL_ERRS() << "Unable to load user's avatar" << LL_ENDL;
+			ALOG_CRITICAL("Unable to load user's avatar");
 		}
 		else
 		{
-			LL_WARNS() << "Unable to load other's avatar" << LL_ENDL;
+			ALOG_WARN("Unable to load other's avatar");
 		}
 		return;
 	}

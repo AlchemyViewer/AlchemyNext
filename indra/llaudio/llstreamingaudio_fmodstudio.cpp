@@ -38,7 +38,7 @@ inline bool Check_FMOD_Stream_Error(FMOD_RESULT result, const char *string)
 {
 	if (result == FMOD_OK)
 		return false;
-	LL_WARNS("AudioImpl") << string << " Error: " << FMOD_ErrorString(result) << LL_ENDL;
+	ALOG_AUDIO_WARN("{} Error: {}", string, FMOD_ErrorString(result));
 	return true;
 }
 
@@ -156,7 +156,7 @@ void LLStreamingAudio_FMODSTUDIO::start(const std::string& url)
 {
 	//if (!mInited)
 	//{
-	//	LL_WARNS() << "startInternetStream before audio initialized" << LL_ENDL;
+	//	ALOG_AUDIO_WARN("startInternetStream before audio initialized");
 	//	return;
 	//}
 
@@ -430,7 +430,7 @@ void LLStreamingAudio_FMODSTUDIO::stop()
 		}
 		else
 		{
-			LL_WARNS() << "Pushing stream to dead list: " << mCurrentInternetStreamp->getURL() << LL_ENDL;
+			ALOG_AUDIO_WARN("Pushing stream to dead list: {}", mCurrentInternetStreamp->getURL());
 			mDeadStreams.push_back(mCurrentInternetStreamp);
 		}
 		mCurrentInternetStreamp = nullptr;
@@ -558,9 +558,7 @@ LLAudioStreamManagerFMODSTUDIO::LLAudioStreamManagerFMODSTUDIO(FMOD::System *sys
 
 	if (result!= FMOD_OK)
 	{
-		LL_WARNS() << "Couldn't open fmod stream, error "
-			<< FMOD_ErrorString(result)
-			<< LL_ENDL;
+		ALOG_AUDIO_WARN("Couldn't open fmod stream, error {}", FMOD_ErrorString(result));
 		mReady = false;
 		return;
 	}
@@ -574,7 +572,7 @@ FMOD::Channel *LLAudioStreamManagerFMODSTUDIO::startStream()
 	FMOD_OPENSTATE open_state;
 	if (getOpenState(open_state) != FMOD_OK || open_state != FMOD_OPENSTATE_READY)
 	{
-		LL_WARNS() << "No internet stream to start playing!" << LL_ENDL;
+		ALOG_AUDIO_WARN("No internet stream to start playing!");
 		return nullptr;
 	}
 

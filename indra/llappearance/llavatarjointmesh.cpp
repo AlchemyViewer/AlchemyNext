@@ -53,9 +53,7 @@ LLAvatarJoint *getBaseSkeletonAncestor(LLAvatarJoint* joint)
     LLJoint *ancestor = joint->getParent();
     while (ancestor->getParent() && (ancestor->getSupport() != LLJoint::SUPPORT_BASE))
     {
-#ifdef SHOW_DEBUG
-        LL_DEBUGS("Avatar") << "skipping non-base ancestor " << ancestor->getName() << LL_ENDL;
-#endif
+		ALOG_DEBUG("skipping non-base ancestor {}", ancestor->getName());
         ancestor = ancestor->getParent();
     }
     return (LLAvatarJoint*) ancestor;
@@ -331,9 +329,7 @@ void LLAvatarJointMesh::setMesh( LLPolyMesh *mesh )
 	if (!mMesh->isLOD())
 	{
 		setupJoint((LLAvatarJoint*)getRoot());
-#ifdef SHOW_DEBUG
-        LL_DEBUGS("Avatar") << getName() << " joint render entries: " << mMesh->mJointRenderData.size() << LL_ENDL;
-#endif
+		ALOG_DEBUG("{} joint render entries: {}", getName(), mMesh->mJointRenderData.size());
 	}
 
 }
