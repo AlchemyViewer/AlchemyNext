@@ -89,6 +89,7 @@ public:
 
 	static LLLineBuffer* getLineBuffer();
 	static void setLineBuffer(LLLineBuffer*);
+	static void outputToLinebuffer(const std::vector<std::string>& outvec);
 
 	static std::shared_ptr<spdlog::logger> MAIN_LOG;
 	static std::shared_ptr<spdlog::logger> ASSET_LOG;
@@ -101,7 +102,6 @@ public:
 	static std::shared_ptr<spdlog::logger> UI_LOG;
 
 	static std::vector<spdlog::sink_ptr> sSinks;
-	static std::atomic<bool> sBufferChanged;
 	static std::unique_ptr<absl::Mutex> sMutex;
 	static std::unique_ptr<absl::Mutex> sFatalMutex;
 	static fatal_func_t sFatalFunc;

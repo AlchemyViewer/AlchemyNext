@@ -109,31 +109,33 @@ namespace
 template<typename Mutex>
 class linebuffer_sink : public spdlog::sinks::base_sink <Mutex>
 {
+	using base_t = spdlog::sinks::base_sink <Mutex>;
+public:
+	using linebuffer_func_t = std::function<void(const std::vector<std::string>& outvec)>;
+	linebuffer_sink(linebuffer_func_t buffer_func) 
+		: base_t(), mLineBuffer(std::move(buffer_func))
+	{
+	}
 protected:
 	void sink_it_(const spdlog::details::log_msg& msg) override
 	{
-		if (ALLog::sBufferChanged)
-		{
-			mBuffer = ALLog::getLineBuffer();
-			ALLog::sBufferChanged = false;
-		}
-
-		if (!mBuffer)
-			return;
-		// log_msg is a struct containing the log entry info like level, timestamp, thread id etc.
-		// msg.raw contains pre formatted log
-
 		// If needed (very likely but not mandatory), the sink formats the message before sending it to its final destination:
 		spdlog::memory_buf_t formatted;
-		spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
-		mBuffer->addLine(fmt::to_string(formatted));
+		base_t::formatter_->format(msg, formatted);
+		mLogMessages.emplace_back(fmt::to_string(formatted));
 	}
 
 	void flush_() override
 	{
+		if (mLineBuffer)
+		{
+			mLineBuffer(mLogMessages);
+		}
+		mLogMessages.clear();
 	}
 
-	LLLineBuffer* mBuffer = nullptr;
+	linebuffer_func_t mLineBuffer;
+	std::vector<std::string> mLogMessages;
 };
 
 using linebuffer_sink_mt = linebuffer_sink<std::mutex>;
@@ -152,7 +154,6 @@ std::vector<spdlog::sink_ptr> ALLog::sSinks;
 ALLog::fatal_func_t ALLog::sFatalFunc;
 std::unique_ptr<absl::Mutex> ALLog::sMutex;
 std::unique_ptr<absl::Mutex> ALLog::sFatalMutex;
-std::atomic<bool> ALLog::sBufferChanged;
 LLLineBuffer* ALLog::sLineBuffer = nullptr;
 
 // static
@@ -160,7 +161,6 @@ void ALLog::init(const LogConfig& config)
 {
 	sMutex = std::make_unique<absl::Mutex>();
 	sFatalMutex = std::make_unique<absl::Mutex>();
-	sBufferChanged = false;
 	if (config.fatal_func)
 	{
 		setFatalFunction(config.fatal_func);
@@ -188,7 +188,7 @@ void ALLog::init(const LogConfig& config)
 		}
 
 		{
-			auto linebuffer = std::make_shared<linebuffer_sink_mt>();
+			auto linebuffer = std::make_shared<linebuffer_sink_mt>(outputToLinebuffer);
 			linebuffer->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(console_fmt, spdlog::pattern_time_type::local)));
 			sSinks.emplace_back(std::move(linebuffer));
 		}
@@ -274,7 +274,6 @@ void ALLog::init(const LogConfig& config)
 void ALLog::shutdown()
 {
 	sLineBuffer = nullptr;
-	sBufferChanged = true;
 
 	MEDIA_LOG = nullptr;
 	UI_LOG = nullptr;
@@ -393,7 +392,19 @@ void ALLog::setLineBuffer(LLLineBuffer* bufferp)
 {
 	absl::MutexLockMaybe mtx_lock(sMutex.get());
 	sLineBuffer = bufferp;
-	sBufferChanged = true;
+}
+
+// static
+void ALLog::outputToLinebuffer(const std::vector<std::string>& outvec)
+{
+	absl::MutexLockMaybe mtx_lock(sMutex.get());
+	if (sLineBuffer)
+	{
+		for (const auto& str : outvec)
+		{
+			sLineBuffer->addLine(str);
+		}
+	}
 }
 
 // On Mac, got:
