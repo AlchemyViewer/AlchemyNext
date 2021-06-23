@@ -88,14 +88,11 @@ void LLFeatureList::addFeature(const std::string& name, const BOOL available, co
 {
 	if (mFeatures.count(name))
 	{
-		LL_WARNS("RenderInit") << "LLFeatureList::Attempting to add preexisting feature " << name << LL_ENDL;
+		ALOG_RNDR_WARN("LLFeatureList::Attempting to add preexisting feature {}", name);
 	}
 
 	LLFeatureInfo fi(name, available, level);
-    LL_DEBUGS_ONCE("RenderInit") << "Feature '" << name << "' "
-                                 << (available ? "" : "not " ) << "available"
-                                 << " at " << level
-                                 << LL_ENDL;
+	ALOG_RNDR_DEBUG("Feature '{}' {}available at {}", name, (available ? "" : "not "), level);
 	mFeatures[name] = fi;
 }
 
@@ -106,7 +103,7 @@ BOOL LLFeatureList::isFeatureAvailable(const std::string& name)
 		return mFeatures[name].mAvailable;
 	}
 
-	LL_WARNS_ONCE("RenderInit") << "Feature " << name << " not on feature list!" << LL_ENDL;
+	ALOG_RNDR_WARN("Feature {} not on feature list!", name);
 	
 	// changing this to TRUE so you have to explicitly disable 
 	// something for it to be disabled
@@ -117,17 +114,17 @@ F32 LLFeatureList::getRecommendedValue(const std::string& name)
 {
 	if (mFeatures.count(name) && isFeatureAvailable(name))
 	{
-        LL_DEBUGS_ONCE("RenderInit") << "Setting '" << name << "' to recommended value " <<  mFeatures[name].mRecommendedLevel << LL_ENDL;
+		ALOG_RNDR_DEBUG("Setting '{}' to recommended value {}", name, mFeatures[name].mRecommendedLevel);
 		return mFeatures[name].mRecommendedLevel;
 	}
 
-	LL_WARNS_ONCE("RenderInit") << "Feature " << name << " not on feature list or not available!" << LL_ENDL;
+	ALOG_RNDR_WARN("Feature {} not on feature list or not available!", name);
 	return 0;
 }
 
 BOOL LLFeatureList::maskList(LLFeatureList &mask)
 {
-	LL_DEBUGS_ONCE() << "Masking with " << mask.mName << LL_ENDL;
+	ALOG_RNDR_DEBUG("Masking with {}", mask.mName);
 	//
 	// Lookup the specified feature mask, and overlay it on top of the
 	// current feature mask.
@@ -144,44 +141,36 @@ BOOL LLFeatureList::maskList(LLFeatureList &mask)
 		//
 		if (!mFeatures.count(mask_fi.mName))
 		{
-			LL_WARNS("RenderInit") << "Feature " << mask_fi.mName << " in mask not in top level!" << LL_ENDL;
+			ALOG_RNDR_WARN("Feature {} in mask not in top level!", mask_fi.mName);
 			continue;
 		}
 
 		LLFeatureInfo &cur_fi = mFeatures[mask_fi.mName];
 		if (mask_fi.mAvailable && !cur_fi.mAvailable)
 		{
-			LL_WARNS("RenderInit") << "Mask attempting to reenabling disabled feature, ignoring " << cur_fi.mName << LL_ENDL;
+			ALOG_RNDR_WARN("Mask attempting to reenabling disabled feature, ignoring {}", cur_fi.mName);
 			continue;
 		}
 		cur_fi.mAvailable = mask_fi.mAvailable;
 		cur_fi.mRecommendedLevel = llmin(cur_fi.mRecommendedLevel, mask_fi.mRecommendedLevel);
-		LL_DEBUGS("RenderInit") << "Feature mask " << mask.mName
-				<< " Feature " << mask_fi.mName
-				<< " Mask: " << mask_fi.mRecommendedLevel
-				<< " Now: " << cur_fi.mRecommendedLevel << LL_ENDL;
+		ALOG_RNDR_DEBUG("Feature mask {} Feature {} Mask: {} Now: {}", mask.mName, mask_fi.mName, mask_fi.mRecommendedLevel, cur_fi.mRecommendedLevel);
 	}
 
-	LL_DEBUGS("RenderInit") << "After applying mask " << mask.mName << std::endl;
-		// Will conditionally call dump only if the above message will be logged, thanks 
-		// to it being wrapped by the LL_DEBUGS and LL_ENDL macros.
-		dump();
-	LL_CONT << LL_ENDL;
+	ALOG_RNDR_DEBUG("After applying mask {}", mask.mName);
+	dump();
 
 	return TRUE;
 }
 
 void LLFeatureList::dump()
 {
-	LL_DEBUGS("RenderInit") << "Feature list: " << mName << LL_ENDL;
-
-	LLFeatureInfo fi;
-	feature_map_t::iterator feature_it;
-	for (feature_it = mFeatures.begin(); feature_it != mFeatures.end(); ++feature_it)
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG
+	ALOG_RNDR_DEBUG("Feature list: {}", mName);
+	for (const auto& feature_pair : mFeatures)
 	{
-		fi = feature_it->second;
-		LL_DEBUGS("RenderInit") << "With " << mName << " feature " << fi.mName << " " << fi.mAvailable << ":" << fi.mRecommendedLevel << LL_ENDL;
+		ALOG_RNDR_DEBUG("With {} feature {} {}:{}", mName, feature_pair.second.mName, feature_pair.second.mAvailable, feature_pair.second.mRecommendedLevel);
 	}
+#endif
 }
 
 static const std::vector<std::string> sGraphicsLevelNames = boost::assign::list_of
@@ -248,10 +237,10 @@ BOOL LLFeatureManager::maskFeatures(const std::string& name)
 	LLFeatureList *maskp = findMask(name);
 	if (!maskp)
 	{
- 		LL_DEBUGS("RenderInit") << "Unknown feature mask " << name << LL_ENDL;
+		ALOG_RNDR_DEBUG("Unknown feature mask {}", name);
 		return FALSE;
 	}
-	LL_INFOS("RenderInit") << "Applying GPU Feature list: " << name << LL_ENDL;
+	ALOG_RNDR_INFO("Applying GPU Feature list: {}", name);
 	return maskList(*maskp);
 }
 
@@ -282,7 +271,7 @@ bool LLFeatureManager::loadFeatureTables()
 
 bool LLFeatureManager::parseFeatureTable(std::string filename)
 {
-	LL_INFOS("RenderInit") << "Attempting to parse feature table from " << filename << LL_ENDL;
+	ALOG_RNDR_INFO("Attempting to parse feature table from {}", filename);
 
 	llifstream file;
 	std::string name;
@@ -293,7 +282,7 @@ bool LLFeatureManager::parseFeatureTable(std::string filename)
 
 	if (!file)
 	{
-		LL_WARNS("RenderInit") << "Unable to open feature table " << filename << LL_ENDL;
+		ALOG_RNDR_WARN("Unable to open feature table {}", filename);
 		return FALSE;
 	}
 
@@ -301,13 +290,13 @@ bool LLFeatureManager::parseFeatureTable(std::string filename)
 	file >> name;
 	if (name != "version")
 	{
-		LL_WARNS("RenderInit") << filename << " does not appear to be a valid feature table!" << LL_ENDL;
+		ALOG_RNDR_WARN("{} does not appear to be a valid feature table!", filename);
 		return false;
 	}
 	file >> version;
 
 	mTableVersion = version;
-	LL_INFOS("RenderInit") << "Found feature table version " << version << LL_ENDL;
+	ALOG_RNDR_INFO("Found feature table version {}", version);
 
 	LLFeatureList *flp = NULL;
 	bool parse_ok = true;
@@ -324,16 +313,15 @@ bool LLFeatureManager::parseFeatureTable(std::string filename)
         
 		if (name == "list")
 		{
-			LL_DEBUGS("RenderInit") << "Before new list" << std::endl;
+			ALOG_RNDR_DEBUG("Before new list");
 			if (flp)
 			{
 				flp->dump();
 			}
 			else
 			{
-				LL_CONT << "No current list";
+				ALOG_RNDR_DEBUG("No current list");
 			}
-			LL_CONT << LL_ENDL;
 			
 			// It's a new mask, create it.
 			file >> name;
@@ -344,7 +332,7 @@ bool LLFeatureManager::parseFeatureTable(std::string filename)
             }
             else
             {
-				LL_WARNS("RenderInit") << "Overriding mask '" << name << "'; this is invalid!" << LL_ENDL;
+				ALOG_RNDR_WARN("Overriding mask '{}'; this is invalid!", name);
 				parse_ok = false;
 			}
 		}
@@ -359,7 +347,7 @@ bool LLFeatureManager::parseFeatureTable(std::string filename)
             }
 			else
 			{
-				LL_WARNS("RenderInit") << "Specified parameter before <list> keyword!" << LL_ENDL;
+				ALOG_RNDR_WARN("Specified parameter before <list> keyword!");
 				parse_ok = false;
 			}
 		}
@@ -368,7 +356,7 @@ bool LLFeatureManager::parseFeatureTable(std::string filename)
 
 	if (!parse_ok)
 	{
-		LL_WARNS("RenderInit") << "Discarding feature table data from " << filename << LL_ENDL;
+		ALOG_RNDR_WARN("Discarding feature table data from {}", filename);
 		cleanupFeatureTables();
 	}
 	
@@ -415,14 +403,14 @@ bool LLFeatureManager::loadGPUClass()
 		catch (const std::exception& e)
 		{
 			gbps = -1.f;
-			LL_WARNS("RenderInit") << "GPU benchmark failed: " << e.what() << LL_ENDL;
+			ALOG_RNDR_WARN("GPU benchmark failed: {}", e.what());
 		}
 	
 		if (gbps < 0.f)
 		{ //couldn't bench, use GLVersion
 	#if LL_DARWIN
 		//GLVersion is misleading on OSX, just default to class 3 if we can't bench
-		LL_WARNS("RenderInit") << "Unable to get an accurate benchmark; defaulting to class 3" << LL_ENDL;
+			ALOG_RNDR_WARN("Unable to get an accurate benchmark; defaulting to class 3");
 		mGPUClass = GPU_CLASS_3;
 	#else
 			if (gGLManager.mGLVersion <= 2.f)
@@ -488,7 +476,7 @@ bool LLFeatureManager::loadGPUClass()
 	else
 	{
 		//setting says don't benchmark MAINT-7558
-        LL_WARNS("RenderInit") << "Setting 'SkipBenchmark' is true; defaulting to class 1 (may be required for some GPUs)" << LL_ENDL;
+		ALOG_RNDR_WARN("Setting 'SkipBenchmark' is true; defaulting to class 1 (may be required for some GPUs)");
         
 		mGPUClass = GPU_CLASS_1;
 	}
@@ -525,7 +513,7 @@ void LLFeatureManager::applyRecommendedSettings()
 	// cap the level at 2 (high)
 	U32 level = llmax(GPU_CLASS_0, llmin(mGPUClass, GPU_CLASS_5));
 
-	LL_INFOS("RenderInit") << "Applying Recommended Features for level " << level << LL_ENDL;
+	ALOG_RNDR_INFO("Applying Recommended Features for level {}", level);
 
 	setGraphicsLevel(level, false);
 	gSavedSettings.setU32("RenderQualityPerformance", level);
@@ -571,7 +559,7 @@ void LLFeatureManager::applyFeatures(bool skipFeatures)
 		LLControlVariable* ctrl = gSavedSettings.getControl(mIt->first);
 		if(ctrl == NULL)
 		{
-			LL_WARNS("RenderInit") << "AHHH! Control setting " << mIt->first << " does not exist!" << LL_ENDL;
+			ALOG_RNDR_WARN("AHHH! Control setting {} does not exist!", mIt->first);
 			continue;
 		}
 
@@ -594,7 +582,7 @@ void LLFeatureManager::applyFeatures(bool skipFeatures)
 		}
 		else
 		{
-			LL_WARNS("RenderInit") << "AHHH! Control variable is not a numeric type!" << LL_ENDL;
+			ALOG_RNDR_WARN("AHHH! Control variable is not a numeric type!");
 		}
 	}
 }
@@ -641,7 +629,7 @@ void LLFeatureManager::applyBaseMasks()
 	LLFeatureList* maskp = findMask("all");
 	if(maskp == NULL)
 	{
-		LL_WARNS("RenderInit") << "AHH! No \"all\" in feature table!" << LL_ENDL;
+		ALOG_RNDR_WARN("AHH! No \"all\" in feature table!");
 		return;
 	}
 
@@ -660,12 +648,12 @@ void LLFeatureManager::applyBaseMasks()
 			"Class5",
 		};
 
-		LL_INFOS("RenderInit") << "Setting GPU Class to " << class_table[mGPUClass] << LL_ENDL;
+		ALOG_RNDR_INFO("Setting GPU Class to {}", class_table[mGPUClass]);
 		maskFeatures(class_table[mGPUClass]);
 	}
 	else
 	{
-		LL_INFOS("RenderInit") << "Setting GPU Class to Unknown" << LL_ENDL;
+		ALOG_RNDR_INFO("Setting GPU Class to Unknown");
 		maskFeatures("Unknown");
 	}
 
@@ -746,7 +734,7 @@ void LLFeatureManager::applyBaseMasks()
 		}
 	}
 
-	//LL_INFOS() << "Masking features from gpu table match: " << gpustr << LL_ENDL;
+	//ALOG_RNDR_INFO("Masking features from gpu table match: {}", gpustr);
 	maskFeatures(gpustr);
 
 	// now mask cpu type ones
@@ -776,7 +764,7 @@ LLSD LLFeatureManager::getRecommendedSettingsMap()
 
 	loadGPUClass();
 	U32 level = llmax(GPU_CLASS_0, llmin(mGPUClass, GPU_CLASS_5));
-	LL_INFOS("RenderInit") << "Getting the map of recommended settings for level " << level << LL_ENDL;
+	ALOG_RNDR_INFO("Getting the map of recommended settings for level {}", level);
 
 	applyBaseMasks();
 	std::string features(isValidGraphicsLevel(level) ? getNameForGraphicsLevel(level) : "Low");
@@ -796,7 +784,7 @@ LLSD LLFeatureManager::getRecommendedSettingsMap()
 		LLControlVariable* ctrl = gSavedSettings.getControl(mIt->first);
 		if (ctrl == NULL)
 		{
-			LL_WARNS("RenderInit") << "AHHH! Control setting " << mIt->first << " does not exist!" << LL_ENDL;
+			ALOG_RNDR_WARN("AHHH! Control setting {} does not exist!", mIt->first);
 			continue;
 		}
 
@@ -814,7 +802,7 @@ LLSD LLFeatureManager::getRecommendedSettingsMap()
 		}
 		else
 		{
-			LL_WARNS("RenderInit") << "AHHH! Control variable is not a numeric type!" << LL_ENDL;
+			ALOG_RNDR_WARN("AHHH! Control variable is not a numeric type!");
 			continue;
 		}
 		map[mIt->first]["Comment"] = ctrl->getComment();;

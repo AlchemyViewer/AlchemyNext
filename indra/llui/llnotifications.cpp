@@ -241,8 +241,7 @@ LLNotificationForm::LLNotificationForm(const std::string& name, const LLNotifica
 		}
 	}
 
-	LL_DEBUGS("Notifications") << name << LL_ENDL;
-	LL_DEBUGS("Notifications") << ll_pretty_print_sd(mFormData) << LL_ENDL;
+	ALOG_UI_DEBUG(FMT_STRING("{}\n{}"), name, ll_pretty_print_sd(mFormData));
 }
 
 LLNotificationForm::LLNotificationForm(const LLSD& sd)
@@ -254,7 +253,7 @@ LLNotificationForm::LLNotificationForm(const LLSD& sd)
 	}
 	else
 	{
-		LL_WARNS("Notifications") << "Invalid form data " << sd << LL_ENDL;
+		ALOG_UI_WARN("Invalid form data {}", sd);
 		mFormData = LLSD::emptyArray();
 	}
 }
@@ -434,11 +433,11 @@ LLNotificationTemplate::LLNotificationTemplate(const LLNotificationTemplate::Par
 		mUniqueContext.push_back(context.value);
 	}
 	
-	LL_DEBUGS("Notifications") << "notification \"" << mName << "\": tag count is " << p.tags.size() << LL_ENDL;
+	ALOG_UI_DEBUG("notification \"{}\": tag count is {}", mName, p.tags.size());
 	
 	for (const LLNotificationTemplate::Tag& tag : p.tags)
 	{
-		LL_DEBUGS("Notifications") << "    tag \"" << std::string(tag.value) << "\"" << LL_ENDL;
+		ALOG_UI_DEBUG("    tag \"{}\"", std::string(tag.value));
 		mTags.push_back(tag.value);
 	}
 
@@ -1395,7 +1394,7 @@ void LLNotifications::cleanupSingleton()
 
 void LLNotifications::createDefaultChannels()
 {
-    LL_INFOS("Notifications") << "Generating default notification channels" << LL_ENDL;
+    ALOG_UI_INFO("Generating default notification channels");
 	// now construct the various channels AFTER loading the notifications,
 	// because the history channel is going to rewrite the stored notifications file
 	mDefaultChannels.push_back(new LLNotificationChannel("Enabled", "",
@@ -1451,7 +1450,7 @@ void LLNotifications::forceResponse(const LLNotification::Params& params, S32 op
 	
 	if (selected_item.isUndefined())
 	{
-		LL_WARNS("Notifications") << "Invalid option" << option << " for notification " << (std::string)params.name << LL_ENDL;
+		ALOG_UI_WARN("Invalid option {} for notification {}", option, (std::string)params.name);
 		return;
 	}
 	response[selected_item["name"].asString()] = true;
@@ -1485,12 +1484,12 @@ void replaceSubstitutionStrings(LLXMLNodePtr node, StringMap& replacements)
 			if (found != replacements.end())
 			{
 				replacement = found->second;
-				LL_DEBUGS("Notifications") << "replaceSubstitutionStrings: value: \"" << value << "\" repl: \"" << replacement << "\"." << LL_ENDL;
+				ALOG_UI_DEBUG("replaceSubstitutionStrings: value: \"{}\" repl: \"{}\".", value, replacement);
 				it->second->setValue(replacement);
 			}
 			else
 			{
-				LL_WARNS("Notifications") << "replaceSubstitutionStrings FAILURE: could not find replacement \"" << value << "\"." << LL_ENDL;
+				ALOG_UI_WARN("replaceSubstitutionStrings FAILURE: could not find replacement \"\".", value);
 			}
 		}
 	}
@@ -1529,7 +1528,7 @@ void addPathIfExists(const std::string& new_path, std::vector<std::string>& path
 
 bool LLNotifications::loadTemplates()
 {
-	LL_INFOS("Notifications") << "Reading notifications template" << LL_ENDL;
+	ALOG_UI_INFO("Reading notifications template");
 	// Passing findSkinnedFilenames(constraint=LLDir::ALL_SKINS) makes it
 	// output all relevant pathnames instead of just the ones from the most
 	// specific skin.
@@ -1542,7 +1541,7 @@ bool LLNotifications::loadTemplates()
 
 	if (!success || root.isNull() || !root->hasName( "notifications" ))
 	{
-		LL_ERRS() << "Problem reading XML from UI Notifications file: " << base_filename << LL_ENDL;
+		ALOG_UI_CRITICAL("Problem reading XML from UI Notifications file: {}", base_filename);
 		return false;
 	}
 
@@ -1552,7 +1551,7 @@ bool LLNotifications::loadTemplates()
 
 	if(!params.validateBlock())
 	{
-		LL_ERRS() << "Problem reading XUI from UI Notifications file: " << base_filename << LL_ENDL;
+		ALOG_UI_CRITICAL("Problem reading XUI from UI Notifications file: {:s}", base_filename);
 		return false;
 	}
 
@@ -1600,7 +1599,7 @@ bool LLNotifications::loadTemplates()
 		mTemplates[notification.name] = LLNotificationTemplatePtr(new LLNotificationTemplate(notification));
 	}
 
-	LL_INFOS("Notifications") << "...done" << LL_ENDL;
+	ALOG_UI_INFO("...done");
 
 	return true;
 }
@@ -1618,7 +1617,7 @@ bool LLNotifications::loadVisibilityRules()
 
 	if(!params.validateBlock())
 	{
-		LL_ERRS() << "Problem reading UI Notification Visibility Rules file: " << full_filename << LL_ENDL;
+		ALOG_UI_CRITICAL("Problem reading UI Notification Visibility Rules file: {}", full_filename);
 		return false;
 	}
 
@@ -1683,7 +1682,7 @@ void LLNotifications::add(const LLNotificationPtr pNotif)
 	LLNotificationSet::iterator it=mItems.find(pNotif);
 	if (it != mItems.end())
 	{
-		LL_ERRS() << "Notification added a second time to the master notification channel." << LL_ENDL;
+		ALOG_UI_CRITICAL("Notification added a second time to the master notification channel.");
 	}
 
 	updateItem(LLSD().with("sigtype", "add").with("id", pNotif->id()), pNotif);
@@ -1765,9 +1764,7 @@ LLNotificationPtr LLNotifications::find(LLUUID uuid)
 	LLNotificationSet::iterator it=mItems.find(target);
 	if (it == mItems.end())
 	{
-#ifdef SHOW_DEBUG
-		LL_DEBUGS("Notifications") << "Tried to dereference uuid '" << uuid << "' as a notification key but didn't find it." << LL_ENDL;
-#endif
+		ALOG_UI_DEBUG("Tried to dereference uuid '{}' as a notification key but didn't find it.", uuid);
 		return LLNotificationPtr((LLNotification*)NULL);
 	}
 	else
@@ -1830,15 +1827,8 @@ bool LLNotifications::isVisibleByRules(LLNotificationPtr n)
 	for(it = mVisibilityRules.begin(); it != mVisibilityRules.end(); it++)
 	{
 		// An empty type/tag/name string will match any notification, so only do the comparison when the string is non-empty in the rule.
-#ifdef SHOW_DEBUG
-		LL_DEBUGS("Notifications")
-			<< "notification \"" << n->getName() << "\" " 
-			<< "testing against " << ((*it)->mVisible?"show":"hide") << " rule, "
-			<< "name = \"" << (*it)->mName << "\" "
-			<< "tag = \"" << (*it)->mTag << "\" "
-			<< "type = \"" << (*it)->mType << "\" "
-			<< LL_ENDL;
-#endif
+		ALOG_UI_DEBUG("notification \"{}\" testing against {} rule, name = \"{}\" tag = \"{}\" type = \"{}\" ", 
+			n->getName(), ((*it)->mVisible ? "show" : "hide"), (*it)->mName, (*it)->mTag, (*it)->mType);
 
 		if(!(*it)->mType.empty())
 		{
@@ -1877,9 +1867,7 @@ bool LLNotifications::isVisibleByRules(LLNotificationPtr n)
 			if((*it)->mResponse.empty())
 			{
 				// Response property is empty.  Cancel this notification.
-#ifdef SHOW_DEBUG
-				LL_DEBUGS("Notifications") << "cancelling notification " << n->getName() << LL_ENDL;
-#endif
+				ALOG_UI_DEBUG("cancelling notification {}", n->getName());
 
 				cancel(n);
 			}
@@ -1890,9 +1878,7 @@ bool LLNotifications::isVisibleByRules(LLNotificationPtr n)
 				// TODO: verify that the response template has an item with the correct name
 				response[(*it)->mResponse] = true;
 
-#ifdef SHOW_DEBUG
-				LL_DEBUGS("Notifications") << "responding to notification " << n->getName() << " with response = " << response << LL_ENDL;
-#endif
+				ALOG_UI_DEBUG("responding to notification {} with response = {}", n->getName(), response);
 				
 				n->respond(response);
 			}
@@ -1904,9 +1890,7 @@ bool LLNotifications::isVisibleByRules(LLNotificationPtr n)
 		break;
 	}
 	
-#ifdef SHOW_DEBUG
-	LL_DEBUGS("Notifications") << "allowing notification " << n->getName() << LL_ENDL;
-#endif
+	ALOG_UI_DEBUG("allowing notification {}", n->getName());
 
 	return true;
 }
@@ -1967,7 +1951,7 @@ void LLPostponedNotification::onAvatarNameCache(const LLUUID& agent_id,
 	// from PE merge - we should figure out if this is the right thing to do
 	if (name.empty())
 	{
-		LL_WARNS("Notifications") << "Empty name received for Id: " << agent_id << LL_ENDL;
+		ALOG_UI_WARN("Empty name received for Id: {}", agent_id);
 		name = SYSTEM_FROM;
 	}
 	
