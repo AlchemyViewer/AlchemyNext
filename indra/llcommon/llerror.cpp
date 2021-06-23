@@ -273,7 +273,8 @@ void ALLog::init(const LogConfig& config)
 // static
 void ALLog::shutdown()
 {
-	sLineBuffer = nullptr;
+	setFatalFunction(nullptr);
+	setLineBuffer(nullptr);
 
 	MEDIA_LOG = nullptr;
 	UI_LOG = nullptr;
@@ -382,8 +383,11 @@ void ALLog::crashAndLoop(const std::string& message)
 // static 
 LLLineBuffer* ALLog::getLineBuffer()
 {
-	absl::MutexLockMaybe mtx_lock(sMutex.get());
-	auto retval = sLineBuffer;
+	LLLineBuffer* retval = nullptr;
+	{
+		absl::MutexLockMaybe mtx_lock(sMutex.get());
+		retval = sLineBuffer;
+	}
 	return retval;
 }
 
