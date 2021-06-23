@@ -242,6 +242,37 @@ static_assert(std::is_trivially_copyable<LLUUID>::value, "LLUUID must be trivial
 static_assert(std::is_trivially_move_assignable<LLUUID>::value, "LLUUID must be trivial move");
 static_assert(std::is_standard_layout<LLUUID>::value, "LLUUID must be a standard layout type");
 
+template <>
+struct fmt::formatter<LLUUID> {
+	constexpr auto parse(fmt::format_parse_context& ctx)
+	{
+		return ctx.end(); // returns the iterator to the last parsed character in the format string, in this case we just swallow everything
+	}
+
+	template <typename FormatContext>
+	auto format(const LLUUID& p, FormatContext& ctx) -> decltype(ctx.out()) {
+		return format_to(
+			ctx.out(),
+			FMT_COMPILE("{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}"),
+			(U8)(p.mData[0]),
+			(U8)(p.mData[1]),
+			(U8)(p.mData[2]),
+			(U8)(p.mData[3]),
+			(U8)(p.mData[4]),
+			(U8)(p.mData[5]),
+			(U8)(p.mData[6]),
+			(U8)(p.mData[7]),
+			(U8)(p.mData[8]),
+			(U8)(p.mData[9]),
+			(U8)(p.mData[10]),
+			(U8)(p.mData[11]),
+			(U8)(p.mData[12]),
+			(U8)(p.mData[13]),
+			(U8)(p.mData[14]),
+			(U8)(p.mData[15]));
+	}
+};
+
 typedef std::vector<LLUUID> uuid_vec_t;
 typedef std::set<LLUUID> uuid_set_t;
 
