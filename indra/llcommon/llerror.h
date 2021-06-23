@@ -51,8 +51,14 @@ public:
 		std::string log_filename = "";
 		bool truncate_logfile = true;
 		ALLog::fatal_func_t fatal_func = fatal_func_t();
+		bool log_to_file = true;
+		bool log_to_linebuffer = false;
 		bool log_to_stderr = true;
-		bool async_logging = true;
+		bool log_to_ostream = false;
+		bool async_logging = false;
+		ELevel default_level = ELevel::info;
+		int flush_interval = 1; // seconds
+		ELevel force_flush_level = ELevel::err;
 	};
 
 
@@ -101,6 +107,8 @@ public:
 	static std::shared_ptr<spdlog::logger> TEXTURE_LOG;
 	static std::shared_ptr<spdlog::logger> UI_LOG;
 
+private:
+	static LogConfig sGlobalConfig;
 	static std::vector<spdlog::sink_ptr> sSinks;
 	static std::unique_ptr<absl::Mutex> sMutex;
 	static std::unique_ptr<absl::Mutex> sFatalMutex;

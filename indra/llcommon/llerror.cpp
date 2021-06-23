@@ -151,6 +151,7 @@ std::shared_ptr<spdlog::logger> ALLog::RENDER_LOG;
 std::shared_ptr<spdlog::logger> ALLog::TEXTURE_LOG;
 std::shared_ptr<spdlog::logger> ALLog::UI_LOG;
 std::vector<spdlog::sink_ptr> ALLog::sSinks;
+ALLog::LogConfig ALLog::sGlobalConfig;
 ALLog::fatal_func_t ALLog::sFatalFunc;
 std::unique_ptr<absl::Mutex> ALLog::sMutex;
 std::unique_ptr<absl::Mutex> ALLog::sFatalMutex;
@@ -159,8 +160,11 @@ LLLineBuffer* ALLog::sLineBuffer = nullptr;
 // static
 void ALLog::init(const LogConfig& config)
 {
+	sGlobalConfig = config;
+
 	sMutex = std::make_unique<absl::Mutex>();
 	sFatalMutex = std::make_unique<absl::Mutex>();
+
 	if (config.fatal_func)
 	{
 		setFatalFunction(config.fatal_func);
@@ -174,29 +178,30 @@ void ALLog::init(const LogConfig& config)
 	{
 		spdlog::init_thread_pool(8192, 2);
 	}
-	spdlog::flush_every(std::chrono::seconds(1));
+	spdlog::flush_on(config.force_flush_level);
+	spdlog::flush_every(std::chrono::seconds(config.flush_interval));
+	spdlog::set_level(config.default_level);
+
+	const std::string default_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%n] [%l] [%s:%#] [%!] %v");
+	spdlog::set_pattern(default_fmt, spdlog::pattern_time_type::utc);
 
 	try
 	{
-		const std::string default_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%n] [%l] [%s:%#] [%!] %v");
-		const std::string console_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%l] [%s:%#] %v");
-		if(!config.log_filename.empty())
+		if(config.log_to_file && !config.log_filename.empty())
 		{
 			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(config.log_filename, config.truncate_logfile);
-			basic_file->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(default_fmt, spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(basic_file));
 		}
 
+		if(config.log_to_linebuffer)
 		{
 			auto linebuffer = std::make_shared<linebuffer_sink_mt>(outputToLinebuffer);
-			linebuffer->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(console_fmt, spdlog::pattern_time_type::local)));
 			sSinks.emplace_back(std::move(linebuffer));
 		}
 
 		if (config.log_to_stderr && shouldLogToStderr())
 		{
 			auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
-			stderr_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(console_fmt, spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(stderr_sink));
 		}
 
@@ -204,7 +209,6 @@ void ALLog::init(const LogConfig& config)
 		if (IsDebuggerPresent())
 		{
 			auto msvc_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-			msvc_sink->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(default_fmt, spdlog::pattern_time_type::utc)));
 			sSinks.emplace_back(std::move(msvc_sink));
 		}
 #endif
@@ -240,26 +244,17 @@ void ALLog::init(const LogConfig& config)
 			TEXTURE_LOG = std::make_shared<spdlog::logger>("textr", dup_filter);
 			UI_LOG = std::make_shared<spdlog::logger>("ui", dup_filter);
 		}
-		MAIN_LOG->flush_on(spdlog::level::err);
-		ASSET_LOG->flush_on(spdlog::level::err);
-		AUDIO_LOG->flush_on(spdlog::level::err);
-		IO_LOG->flush_on(spdlog::level::err);
-		MEDIA_LOG->flush_on(spdlog::level::err);
-		NETWORK_LOG->flush_on(spdlog::level::err);
-		RENDER_LOG->flush_on(spdlog::level::err);
-		TEXTURE_LOG->flush_on(spdlog::level::err);
-		UI_LOG->flush_on(spdlog::level::err);
 
 		// Register the loggers
-		spdlog::register_logger(MAIN_LOG);
-		spdlog::register_logger(ASSET_LOG);
-		spdlog::register_logger(AUDIO_LOG);
-		spdlog::register_logger(IO_LOG);
-		spdlog::register_logger(MEDIA_LOG);
-		spdlog::register_logger(NETWORK_LOG);
-		spdlog::register_logger(RENDER_LOG);
-		spdlog::register_logger(TEXTURE_LOG);
-		spdlog::register_logger(UI_LOG);
+		spdlog::initialize_logger(MAIN_LOG);
+		spdlog::initialize_logger(ASSET_LOG);
+		spdlog::initialize_logger(AUDIO_LOG);
+		spdlog::initialize_logger(IO_LOG);
+		spdlog::initialize_logger(MEDIA_LOG);
+		spdlog::initialize_logger(NETWORK_LOG);
+		spdlog::initialize_logger(RENDER_LOG);
+		spdlog::initialize_logger(TEXTURE_LOG);
+		spdlog::initialize_logger(UI_LOG);
 
 		// Now set the default logger to our main
 		spdlog::set_default_logger(MAIN_LOG);

@@ -2324,6 +2324,9 @@ void LLAppViewer::initLoggingAndGetLastDuration()
 
 	// Set the log file to SecondLife.log
 	ALLog::LogConfig log_config = {};
+	log_config.log_to_file = true;
+	log_config.log_to_linebuffer = true;
+	log_config.log_to_stderr = true;
 	log_config.log_filename = spdlog_file;
 	log_config.truncate_logfile = true;
 	log_config.async_logging = true;
