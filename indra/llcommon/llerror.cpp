@@ -276,13 +276,15 @@ void ALLog::shutdown()
 	setFatalFunction(nullptr);
 	setLineBuffer(nullptr);
 
-	MEDIA_LOG = nullptr;
-	UI_LOG = nullptr;
-	IO_LOG = nullptr;
+	MAIN_LOG = nullptr;
 	AUDIO_LOG = nullptr;
+	ASSET_LOG = nullptr;
+	IO_LOG = nullptr;
+	MEDIA_LOG = nullptr;
 	NETWORK_LOG = nullptr;
 	RENDER_LOG = nullptr;
-	MAIN_LOG = nullptr;
+	UI_LOG = nullptr;
+	TEXTURE_LOG = nullptr;
 	sSinks.clear();
 
 	spdlog::shutdown();
