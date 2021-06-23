@@ -92,8 +92,7 @@ void HttpOperation::stageFromRequest(HttpService *)
 	// Default implementation should never be called.  This
 	// indicates an operation making a transition that isn't
 	// defined.
-	LL_ERRS(LOG_CORE) << "Default stageFromRequest method may not be called."
-					  << LL_ENDL;
+	ALOG_NET_CRITICAL("Default stageFromRequest method may not be called.");
 }
 
 
@@ -102,8 +101,7 @@ void HttpOperation::stageFromReady(HttpService *)
 	// Default implementation should never be called.  This
 	// indicates an operation making a transition that isn't
 	// defined.
-	LL_ERRS(LOG_CORE) << "Default stageFromReady method may not be called."
-					  << LL_ENDL;
+	ALOG_NET_CRITICAL("Default stageFromReady method may not be called.");
 }
 
 
@@ -112,8 +110,7 @@ void HttpOperation::stageFromActive(HttpService *)
 	// Default implementation should never be called.  This
 	// indicates an operation making a transition that isn't
 	// defined.
-	LL_ERRS(LOG_CORE) << "Default stageFromActive method may not be called."
-					  << LL_ENDL;
+	ALOG_NET_CRITICAL("Default stageFromActive method may not be called.");
 }
 
 
@@ -188,7 +185,7 @@ HttpOperation::ptr_t HttpOperation::findByHandle(HttpHandle handle)
         handleMap_t::iterator it = mHandleMap.find(handle);
         if (it == mHandleMap.end())
         {
-            LL_WARNS("LLCore::HTTP") << "Could not find operation for handle " << handle << LL_ENDL;
+            ALOG_NET_WARN("Could not find operation for handle {}", fmt::ptr(handle));
             return ptr_t();
         }
 
@@ -206,9 +203,7 @@ void HttpOperation::addAsReply()
 {
 	if (mTracing > HTTP_TRACE_OFF)
 	{
-		LL_INFOS(LOG_CORE) << "TRACE, ToReplyQueue, Handle:  "
-						   << getHandle()
-						   << LL_ENDL;
+		ALOG_NET_INFO("TRACE, ToReplyQueue, Handle:  {}", fmt::ptr(getHandle()));
 	}
 	
 	if (mReplyQueue)

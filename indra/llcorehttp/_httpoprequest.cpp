@@ -499,8 +499,7 @@ HttpStatus HttpOpRequest::prepareRequest(HttpService * service)
 	if (! mCurlHandle)
 	{
 		// We're in trouble.  We'll continue but it won't go well.
-		LL_WARNS(LOG_CORE) << "Failed to allocate libcurl easy handle.  Continuing."
-						   << LL_ENDL;
+		ALOG_NET_WARN("Failed to allocate libcurl easy handle.  Continuing.");
 		return HttpStatus(HttpStatus::LLCORE, HE_BAD_ALLOC);
 	}
 
@@ -804,8 +803,7 @@ size_t HttpOpRequest::readCallback(void * data, size_t size, size_t nmemb, void 
 		{
 			// Warn but continue if the read position moves beyond end-of-body
 			// for some reason.
-			LL_WARNS(LOG_CORE) << "Request body position beyond body size.  Truncating request body."
-							   << LL_ENDL;
+			ALOG_NET_WARN("Request body position beyond body size.  Truncating request body.");
 		}
 		return 0;
 	}
@@ -840,7 +838,7 @@ int HttpOpRequest::seekCallback(void *userdata, curl_off_t offset, int origin)
 
     if (newPos >= op->mReqBody->size())
     {
-        LL_WARNS(LOG_CORE) << "Attempt to seek to position outside post body." << LL_ENDL;
+		ALOG_NET_WARN("Attempt to seek to position outside post body.");
         return 2;
     }
 
@@ -975,10 +973,7 @@ size_t HttpOpRequest::headerCallback(void * data, size_t size, size_t nmemb, voi
 		else
 		{
 			// Ignore the unparsable.
-			LL_INFOS_ONCE(LOG_CORE) << "Problem parsing odd Content-Range header:  '"
-									<< std::string(hdr_data, wanted_hdr_size)
-									<< "'.  Ignoring."
-									<< LL_ENDL;
+			ALOG_NET_INFO("Problem parsing odd Content-Range header:  '{}'.  Ignoring.", std::string(hdr_data, wanted_hdr_size));
 		}
 	}
 
@@ -1118,11 +1113,7 @@ int HttpOpRequest::debugCallback(CURL * handle, curl_infotype info, char * buffe
 
 	if (logit)
 	{
-		LL_INFOS(LOG_CORE) << "TRACE, LibcurlDebug, Handle:  "
-						   << op->getHandle()
-						   << ", Type:  " << tag
-						   << ", Data:  " << safe_line
-						   << LL_ENDL;
+		ALOG_NET_INFO("TRACE, LibcurlDebug, Handle:  {}, Type:  {}, Data:  {}", fmt::ptr(op->getHandle()), tag, safe_line);
 	}
 		
 	return 0;
@@ -1336,9 +1327,7 @@ void check_curl_easy_code(CURLcode code, int curl_setopt_option)
 		//
 		// linux appears to throw a curl error once per session for a bad initialization
 		// at a pretty random time (when enabling cookies).
-		LL_WARNS(LOG_CORE) << "libcurl error detected:  " << curl_easy_strerror(code)
-						   << ", curl_easy_setopt option:  " << curl_setopt_option
-						   << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("libcurl error detected:  {:s}, curl_easy_setopt option:  {:d}"), curl_easy_strerror(code), curl_setopt_option);
 	}
 }
 

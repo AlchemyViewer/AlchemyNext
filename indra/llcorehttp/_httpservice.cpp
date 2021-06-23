@@ -95,10 +95,7 @@ HttpService::~HttpService()
 			if (! mThread->timedJoin(250))
 			{
 				// Failed to join, expect problems ahead so do a hard termination.
-				LL_WARNS(LOG_CORE) << "Destroying HttpService with running thread.  Expect problems." << LL_NEWLINE
-									<< "State: " << S32(sState)
-									<< " Last policy: " << U32(mLastPolicy)
-									<< LL_ENDL;
+				ALOG_NET_WARN("Destroying HttpService with running thread.  Expect problems.\nState: {} Last policy: {}", S32(sState), U32(mLastPolicy));
 
 				mThread->cancel();
 			}
@@ -325,7 +322,7 @@ void HttpService::threadRun(LLCoreInt::HttpThread * thread)
             //output possible call stacks to log file.
             LLError::LLCallStacks::print();
 
-            LL_ERRS() << "Bad memory allocation in HttpService::threadRun()!" << LL_ENDL;
+            ALOG_NET_CRITICAL("Bad memory allocation in HttpService::threadRun()!");
         }
         catch (...)
         {
@@ -359,9 +356,7 @@ HttpService::ELoopSpeed HttpService::processRequestQueue(ELoopSpeed loop)
 
 			if (op->mTracing > HTTP_TRACE_OFF)
 			{
-				LL_INFOS(LOG_CORE) << "TRACE, FromRequestQueue, Handle:  "
-								   << op->getHandle()
-								   << LL_ENDL;
+				ALOG_NET_INFO(FMT_STRING("TRACE, FromRequestQueue, Handle:  {}"), fmt::ptr(op->getHandle()));
 			}
 
 			// Stage

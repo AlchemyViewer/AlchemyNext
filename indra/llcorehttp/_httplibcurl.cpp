@@ -125,8 +125,7 @@ void HttpLibcurl::start(int policy_count)
 	{
 		if (NULL == (mMultiHandles[policy_class] = curl_multi_init()))
 		{
-			LL_ERRS(LOG_CORE) << "Failed to allocate multi handle in libcurl."
-							  << LL_ENDL;
+			ALOG_NET_CRITICAL("Failed to allocate multi handle in libcurl.");
 		}
 		mActiveHandles[policy_class] = 0;
 		mDirtyPolicy[policy_class] = false;
@@ -195,9 +194,7 @@ HttpService::ELoopSpeed HttpLibcurl::processTransport()
 			}
 			else
 			{
-				LL_WARNS_ONCE(LOG_CORE) << "Unexpected message from libcurl.  Msg code:  "
-										<< msg->msg
-										<< LL_ENDL;
+				ALOG_NET_WARN(FMT_STRING("Unexpected message from libcurl.  Msg code:  {:d}"), msg->msg);
 			}
 			msgs_in_queue = 0;
 		}
@@ -242,11 +239,7 @@ void HttpLibcurl::addOp(const HttpOpRequest::ptr_t &op)
 	{
 		HttpPolicy & policy(mService->getPolicy());
 		
-		LL_INFOS(LOG_CORE) << "TRACE, ToActiveQueue, Handle:  "
-                            << op->getHandle()
-						    << ", Actives:  " << mActiveOps.size()
-						    << ", Readies:  " << policy.getReadyCount(op->mReqPolicy)
-						    << LL_ENDL;
+		ALOG_NET_INFO(FMT_STRING("TRACE, ToActiveQueue, Handle:  {:p}, Actives:  {:d}, Readies:  {:d}"), fmt::ptr(op->getHandle()), mActiveOps.size(), policy.getReadyCount(op->mReqPolicy));
 	}
 }
 
@@ -293,10 +286,7 @@ void HttpLibcurl::cancelRequest(const HttpOpRequest::ptr_t &op)
 	// Tracing
 	if (op->mTracing > HTTP_TRACE_OFF)
 	{
-		LL_INFOS(LOG_CORE) << "TRACE, RequestCanceled, Handle:  "
-						   << op->getHandle()
-						   << ", Status:  " << op->mStatus.toTerseString()
-						   << LL_ENDL;
+		ALOG_NET_INFO(FMT_STRING("TRACE, RequestCanceled, Handle:  {:p}, Status:  {:s}"), fmt::ptr(op->getHandle()), op->mStatus.toTerseString());
 	}
 
 	// Cancel op and deliver for notification
@@ -315,31 +305,27 @@ bool HttpLibcurl::completeRequest(CURLM * multi_handle, CURL * handle, CURLcode 
     ccode =	curl_easy_getinfo(handle, CURLINFO_PRIVATE, &ophandle);
     if (ccode)
     {
-        LL_WARNS(LOG_CORE) << "libcurl error: " << ccode << " Unable to retrieve operation handle from CURL handle" << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("libcurl error: ({:s}) Unable to retrieve operation handle from CURL handle"), curl_easy_strerror(ccode));
         return false;
     }
     HttpOpRequest::ptr_t op(HttpOpRequest::fromHandle<HttpOpRequest>(ophandle));
     
     if (!op)
     {
-        LL_WARNS() << "Unable to locate operation by handle. May have expired!" << LL_ENDL;
+		ALOG_NET_WARN("Unable to locate operation by handle. May have expired!");
         return false;
     }
 
 	if (handle != op->mCurlHandle || ! op->mCurlActive)
 	{
-		LL_WARNS(LOG_CORE) << "libcurl handle and HttpOpRequest handle in disagreement or inactive request."
-						   << "  Handle:  " << static_cast<HttpHandle>(handle)
-						   << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("libcurl handle and HttpOpRequest handle in disagreement or inactive request.  Handle:  {:p}"), fmt::ptr(static_cast<HttpHandle>(handle)));
 		return false;
 	}
 
 	active_set_t::iterator it(mActiveOps.find(op));
 	if (mActiveOps.end() == it)
 	{
-		LL_WARNS(LOG_CORE) << "libcurl completion for request not on active list.  Continuing."
-						   << "  Handle:  " << static_cast<HttpHandle>(handle)
-						   << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("libcurl completion for request not on active list.  Continuing.  Handle:  {:p}"), fmt::ptr(static_cast<HttpHandle>(handle)));
 		return false;
 	}
 
@@ -376,15 +362,13 @@ bool HttpLibcurl::completeRequest(CURLM * multi_handle, CURL * handle, CURLcode 
                     }
                     else
                     {
-                        LL_WARNS(LOG_CORE) << "CURL error:" << ccode << " Attempting to get content type." << LL_ENDL;
+						ALOG_NET_WARN(FMT_STRING("CURL error: ({:s}) Attempting to get content type."), curl_easy_strerror(ccode));
                     }
                     op->mStatus = HttpStatus(http_status);
                 }
                 else
                 {
-                    LL_WARNS(LOG_CORE) << "Invalid HTTP response code ("
-                        << http_status << ") received from server."
-                        << LL_ENDL;
+					ALOG_NET_WARN(FMT_STRING("Invalid HTTP response code ({:d}) received from server."), http_status);
                     op->mStatus = HttpStatus(HttpStatus::LLCORE, HE_INVALID_HTTP_STATUS);
                 }
             }
@@ -395,7 +379,7 @@ bool HttpLibcurl::completeRequest(CURLM * multi_handle, CURL * handle, CURLcode 
         }
         else
         {
-            LL_WARNS(LOG_CORE) << "Attempt to retrieve status from NULL handle!" << LL_ENDL;
+			ALOG_NET_WARN("Attempt to retrieve status from NULL handle!");
         }
 	}
 
@@ -407,8 +391,7 @@ bool HttpLibcurl::completeRequest(CURLM * multi_handle, CURL * handle, CURLcode 
     }
     else
     {
-        LL_WARNS(LOG_CORE) << "Curl multi_handle or handle is NULL on remove! multi:" 
-            << std::hex << multi_handle << " h:" << std::hex << handle << std::dec << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("Curl multi_handle or handle is NULL on remove! multi: {:p} h: {:p}"), fmt::ptr(multi_handle), fmt::ptr(handle));
     }
 
     op->mCurlHandle = NULL;
@@ -416,10 +399,7 @@ bool HttpLibcurl::completeRequest(CURLM * multi_handle, CURL * handle, CURLcode 
 	// Tracing
 	if (op->mTracing > HTTP_TRACE_OFF)
 	{
-		LL_INFOS(LOG_CORE) << "TRACE, RequestComplete, Handle:  "
-                            << op->getHandle()
-						    << ", Status:  " << op->mStatus.toTerseString()
-						    << LL_ENDL;
+		ALOG_NET_INFO(FMT_STRING("TRACE, RequestComplete, Handle:  {:p}, Status:  {:s}"), fmt::ptr(op->getHandle()), op->mStatus.toTerseString());
 	}
 
 	// Dispatch to next stage
@@ -627,9 +607,7 @@ void check_curl_multi_code(CURLMcode code, int curl_setopt_option)
 {
 	if (CURLM_OK != code)
 	{
-		LL_WARNS(LOG_CORE) << "libcurl multi error detected:  " << curl_multi_strerror(code)
-						   << ", curl_multi_setopt option:  " << curl_setopt_option
-						   << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("libcurl multi error detected:  {:s}, curl_multi_setopt option:  {:d}"), curl_multi_strerror(code), curl_setopt_option);
 	}
 }
 
@@ -638,8 +616,7 @@ void check_curl_multi_code(CURLMcode code)
 {
 	if (CURLM_OK != code)
 	{
-		LL_WARNS(LOG_CORE) << "libcurl multi error detected:  " << curl_multi_strerror(code)
-						   << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("libcurl multi error detected:  {:s}"), curl_multi_strerror(code));
 	}
 }
 

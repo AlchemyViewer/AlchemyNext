@@ -154,7 +154,7 @@ size_t BufferArray::append(const void * src, size_t len)
             //output possible call stacks to log file.
             LLError::LLCallStacks::print();
 
-            LL_WARNS() << "Bad memory allocation in thrown by Block::alloc in read!" << LL_ENDL;
+            ALOG_NET_WARN("Bad memory allocation in thrown by Block::alloc in read!");
             break;
         }
         memcpy(block->mData, c_src, copy_len);

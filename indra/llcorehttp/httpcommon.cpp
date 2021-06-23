@@ -289,7 +289,7 @@ CURL *getCurlTemplateHandle()
         curlpTemplateHandle = curl_easy_init();
         if (curlpTemplateHandle == NULL)
         {
-            LL_WARNS() << "curl error calling curl_easy_init()" << LL_ENDL;
+            ALOG_NET_WARN("curl error calling curl_easy_init()");
         }
         else
         {
@@ -350,7 +350,7 @@ void ssl_locking_callback(int mode, int type, const char *file, int line)
 {
     if (type >= sSSLMutex.size())
     {
-        LL_WARNS() << "Attempt to get unknown MUTEX in SSL Lock." << LL_ENDL;
+        ALOG_NET_WARN("Attempt to get unknown MUTEX in SSL Lock.");
     }
 
     if (mode & CRYPTO_LOCK)
@@ -430,9 +430,7 @@ void check_curl_code(CURLcode code, int curl_setopt_option)
         //
         // linux appears to throw a curl error once per session for a bad initialization
         // at a pretty random time (when enabling cookies).
-        LL_WARNS() << "libcurl error detected:  " << curl_easy_strerror(code)
-            << ", curl_easy_setopt option:  " << curl_setopt_option
-            << LL_ENDL;
+		ALOG_NET_WARN(FMT_STRING("libcurl error detected:  {:s}, curl_easy_setopt option:  {:d}"), curl_easy_strerror(code), curl_setopt_option);
     }
 
 }
