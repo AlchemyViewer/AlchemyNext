@@ -89,7 +89,7 @@ BOOL LLDriverParamInfo::parseXml(LLXmlTreeNode* node)
 		}
 		else
 		{
-			LL_ERRS() << "<driven> Unable to resolve driven parameter: " << driven_id << LL_ENDL;
+			ALOG_CRITICAL("<driven> Unable to resolve driven parameter: {}", driven_id);
 			return FALSE;
 		}
 	}
@@ -116,7 +116,7 @@ void LLDriverParamInfo::toStream(std::ostream &out)
 	// corresponding param in the most recently created
 	// avatar. Apparently these toStream() methods are not currently
 	// used anywhere, so it's not an urgent problem.
-    LL_WARNS_ONCE() << "Invalid usage of mDriverParam." << LL_ENDL;
+	LL_WARNS_ONCE() << "Invalid usage of mDriverParam." << LL_ENDL;
     
 	if(mDriverParam && mDriverParam->getAvatarAppearance()->isSelf() &&
 		mDriverParam->getAvatarAppearance()->isValid())
@@ -147,9 +147,7 @@ void LLDriverParamInfo::toStream(std::ostream &out)
 			}
 			else
 			{
-				LL_WARNS() << "could not get parameter " << driven.mDrivenID << " from avatar " 
-						<< mDriverParam->getAvatarAppearance() 
-						<< " for driver parameter " << getID() << LL_ENDL;
+				ALOG_WARN("could not get parameter {} from avatar {} for driver parameter {}", driven.mDrivenID, mDriverParam->getAvatarAppearance(), getID());
 			}
 			out << std::endl;
 		}

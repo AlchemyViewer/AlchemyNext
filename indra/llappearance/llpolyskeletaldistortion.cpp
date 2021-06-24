@@ -56,8 +56,8 @@ BOOL LLPolySkeletalDistortionInfo::parseXml(LLXmlTreeNode* node)
 
         if (NULL == skeletalParam)
         {
-                LL_WARNS() << "Failed to getChildByName(\"param_skeleton\")"
-                        << LL_ENDL;
+                ALOG_WARN("Failed to getChildByName(\"param_skeleton\")"
+                       );
                 return FALSE;
         }
 
@@ -73,14 +73,14 @@ BOOL LLPolySkeletalDistortionInfo::parseXml(LLXmlTreeNode* node)
                         static LLStdStringHandle name_string = LLXmlTree::addAttributeString("name");
                         if (!bone->getFastAttributeString(name_string, name))
                         {
-                                LL_WARNS() << "No bone name specified for skeletal param." << LL_ENDL;
+                                ALOG_WARN("No bone name specified for skeletal param.");
                                 continue;
                         }
 
                         static LLStdStringHandle scale_string = LLXmlTree::addAttributeString("scale");
                         if (!bone->getFastAttributeVector3(scale_string, scale))
                         {
-                                LL_WARNS() << "No scale specified for bone " << name << "." << LL_ENDL;
+                            ALOG_WARN("No scale specified for bone {}.", name);
                                 continue;
                         }
 
@@ -94,7 +94,7 @@ BOOL LLPolySkeletalDistortionInfo::parseXml(LLXmlTreeNode* node)
                 }
                 else
                 {
-                        LL_WARNS() << "Unrecognized element " << bone->getName() << " in skeletal distortion" << LL_ENDL;
+                        ALOG_WARN("Unrecognized element {} in skeletal distortion", bone->getName());
                         continue;
                 }
         }
@@ -145,7 +145,7 @@ BOOL LLPolySkeletalDistortion::setInfo(LLPolySkeletalDistortionInfo *info)
         {
             // There's no point continuing after this error - means
             // that either the skeleton or lad file is broken.
-            LL_WARNS() << "Joint " << bone_info->mBoneName << " not found." << LL_ENDL;
+            ALOG_WARN("Joint {} not found.", bone_info->mBoneName);
 			return FALSE;
         }
 

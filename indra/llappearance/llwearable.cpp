@@ -173,7 +173,7 @@ void LLWearable::createVisualParams(LLAvatarAppearance *avatarp)
 		{
 			if( !param->linkDrivenParams(boost::bind(param_function,avatarp,_1 ), true))
 			{
-				LL_DEBUGS("Avatar") << "could not link driven params for wearable " << getName() << " id: " << param->getID() << LL_ENDL;
+				ALOG_DEBUG("could not link driven params for wearable {} id: {}", getName(), param->getID());
 				continue;
 			}
 		}
@@ -197,7 +197,7 @@ void LLWearable::createLayers(S32 te, LLAvatarAppearance *avatarp)
 	}
 	else
 	{
-		   LL_WARNS() << "could not find layerset for LTO in wearable!" << LL_ENDL;
+		   ALOG_WARN("could not find layerset for LTO in wearable!");
 	}
 }
 
@@ -232,7 +232,7 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	// read header and version 
 	if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 	{
-		LL_WARNS() << "Failed to read wearable asset input stream." << LL_ENDL;
+		ALOG_WARN("Failed to read wearable asset input stream.");
 		return LLWearable::FAILURE;
 	}
 	if ( 1 != sscanf( /* Flawfinder: ignore */
@@ -250,15 +250,14 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	// these wearables get re-saved with version definition 22.
 	if( mDefinitionVersion > LLWearable::sCurrentDefinitionVersion && mDefinitionVersion != 24 )
 	{
-		LL_WARNS() << "Wearable asset has newer version (" << mDefinitionVersion << ") than XML (" << LLWearable::sCurrentDefinitionVersion << ")" << LL_ENDL;
+		ALOG_WARN("Wearable asset has newer version ({}) than XML ({})", mDefinitionVersion, LLWearable::sCurrentDefinitionVersion);
 		return LLWearable::FAILURE;
 	}
 
 	// name may be empty
     if (!input_stream.good())
 	{
-		LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-				<< "while reading name" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: early end of input stream while reading name");
 		return LLWearable::FAILURE;
 	}
 	input_stream.getline(buffer, PARSE_BUFFER_SIZE);
@@ -267,8 +266,7 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	// description may be empty
 	if (!input_stream.good())
 	{
-		LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-				<< "while reading description" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: early end of input stream while reading description");
 		return LLWearable::FAILURE;
 	}
 	input_stream.getline(buffer, PARSE_BUFFER_SIZE);
@@ -277,15 +275,14 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	// permissions may have extra empty lines before the correct line
 	if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 	{
-		LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-				<< "while reading permissions" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: early end of input stream while reading permissions");
 		return LLWearable::FAILURE;
 	}
 	S32 perm_version = -1;
 	if ( 1 != sscanf( buffer, " permissions %d\n", &perm_version ) ||
 		 perm_version != 0 )
 	{
-		LL_WARNS() << "Bad Wearable asset: missing valid permissions" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: missing valid permissions");
 		return LLWearable::FAILURE;
 	}
 	if( !mPermissions.importLegacyStream( input_stream ) )
@@ -296,15 +293,14 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	// sale info
 	if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 	{
-		LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-				<< "while reading sale info" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: early end of input stream while reading sale info");
 		return LLWearable::FAILURE;
 	}
 	S32 sale_info_version = -1;
 	if ( 1 != sscanf( buffer, " sale_info %d\n", &sale_info_version ) ||
 		sale_info_version != 0 )
 	{
-		LL_WARNS() << "Bad Wearable asset: missing valid sale_info" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: missing valid sale_info");
 		return LLWearable::FAILURE;
 	}
 	// Sale info used to contain next owner perm. It is now in the
@@ -330,14 +326,13 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	// wearable type
 	if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 	{
-		LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-				<< "while reading type" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: early end of input stream while reading type");
 		return LLWearable::FAILURE;
 	}
 	S32 type = -1;
 	if ( 1 != sscanf( buffer, "type %d\n", &type ) )
 	{
-		LL_WARNS() << "Bad Wearable asset: bad type" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: bad type");
 		return LLWearable::FAILURE;
 	}
 	if( 0 <= type && type < LLWearableType::WT_COUNT )
@@ -347,36 +342,30 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	else
 	{
 		mType = LLWearableType::WT_COUNT;
-		LL_WARNS() << "Bad Wearable asset: bad type #" << type <<  LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: bad type #{}", type);
 		return LLWearable::FAILURE;
 	}
 
 	// parameters header
 	if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 	{
-		LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-				<< "while reading parameters header" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: early end of input stream while reading parameters header");
 		return LLWearable::FAILURE;
 	}
 	S32 num_parameters = -1;
 	if ( 1 != sscanf( buffer, "parameters %d\n", &num_parameters ) )
 	{
-		LL_WARNS() << "Bad Wearable asset: missing parameters block" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: missing parameters block");
 		return LLWearable::FAILURE;
 	}
 	if ( num_parameters > MAX_WEARABLE_ASSET_PARAMETERS )
 	{
-		LL_WARNS() << "Bad Wearable asset: too many parameters, "
-				<< num_parameters << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: too many parameters, {}", num_parameters);
 		return LLWearable::FAILURE;
 	}
 	if( num_parameters != mVisualParamIndexMap.size() )
 	{
-		LL_WARNS() << "Wearable parameter mismatch. Reading in " 
-				<< num_parameters << " from file, but created " 
-				<< mVisualParamIndexMap.size() 
-				<< " from avatar parameters. type: " 
-				<<  getType() << LL_ENDL;
+		ALOG_WARN("Wearable parameter mismatch. Reading in {} from file, but created {} from avatar parameters. Type: {}", num_parameters, mVisualParamIndexMap.size(), getType());
 	}
 
 	// parameters
@@ -385,15 +374,14 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	{
 		if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 		{
-			LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-					<< "while reading parameter #" << i << LL_ENDL;
+			ALOG_WARN("Bad Wearable asset: early end of input stream while reading parameter #{}", i);
 			return LLWearable::FAILURE;
 		}
 		S32 param_id = 0;
 		F32 param_weight = 0.f;
 		if ( 2 != sscanf( buffer, "%d %f\n", &param_id, &param_weight ) )
 		{
-			LL_WARNS() << "Bad Wearable asset: bad parameter, #" << i << LL_ENDL;
+			ALOG_WARN("Bad Wearable asset: bad parameter, #{}", i);
 			return LLWearable::FAILURE;
 		}
 		mSavedVisualParamMap[param_id] = param_weight;
@@ -402,20 +390,18 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	// textures header
 	if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 	{
-		LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-				<< "while reading textures header" << i << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: early end of input stream while reading textures header {}", i);
 		return LLWearable::FAILURE;
 	}
 	S32 num_textures = -1;
 	if ( 1 != sscanf( buffer, "textures %d\n", &num_textures) )
 	{
-		LL_WARNS() << "Bad Wearable asset: missing textures block" << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: missing textures block");
 		return LLWearable::FAILURE;
 	}
 	if ( num_textures > MAX_WEARABLE_ASSET_TEXTURES )
 	{
-		LL_WARNS() << "Bad Wearable asset: too many textures, "
-				<< num_textures << LL_ENDL;
+		ALOG_WARN("Bad Wearable asset: too many textures, {}", num_textures);
 		return LLWearable::FAILURE;
 	}
 
@@ -424,8 +410,7 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 	{
 		if (!getNextPopulatedLine(input_stream, buffer, PARSE_BUFFER_SIZE))
 		{
-			LL_WARNS() << "Bad Wearable asset: early end of input stream " 
-					<< "while reading textures #" << i << LL_ENDL;
+			ALOG_WARN("Bad Wearable asset: early end of input stream while reading textures #{}", i);
 			return LLWearable::FAILURE;
 		}
 		S32 te = 0;
@@ -434,20 +419,19 @@ LLWearable::EImportResult LLWearable::importStream( std::istream& input_stream, 
 				"%d %36s\n",
 				&te, uuid_buffer) )
 		{
-				LL_WARNS() << "Bad Wearable asset: bad texture, #" << i << LL_ENDL;
+				ALOG_WARN("Bad Wearable asset: bad texture, #{}", i);
 				return LLWearable::FAILURE;
 		}
 
 		if (te >= ETextureIndex::TEX_NUM_INDICES) //createLayers() converts to ETextureIndex
 		{
-			LL_WARNS() << "Bad Wearable asset: bad texture index: " << te << LL_ENDL;
+			ALOG_WARN("Bad Wearable asset: bad texture index: {}", te);
 			return LLWearable::FAILURE;
 		}
 
 		if( !LLUUID::validate( uuid_buffer ) )
 		{
-				LL_WARNS() << "Bad Wearable asset: bad texture uuid: " 
-						<< uuid_buffer << LL_ENDL;
+				ALOG_WARN("Bad Wearable asset: bad texture uuid: {}", uuid_buffer);
 				return LLWearable::FAILURE;
 		}
 		LLUUID id = LLUUID(uuid_buffer);
@@ -680,7 +664,7 @@ void LLWearable::setVisualParamWeight(S32 param_index, F32 value)
 	}
 	else
 	{
-		LL_ERRS() << "LLWearable::setVisualParam passed invalid parameter index: " << param_index << " for wearable type: " << this->getName() << LL_ENDL;
+		ALOG_CRITICAL("LLWearable::setVisualParam passed invalid parameter index: {} for wearable type: {}", param_index, this->getName());
 	}
 }
 
@@ -694,7 +678,7 @@ F32 LLWearable::getVisualParamWeight(S32 param_index) const
 	}
 	else
 	{
-		LL_WARNS() << "LLWerable::getVisualParam passed invalid parameter index: "  << param_index << " for wearable type: " << this->getName() << LL_ENDL;
+		ALOG_WARN("LLWerable::getVisualParam passed invalid parameter index: {} for wearable type: {}", param_index, this->getName());
 	}
 	return (F32)-1.0f;
 }

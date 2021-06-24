@@ -64,7 +64,7 @@ LLLocalTextureObject::LLLocalTextureObject(const LLLocalTextureObject& lto) :
 		LLTexLayer* original_layer = lto.getTexLayer(index);
 		if (!original_layer)
 		{
-			LL_ERRS() << "could not clone Local Texture Object: unable to extract texlayer!" << LL_ENDL;
+			ALOG_CRITICAL("could not clone Local Texture Object: unable to extract texlayer!");
 			continue;
 		}
 
