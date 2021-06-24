@@ -77,7 +77,7 @@ public:
 					*(mBuffer + mBufferSize++) = mLoad;
 					if (mBufferSize > mMaxSize)
 					{
-						LL_ERRS() << "mBufferSize exceeding mMaxSize!" << LL_ENDL;
+						ALOG_CRITICAL("mBufferSize exceeding mMaxSize!: {} > {}", mBufferSize, mMaxSize);
 					}
 					mLoadSize = 0;
 					mLoad = 0x00;
@@ -120,7 +120,7 @@ public:
 					*(mBuffer + mBufferSize++) = mLoad;
 					if (mBufferSize > mMaxSize)
 					{
-						LL_ERRS() << "mBufferSize exceeding mMaxSize!" << LL_ENDL;
+						ALOG_CRITICAL("mBufferSize exceeding mMaxSize!: {} > {}", mBufferSize, mMaxSize);
 					}
 					mLoadSize = 0;
 					mLoad = 0x00;
@@ -163,8 +163,7 @@ public:
 #ifdef _DEBUG
 					if (mBufferSize > mMaxSize)
 					{
-						LL_ERRS() << "mBufferSize exceeding mMaxSize" << LL_ENDL;
-						LL_ERRS() << mBufferSize << " > " << mMaxSize << LL_ENDL;
+						ALOG_CRITICAL("mBufferSize exceeding mMaxSize!: {} > {}", mBufferSize, mMaxSize);
 					}
 #endif
 					mLoad = *(mBuffer + mBufferSize++);
@@ -188,7 +187,7 @@ public:
 			*(mBuffer + mBufferSize++) = mLoad;
 			if (mBufferSize > mMaxSize)
 			{
-				LL_ERRS() << "mBufferSize exceeding mMaxSize!" << LL_ENDL;
+				ALOG_CRITICAL("mBufferSize exceeding mMaxSize!: {} > {}", mBufferSize, mMaxSize);
 			}
 			mLoadSize = 0;
 		}

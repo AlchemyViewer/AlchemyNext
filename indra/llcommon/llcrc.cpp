@@ -162,7 +162,7 @@ void LLCRC::update(const std::string& filename)
 {
 	if (filename.empty())
 	{
-		LL_ERRS() << "No filename specified" << LL_ENDL;
+		ALOG_CRITICAL("No filename specified");
 		return;
 	}
 

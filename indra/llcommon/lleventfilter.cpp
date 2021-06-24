@@ -104,7 +104,7 @@ public:
 
     void operator()()
     {
-        LL_ERRS("LLEventTimeout") << mMessage << LL_ENDL;
+        ALOG_CRITICAL(mMessage);
     }
 
 private:

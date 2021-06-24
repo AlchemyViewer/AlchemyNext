@@ -268,7 +268,7 @@ public:
         {
             // We need one clear per one get
             // At the moment no need to support multiple calls
-            LL_ERRS() << "LLAPRFilePoolScope is not supposed to be initialized twice" << LL_ENDL;
+            ALOG_CRITICAL("LLAPRFilePoolScope is not supposed to be initialized twice");
         }
         mInitialized = true;
         return pPool->getVolatileAPRPool();

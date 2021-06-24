@@ -158,7 +158,7 @@ std::string LLCoros::generateDistinctName(const std::string& prefix) const
     // Allowing empty name would make getName()'s not-found return ambiguous.
     if (prefix.empty())
     {
-        LL_ERRS("LLCoros") << "LLCoros::launch(): pass non-empty name string" << LL_ENDL;
+        ALOG_CRITICAL("LLCoros::launch(): pass non-empty name string");
     }
 
     // If the specified name isn't already in the map, just use that.

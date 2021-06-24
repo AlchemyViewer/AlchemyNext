@@ -74,8 +74,7 @@ LLSDArgsSource::LLSDArgsSource(const std::string function, const LLSD& args):
 {
     if (! (_args.isUndefined() || _args.isArray()))
     {
-        LL_ERRS("LLSDArgsSource") << _function << " needs an args array instead of "
-                                  << _args << LL_ENDL;
+       ALOG_CRITICAL("{} needs an args array instead of {}", _function, _args);
     }
 }
 
@@ -598,8 +597,7 @@ void LLEventDispatcher::operator()(const std::string& name, const LLSD& event) c
 {
     if (! try_call(name, event))
     {
-        LL_ERRS("LLEventDispatcher") << "LLEventDispatcher(" << mDesc << "): '" << name
-                                     << "' not found" << LL_ENDL;
+        ALOG_CRITICAL("LLEventDispatcher({}): '{}' not found", mDesc, name);
     }
 }
 
@@ -613,8 +611,7 @@ void LLEventDispatcher::operator()(const LLSD& event) const
     std::string name(event[mKey]);
     if (! try_call(name, event))
     {
-        LL_ERRS("LLEventDispatcher") << "LLEventDispatcher(" << mDesc << "): bad " << mKey
-                                     << " value '" << name << "'" << LL_ENDL;
+        ALOG_CRITICAL("LLEventDispatcher({}): bad {} value '{}'", mDesc, mKey, name);
     }
 }
 

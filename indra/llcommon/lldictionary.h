@@ -89,7 +89,7 @@ protected:
 	{
 		if (lookup(index))
 		{
-			LL_ERRS() << "Dictionary entry already added (attempted to add duplicate entry)" << LL_ENDL;
+			ALOG_CRITICAL("Dictionary entry already added (attempted to add duplicate entry)");
 		}
 		(*this)[index] = entry;
 	}
