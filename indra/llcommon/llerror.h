@@ -100,15 +100,15 @@ public:
 		fatal_func_t mPrev;
 	};
 
-	static std::shared_ptr<spdlog::logger> MAIN_LOG;
-	static std::shared_ptr<spdlog::logger> ASSET_LOG;
-	static std::shared_ptr<spdlog::logger> AUDIO_LOG;
-	static std::shared_ptr<spdlog::logger> IO_LOG;
-	static std::shared_ptr<spdlog::logger> MEDIA_LOG;
-	static std::shared_ptr<spdlog::logger> NETWORK_LOG;
-	static std::shared_ptr<spdlog::logger> RENDER_LOG;
-	static std::shared_ptr<spdlog::logger> TEXTURE_LOG;
-	static std::shared_ptr<spdlog::logger> UI_LOG;
+	static spdlog::logger* MAIN_LOG;
+	static spdlog::logger* ASSET_LOG;
+	static spdlog::logger* AUDIO_LOG;
+	static spdlog::logger* IO_LOG;
+	static spdlog::logger* MEDIA_LOG;
+	static spdlog::logger* NETWORK_LOG;
+	static spdlog::logger* RENDER_LOG;
+	static spdlog::logger* TEXTURE_LOG;
+	static spdlog::logger* UI_LOG;
 
 private:
 	static std::shared_ptr<spdlog::sinks::dup_filter_sink_mt> sDistSink;
@@ -122,6 +122,7 @@ private:
 	};
 	static LogConfig sGlobalConfig;
 	static std::vector<spdlog::sink_ptr> sSinks;
+	static std::vector<std::shared_ptr<spdlog::logger>> sLoggers;
 	static std::unique_ptr<absl::Mutex> sFatalMutex;
 	static fatal_func_t sFatalFunc;
 };

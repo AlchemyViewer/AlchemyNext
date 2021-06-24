@@ -143,17 +143,18 @@ protected:
 using linebuffer_sink_mt = linebuffer_sink<std::mutex>;
 using linebuffer_sink_st = linebuffer_sink<spdlog::details::null_mutex>;
 
-std::shared_ptr<spdlog::logger> ALLog::MAIN_LOG;
-std::shared_ptr<spdlog::logger> ALLog::ASSET_LOG;
-std::shared_ptr<spdlog::logger> ALLog::AUDIO_LOG;
-std::shared_ptr<spdlog::logger> ALLog::IO_LOG;
-std::shared_ptr<spdlog::logger> ALLog::MEDIA_LOG;
-std::shared_ptr<spdlog::logger> ALLog::NETWORK_LOG;
-std::shared_ptr<spdlog::logger> ALLog::RENDER_LOG;
-std::shared_ptr<spdlog::logger> ALLog::TEXTURE_LOG;
-std::shared_ptr<spdlog::logger> ALLog::UI_LOG;
+spdlog::logger* ALLog::MAIN_LOG = nullptr;
+spdlog::logger* ALLog::ASSET_LOG = nullptr;
+spdlog::logger* ALLog::AUDIO_LOG = nullptr;
+spdlog::logger* ALLog::IO_LOG = nullptr;
+spdlog::logger* ALLog::MEDIA_LOG = nullptr;
+spdlog::logger* ALLog::NETWORK_LOG = nullptr;
+spdlog::logger* ALLog::RENDER_LOG = nullptr;
+spdlog::logger* ALLog::TEXTURE_LOG = nullptr;
+spdlog::logger* ALLog::UI_LOG = nullptr;
 std::shared_ptr<spdlog::sinks::dup_filter_sink_mt> ALLog::sDistSink;
 std::vector<spdlog::sink_ptr> ALLog::sSinks;
+std::vector<std::shared_ptr<spdlog::logger>> ALLog::sLoggers;
 ALLog::LogConfig ALLog::sGlobalConfig;
 ALLog::fatal_func_t ALLog::sFatalFunc;
 std::unique_ptr<absl::Mutex> ALLog::sFatalMutex;
@@ -209,44 +210,76 @@ void ALLog::init(const LogConfig& config)
 		}
 #endif
 
+		std::shared_ptr<spdlog::logger> main_log_ptr;
+		std::shared_ptr<spdlog::logger> asset_log_ptr;
+		std::shared_ptr<spdlog::logger> audio_log_ptr;
+		std::shared_ptr<spdlog::logger> io_log_ptr;
+		std::shared_ptr<spdlog::logger> media_log_ptr;
+		std::shared_ptr<spdlog::logger> network_log_ptr;
+		std::shared_ptr<spdlog::logger> render_log_ptr;
+		std::shared_ptr<spdlog::logger> texture_log_ptr;
+		std::shared_ptr<spdlog::logger> ui_log_ptr;
+
 		if (config.async_logging)
 		{
-			MAIN_LOG = std::make_shared<spdlog::async_logger>("mainl", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			ASSET_LOG = std::make_shared<spdlog::async_logger>("asset", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			AUDIO_LOG = std::make_shared<spdlog::async_logger>("audio", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			IO_LOG = std::make_shared<spdlog::async_logger>("iodat", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			MEDIA_LOG = std::make_shared<spdlog::async_logger>("media", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			NETWORK_LOG = std::make_shared<spdlog::async_logger>("ntwrk", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			RENDER_LOG = std::make_shared<spdlog::async_logger>("rendr", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			TEXTURE_LOG = std::make_shared<spdlog::async_logger>("textr", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			UI_LOG = std::make_shared<spdlog::async_logger>("uimsg", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			main_log_ptr = std::make_shared<spdlog::async_logger>("mainl", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			asset_log_ptr = std::make_shared<spdlog::async_logger>("asset", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			audio_log_ptr = std::make_shared<spdlog::async_logger>("audio", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			io_log_ptr = std::make_shared<spdlog::async_logger>("iodat", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			media_log_ptr = std::make_shared<spdlog::async_logger>("media", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			network_log_ptr = std::make_shared<spdlog::async_logger>("ntwrk", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			render_log_ptr = std::make_shared<spdlog::async_logger>("rendr", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			texture_log_ptr = std::make_shared<spdlog::async_logger>("textr", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			ui_log_ptr = std::make_shared<spdlog::async_logger>("uimsg", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		}
 		else
 		{
-			MAIN_LOG = std::make_shared<spdlog::logger>("mainl", sDistSink);
-			ASSET_LOG = std::make_shared<spdlog::logger>("asset", sDistSink);
-			AUDIO_LOG = std::make_shared<spdlog::logger>("audio", sDistSink);
-			IO_LOG = std::make_shared<spdlog::logger>("io", sDistSink);
-			MEDIA_LOG = std::make_shared<spdlog::logger>("media", sDistSink);
-			NETWORK_LOG = std::make_shared<spdlog::logger>("network", sDistSink);
-			RENDER_LOG = std::make_shared<spdlog::logger>("render", sDistSink);
-			TEXTURE_LOG = std::make_shared<spdlog::logger>("textr", sDistSink);
-			UI_LOG = std::make_shared<spdlog::logger>("ui", sDistSink);
+			main_log_ptr = std::make_shared<spdlog::logger>("mainl", sDistSink);
+			asset_log_ptr = std::make_shared<spdlog::logger>("asset", sDistSink);
+			audio_log_ptr = std::make_shared<spdlog::logger>("audio", sDistSink);
+			io_log_ptr = std::make_shared<spdlog::logger>("io", sDistSink);
+			media_log_ptr = std::make_shared<spdlog::logger>("media", sDistSink);
+			network_log_ptr = std::make_shared<spdlog::logger>("network", sDistSink);
+			render_log_ptr = std::make_shared<spdlog::logger>("render", sDistSink);
+			texture_log_ptr = std::make_shared<spdlog::logger>("textr", sDistSink);
+			ui_log_ptr = std::make_shared<spdlog::logger>("ui", sDistSink);
 		}
 
+		// Grab raw pointers for logging performance
+		MAIN_LOG = main_log_ptr.get();
+		ASSET_LOG = asset_log_ptr.get();
+		AUDIO_LOG = audio_log_ptr.get();
+		IO_LOG = io_log_ptr.get();
+		MEDIA_LOG = media_log_ptr.get();
+		NETWORK_LOG = network_log_ptr.get();
+		RENDER_LOG = render_log_ptr.get();
+		TEXTURE_LOG = texture_log_ptr.get();
+		UI_LOG = ui_log_ptr.get();
+
 		// Register the loggers
-		spdlog::initialize_logger(MAIN_LOG);
-		spdlog::initialize_logger(ASSET_LOG);
-		spdlog::initialize_logger(AUDIO_LOG);
-		spdlog::initialize_logger(IO_LOG);
-		spdlog::initialize_logger(MEDIA_LOG);
-		spdlog::initialize_logger(NETWORK_LOG);
-		spdlog::initialize_logger(RENDER_LOG);
-		spdlog::initialize_logger(TEXTURE_LOG);
-		spdlog::initialize_logger(UI_LOG);
+		spdlog::initialize_logger(main_log_ptr);
+		spdlog::initialize_logger(asset_log_ptr);
+		spdlog::initialize_logger(audio_log_ptr);
+		spdlog::initialize_logger(io_log_ptr);
+		spdlog::initialize_logger(media_log_ptr);
+		spdlog::initialize_logger(network_log_ptr);
+		spdlog::initialize_logger(render_log_ptr);
+		spdlog::initialize_logger(texture_log_ptr);
+		spdlog::initialize_logger(ui_log_ptr);
 
 		// Now set the default logger to our main
-		spdlog::set_default_logger(MAIN_LOG);
+		spdlog::set_default_logger(main_log_ptr);
+
+		// Retain pointers to loggers
+		sLoggers.emplace_back(std::move(main_log_ptr));
+		sLoggers.emplace_back(std::move(asset_log_ptr));
+		sLoggers.emplace_back(std::move(audio_log_ptr));
+		sLoggers.emplace_back(std::move(io_log_ptr));
+		sLoggers.emplace_back(std::move(media_log_ptr));
+		sLoggers.emplace_back(std::move(network_log_ptr));
+		sLoggers.emplace_back(std::move(render_log_ptr));
+		sLoggers.emplace_back(std::move(texture_log_ptr));
+		sLoggers.emplace_back(std::move(ui_log_ptr));
 	}
 	catch (const spdlog::spdlog_ex& ex)
 	{
@@ -268,6 +301,8 @@ void ALLog::shutdown()
 	RENDER_LOG = nullptr;
 	UI_LOG = nullptr;
 	TEXTURE_LOG = nullptr;
+
+	sLoggers.clear();
 	sSinks.clear();
 
 	spdlog::shutdown();
