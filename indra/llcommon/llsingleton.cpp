@@ -39,7 +39,7 @@
 #include <stdexcept>
 
 namespace {
-void log(LLError::ELevel level,
+void log(ALLog::ELevel level,
          const char* p1, const char* p2, const char* p3, const char* p4);
 } // anonymous namespace
 
@@ -275,17 +275,19 @@ void LLSingletonBase::reset_initializing(list_t::size_type size)
 
 void LLSingletonBase::MasterList::LockedInitializing::log(const char* verb, const char* name)
 {
-        LL_DEBUGS("LLSingleton") << verb << ' ' << demangle(name) << ';';
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG
+        std::ostringstream ostream;
         if (mList)
         {
             for (list_t::const_reverse_iterator ri(mList->rbegin()), rend(mList->rend());
                  ri != rend; ++ri)
             {
                 LLSingletonBase* sb(*ri);
-                LL_CONT << ' ' << classname(sb);
+                ostream << ' ' << classname(sb);
             }
         }
-        LL_ENDL;
+        ALOG_DEBUG(FMT_COMPILE("{:s} {:s};{}"), verb, demangle(name), ostream.str());
+#endif
 }
 
 void LLSingletonBase::capture_dependency()
@@ -449,10 +451,10 @@ void LLSingletonBase::deleteAll()
 /*---------------------------- Logging helpers -----------------------------*/
 namespace {
 
-void log(LLError::ELevel level,
+void log(ALLog::ELevel level,
          const char* p1, const char* p2, const char* p3, const char* p4)
 {
-    LL_VLOGS(level, "LLSingleton") << p1 << p2 << p3 << p4 << LL_ENDL;
+    ALOG_CALL(level, FMT_STRING("{:s}{:s}{:s}{:s}"), p1, p2, p3, p4);
 }
 
 } // anonymous namespace        
@@ -460,37 +462,37 @@ void log(LLError::ELevel level,
 //static
 void LLSingletonBase::logwarns(const char* p1, const char* p2, const char* p3, const char* p4)
 {
-    log(LLError::LEVEL_WARN, p1, p2, p3, p4);
+    log(ALLog::ELevel::warn, p1, p2, p3, p4);
 }
 
 //static
 void LLSingletonBase::loginfos(const char* p1, const char* p2, const char* p3, const char* p4)
 {
-    log(LLError::LEVEL_INFO, p1, p2, p3, p4);
+    log(ALLog::ELevel::info, p1, p2, p3, p4);
 }
 
 //static
 void LLSingletonBase::logdebugs(const char* p1, const char* p2, const char* p3, const char* p4)
 {
-    log(LLError::LEVEL_DEBUG, p1, p2, p3, p4);
+    log(ALLog::ELevel::debug, p1, p2, p3, p4);
 }
 
 //static
 void LLSingletonBase::logerrs(const char* p1, const char* p2, const char* p3, const char* p4)
 {
-    log(LLError::LEVEL_ERROR, p1, p2, p3, p4);
+    log(ALLog::ELevel::critical, p1, p2, p3, p4);
     // The other important side effect of LL_ERRS() is
     // https://www.youtube.com/watch?v=OMG7paGJqhQ (emphasis on OMG)
     std::ostringstream out;
     out << p1 << p2 << p3 << p4;
-    auto crash = LLError::getFatalFunction();
+    auto crash = ALLog::getFatalFunction();
     if (crash)
     {
         crash(out.str());
     }
     else
     {
-        LLError::crashAndLoop(out.str());
+        ALLog::crashAndLoop(out.str());
     }
 }
 
