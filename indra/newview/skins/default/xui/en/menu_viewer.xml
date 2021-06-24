@@ -4116,6 +4116,83 @@ function="World.EnvPreset"
           </menu_item_check>
        </menu>
 
+       <menu
+         create_jump_keys="true"
+         label="Set AL Logging Level"
+         name="Set AL Logging Level"
+         tear_off="true">
+          <menu_item_check
+            name="Trace"
+            label="Trace">
+            <menu_item_check.on_check
+              function="ALog.CheckLoggingLevel"
+              parameter="0" />
+            <menu_item_check.on_click
+             function="ALog.SetLoggingLevel"
+             parameter="0" />
+          </menu_item_check>
+          <menu_item_check
+            name="Debug"
+            label="Debug">
+            <menu_item_check.on_check
+              function="ALog.CheckLoggingLevel"
+              parameter="1" />
+            <menu_item_check.on_click
+             function="ALog.SetLoggingLevel"
+             parameter="1" />
+          </menu_item_check>
+          <menu_item_check
+            name="Info"
+            label="Info">
+            <menu_item_check.on_check
+              function="ALog.CheckLoggingLevel"
+              parameter="2" />
+            <menu_item_check.on_click
+             function="ALog.SetLoggingLevel"
+             parameter="2" />
+          </menu_item_check>
+          <menu_item_check
+            name="Warning"
+            label="Warning">
+            <menu_item_check.on_check
+              function="ALog.CheckLoggingLevel"
+              parameter="3" />
+            <menu_item_check.on_click
+             function="ALog.SetLoggingLevel"
+             parameter="3" />
+          </menu_item_check>
+          <menu_item_check
+            name="Error"
+            label="Error">
+            <menu_item_check.on_check
+              function="ALog.CheckLoggingLevel"
+              parameter="4" />
+            <menu_item_check.on_click
+             function="ALog.SetLoggingLevel"
+             parameter="4" />
+          </menu_item_check>
+          <menu_item_check
+            name="Critical"
+            label="Critical">
+            <menu_item_check.on_check
+              function="ALog.CheckLoggingLevel"
+              parameter="5" />
+            <menu_item_check.on_click
+             function="ALog.SetLoggingLevel"
+             parameter="5" />
+          </menu_item_check>
+          <menu_item_check
+            name="None"
+            label="None">
+            <menu_item_check.on_check
+              function="ALog.CheckLoggingLevel"
+              parameter="6" />
+            <menu_item_check.on_click
+             function="ALog.SetLoggingLevel"
+             parameter="6" />
+          </menu_item_check>
+       </menu>
+
         <menu_item_separator/>
 
         <menu_item_call
