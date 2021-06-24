@@ -45,26 +45,22 @@ typedef boost::error_info<struct errinfo_stacktrace_, boost::stacktrace::stacktr
 
 namespace {
 // used by crash_on_unhandled_exception_() and log_unhandled_exception_()
-void log_unhandled_exception_(LLError::ELevel level,
+void log_unhandled_exception_(ALLog::ELevel level,
                               const char* file, int line, const char* pretty_function,
                               const std::string& context)
 {
     // log same message but allow caller-specified severity level
-    LL_VLOGS(level, "LLException") << LLError::abbreviateFile(file)
-        << "(" << line << "): Unhandled exception caught in " << pretty_function;
-    if (! context.empty())
-    {
-        LL_CONT << ": " << context;
-    }
-    LL_CONT << ":\n" << boost::current_exception_diagnostic_information() << LL_ENDL;
+    ALOG_CALL(level, FMT_COMPILE("{:s}({:d}): Unhandled exception caught in {:s}{:s} :\n{:s}"),
+        LLError::abbreviateFile(file), line, pretty_function, (!context.empty() ? ": " + context : ""),
+        boost::current_exception_diagnostic_information());
 }
 }
 
 void crash_on_unhandled_exception_(const char* file, int line, const char* pretty_function,
                                    const std::string& context)
 {
-    // LL_ERRS() terminates and propagates message into crash dump.
-    log_unhandled_exception_(LLError::LEVEL_ERROR, file, line, pretty_function, context);
+    // ALOG_CRITICAL() terminates and propagates message into crash dump.
+    log_unhandled_exception_(ALLog::ELevel::critical, file, line, pretty_function, context);
 }
 
 void log_unhandled_exception_(const char* file, int line, const char* pretty_function,
@@ -72,7 +68,7 @@ void log_unhandled_exception_(const char* file, int line, const char* pretty_fun
 {
     // Use LL_WARNS() because we seriously do not expect this to happen
     // routinely, but we DO expect to return from this function.
-    log_unhandled_exception_(LLError::LEVEL_WARN, file, line, pretty_function, context);
+    log_unhandled_exception_(ALLog::ELevel::err, file, line, pretty_function, context);
 }
 
 void annotate_exception_(boost::exception& exc)

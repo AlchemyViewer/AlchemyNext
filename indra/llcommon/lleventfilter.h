@@ -137,7 +137,7 @@ public:
      * "mainloop" granularity).
      *
      * Then if the async API breaks its promise, the program terminates with
-     * the specified LL_ERRS @a message. The client of the async API can
+     * the specified ALOG_CRITICAL @a message. The client of the async API can
      * therefore assume the guarantee is upheld.
      *
      * @NOTE

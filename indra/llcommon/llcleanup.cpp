@@ -20,18 +20,11 @@
 #include "llerror.h"
 #include "llerrorcontrol.h"
 
-void log_subsystem_cleanup(LLError::ELevel level,
+void log_subsystem_cleanup(ALLog::ELevel level,
                            const char* file,
                            int line,
                            const char* function,
                            const char* classname)
 {
-    if (level == LLError::ELevel::LEVEL_DEBUG)
-    {
-        ALOG_DEBUG("{}({}): calling {}::cleanupClass() in {}", LLError::abbreviateFile(file), line, classname, function);
-    }
-    else if(level == LLError::ELevel::LEVEL_INFO)
-    {
-        ALOG_INFO("{}({}): calling {}::cleanupClass() in {}", LLError::abbreviateFile(file), line, classname, function);
-    }
+    ALOG_CALL(level, "{}({}): calling {}::cleanupClass() in {}", LLError::abbreviateFile(file), line, classname, function);
 }

@@ -126,6 +126,7 @@ private:
 	static fatal_func_t sFatalFunc;
 };
 
+#define ALOG_CALL(level, ...) SPDLOG_LOGGER_CALL(spdlog::default_logger_raw(), level, __VA_ARGS__)
 #define ALOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)
 #define ALOG_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
 #define ALOG_INFO(...) SPDLOG_INFO(__VA_ARGS__)
