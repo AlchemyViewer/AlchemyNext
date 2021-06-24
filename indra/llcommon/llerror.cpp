@@ -189,14 +189,19 @@ void ALLog::init(const LogConfig& config)
 	{
 		if(config.log_to_file && !config.log_filename.empty())
 		{
-			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(config.log_filename, config.truncate_logfile);
+#if LL_WINDOWS
+			auto logfilestr = ll_convert_string_to_wide(config.log_filename);
+#else
+			auto logfilestr = logfilestr;
+#endif
+			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilestr, config.truncate_logfile);
 			sSinks.emplace_back(std::move(basic_file));
 		}
 
 		if(config.log_to_linebuffer)
 		{
 			auto linebuffer = std::make_shared<linebuffer_sink_mt>(outputToLinebuffer);
-			sSinks.emplace_back(std::move(linebuffer));
+			sSinks.emplace_back(std::move(linebuffer)); 
 		}
 
 		if (config.log_to_stderr && shouldLogToStderr())
