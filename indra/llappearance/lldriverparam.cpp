@@ -116,7 +116,7 @@ void LLDriverParamInfo::toStream(std::ostream &out)
 	// corresponding param in the most recently created
 	// avatar. Apparently these toStream() methods are not currently
 	// used anywhere, so it's not an urgent problem.
-	LL_WARNS_ONCE() << "Invalid usage of mDriverParam." << LL_ENDL;
+	ALOG_WARN("Invalid usage of mDriverParam.");
     
 	if(mDriverParam && mDriverParam->getAvatarAppearance()->isSelf() &&
 		mDriverParam->getAvatarAppearance()->isValid())
