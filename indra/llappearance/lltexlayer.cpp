@@ -205,7 +205,7 @@ BOOL LLTexLayerSetInfo::parseXml(LLXmlTreeNode* node)
 	static LLStdStringHandle body_region_string = LLXmlTree::addAttributeString("body_region");
 	if( !node->getFastAttributeString( body_region_string, mBodyRegion ) )
 	{
-		LL_WARNS() << "<layer_set> is missing body_region attribute" << LL_ENDL;
+		ALOG_WARN("<layer_set> is missing body_region attribute");
 		return FALSE;
 	}
 
@@ -733,13 +733,13 @@ BOOL LLTexLayerInfo::parseXml(LLXmlTreeNode* node)
 			}
 			if (mLocalTexture == TEX_NUM_INDICES)
 			{
-				LL_WARNS() << "<texture> element has invalid local_texture attribute: " << mName << " " << local_texture_name << LL_ENDL;
+				ALOG_WARN("<texture> element has invalid local_texture attribute: {} {}", mName, local_texture_name);
 				return FALSE;
 			}
 		}
 		else	
 		{
-			LL_WARNS() << "<texture> element is missing a required attribute. " << mName << LL_ENDL;
+			ALOG_WARN("<texture> element is missing a required attribute: {}", mName);
 			return FALSE;
 		}
 	}
@@ -802,7 +802,7 @@ BOOL LLTexLayerInfo::createVisualParams(LLAvatarAppearance *appearance)
 		LLTexLayerParamColor* param_color = new LLTexLayerParamColor(appearance);
 		if (!param_color->setInfo(color_info, TRUE))
 		{
-			LL_WARNS() << "NULL TexLayer Color Param could not be added to visual param list. Deleting." << LL_ENDL;
+			ALOG_WARN("NULL TexLayer Color Param could not be added to visual param list. Deleting.");
 			delete param_color;
 			success = FALSE;
 		}
@@ -816,7 +816,7 @@ BOOL LLTexLayerInfo::createVisualParams(LLAvatarAppearance *appearance)
 		LLTexLayerParamAlpha* param_alpha = new LLTexLayerParamAlpha(appearance);
 		if (!param_alpha->setInfo(alpha_info, TRUE))
 		{
-			LL_WARNS() << "NULL TexLayer Alpha Param could not be added to visual param list. Deleting." << LL_ENDL;
+			ALOG_WARN("NULL TexLayer Alpha Param could not be added to visual param list. Deleting.");
 			delete param_alpha;
 			success = FALSE;
 		}
@@ -849,7 +849,7 @@ BOOL LLTexLayerInterface::setInfo(const LLTexLayerInfo *info, LLWearable* wearab
 	// Not a critical warning, but could be useful for debugging later issues. -Nyx
 	if (mInfo != NULL) 
 	{
-			LL_WARNS() << "mInfo != NULL" << LL_ENDL;
+			ALOG_WARN("mInfo != NULL");
 	}
 	mInfo = info;
 	//mID = info->mID; // No ID
@@ -1204,7 +1204,7 @@ BOOL LLTexLayer::render(S32 x, S32 y, S32 width, S32 height, LLRenderTarget* bou
 			}
 			else
 			{
-				LL_INFOS() << "lto not defined or image not defined: " << getInfo()->getLocalTexture() << " lto: " << mLocalTextureObject << LL_ENDL;
+				ALOG_INFO("lto not defined or image not defined: {} lto: {}", getInfo()->getLocalTexture(), mLocalTextureObject);
 			}
 //			if( mTexLayerSet->getAvatarAppearance()->getLocalTextureGL((ETextureIndex)getInfo()->mLocalTexture, &image_gl ) )
 			{
@@ -1292,7 +1292,7 @@ BOOL LLTexLayer::render(S32 x, S32 y, S32 width, S32 height, LLRenderTarget* bou
 
 	if( !success )
 	{
-		LL_INFOS() << "LLTexLayer::render() partial: " << getInfo()->mName << LL_ENDL;
+		ALOG_INFO("LLTexLayer::render() partial: {}", getInfo()->mName);
 	}
 	return success;
 }
@@ -1429,7 +1429,7 @@ void LLTexLayer::renderMorphMasks(S32 x, S32 y, S32 width, S32 height, const LLC
 {
 	if (!force_render && !hasMorph())
 	{
-		LL_DEBUGS() << "skipping renderMorphMasks for " << getUUID() << LL_ENDL;
+		ALOG_DEBUG("skipping renderMorphMasks for {}", getUUID());
 		return;
 	}
 	LL_RECORD_BLOCK_TIME(FTM_RENDER_MORPH_MASKS);
@@ -1470,7 +1470,7 @@ void LLTexLayer::renderMorphMasks(S32 x, S32 y, S32 width, S32 height, const LLC
 		success &= param->render( x, y, width, height );
 		if (!success && !force_render)
 		{
-			LL_DEBUGS() << "Failed to render param " << param->getID() << " ; skipping morph mask." << LL_ENDL;
+			ALOG_DEBUG("Failed to render param {}; skipping morph mask.", param->getID());
 			return;
 		}
 	}
@@ -1512,8 +1512,7 @@ void LLTexLayer::renderMorphMasks(S32 x, S32 y, S32 width, S32 height, const LLC
 			}
 			else
 			{
-				LL_WARNS() << "Skipping rendering of " << getInfo()->mStaticImageFileName 
-						<< "; expected 1 or 4 components." << LL_ENDL;
+				ALOG_WARN("Skipping rendering of {}; expected 1 or 4 components.", getInfo()->mStaticImageFileName);
 			}
 		}
 	}
@@ -1556,8 +1555,8 @@ void LLTexLayer::renderMorphMasks(S32 x, S32 y, S32 width, S32 height, const LLC
                 // We can get bad morph masks during login, on minimize, and occasional gl errors.
                 // We should only be doing this when we believe something has changed with respect to the user's appearance.
 		{
-                       LL_DEBUGS("Avatar") << "gl alpha cache of morph mask not found, doing readback: " << getName() << LL_ENDL;
-                        // clear out a slot if we have filled our cache
+			ALOG_DEBUG("gl alpha cache of morph mask not found, doing readback: {}", getName());
+            // clear out a slot if we have filled our cache
 			S32 max_cache_entries = getTexLayerSet()->getAvatarAppearance()->isSelf() ? 4 : 1;
 			while ((S32)mAlphaCache.size() >= max_cache_entries)
 			{
@@ -1904,18 +1903,14 @@ LLTexLayerStaticImageList::~LLTexLayerStaticImageList()
 
 void LLTexLayerStaticImageList::dumpByteCount() const
 {
-	LL_INFOS() << "Avatar Static Textures " <<
-		"KB GL:" << (mGLBytes / 1024) <<
-		"KB TGA:" << (mTGABytes / 1024) << "KB" << LL_ENDL;
+	ALOG_INFO("Avatar Static Textures\nKB GL: {}KB\nKB TGA: {}KB", (mGLBytes / 1024), (mTGABytes / 1024));
 }
 
 void LLTexLayerStaticImageList::deleteCachedImages()
 {
 	if( mGLBytes || mTGABytes )
 	{
-		LL_INFOS() << "Clearing Static Textures " <<
-			"KB GL:" << (mGLBytes / 1024) <<
-			"KB TGA:" << (mTGABytes / 1024) << "KB" << LL_ENDL;
+		ALOG_INFO("Clearing Static Textures\nKB GL: {}KB\nKB TGA: {}KB", (mGLBytes / 1024), (mTGABytes / 1024));
 
 		//mStaticImageLists uses LLPointers, clear() will cause deletion
 		

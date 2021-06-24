@@ -113,7 +113,7 @@ BOOL LLPolyMorphData::loadBinary(LLFILE *fp, LLPolyMeshSharedData *mesh)
 	llendianswizzle(&numVertices, sizeof(S32), 1);
 	if (numRead != 1)
 	{
-		LL_WARNS() << "Can't read number of morph target vertices" << LL_ENDL;
+		ALOG_WARN("Can't read number of morph target vertices");
 		return FALSE;
 	}
 
@@ -150,13 +150,13 @@ BOOL LLPolyMorphData::loadBinary(LLFILE *fp, LLPolyMeshSharedData *mesh)
 		llendianswizzle(&mVertexIndices[v], sizeof(U32), 1);
 		if (numRead != 1)
 		{
-			LL_WARNS() << "Can't read morph target vertex number" << LL_ENDL;
+			ALOG_WARN("Can't read morph target vertex number");
 			return FALSE;
 		}
 
 		if (mVertexIndices[v] > 10000)
 		{
-			LL_ERRS() << "Bad morph index: " << mVertexIndices[v] << LL_ENDL;
+			ALOG_CRITICAL("Bad morph index: {}", mVertexIndices[v]);
 		}
 
 
@@ -164,7 +164,7 @@ BOOL LLPolyMorphData::loadBinary(LLFILE *fp, LLPolyMeshSharedData *mesh)
 		llendianswizzle(&mCoords[v], sizeof(F32), 3);
 		if (numRead != 3)
 		{
-			LL_WARNS() << "Can't read morph target vertex coordinates" << LL_ENDL;
+			ALOG_WARN("Can't read morph target vertex coordinates");
 			return FALSE;
 		}
 
@@ -184,7 +184,7 @@ BOOL LLPolyMorphData::loadBinary(LLFILE *fp, LLPolyMeshSharedData *mesh)
 		llendianswizzle(&mNormals[v], sizeof(F32), 3);
 		if (numRead != 3)
 		{
-			LL_WARNS() << "Can't read morph target normal" << LL_ENDL;
+			ALOG_WARN("Can't read morph target normal");
 			return FALSE;
 		}
 
@@ -192,7 +192,7 @@ BOOL LLPolyMorphData::loadBinary(LLFILE *fp, LLPolyMeshSharedData *mesh)
 		llendianswizzle(&mBinormals[v], sizeof(F32), 3);
 		if (numRead != 3)
 		{
-			LL_WARNS() << "Can't read morph target binormal" << LL_ENDL;
+			ALOG_WARN("Can't read morph target binormal");
 			return FALSE;
 		}
 
@@ -201,7 +201,7 @@ BOOL LLPolyMorphData::loadBinary(LLFILE *fp, LLPolyMeshSharedData *mesh)
 		llendianswizzle(&mTexCoords[v].mV, sizeof(F32), 2);
 		if (numRead != 2)
 		{
-			LL_WARNS() << "Can't read morph target uv" << LL_ENDL;
+			ALOG_WARN("Can't read morph target uv");
 			return FALSE;
 		}
 
@@ -269,7 +269,7 @@ BOOL LLPolyMorphTargetInfo::parseXml(LLXmlTreeNode* node)
 	static LLStdStringHandle name_string = LLXmlTree::addAttributeString("name");
 	if( !node->getFastAttributeString( name_string, mMorphName ) )
 	{
-		LL_WARNS() << "Avatar file: <param> is missing name attribute" << LL_ENDL;
+		ALOG_WARN("Avatar file: <param> is missing name attribute");
 		return FALSE;  // Continue, ignoring this tag
 	}
 
@@ -280,8 +280,8 @@ BOOL LLPolyMorphTargetInfo::parseXml(LLXmlTreeNode* node)
 
         if (NULL == paramNode)
         {
-                LL_WARNS() << "Failed to getChildByName(\"param_morph\")"
-                        << LL_ENDL;
+                ALOG_WARN("Failed to getChildByName(\"param_morph\")"
+                       );
                 return FALSE;
         }
 
@@ -393,7 +393,7 @@ BOOL LLPolyMorphTarget::setInfo(LLPolyMorphTargetInfo* info)
 	}
 	if (!mMorphData)
 	{
-		LL_WARNS() << "No morph target named " << morph_param_name << " found in mesh." << LL_ENDL;
+		ALOG_WARN("No morph target named {} found in mesh.", morph_param_name);
 		return FALSE;  // Continue, ignoring this tag
 	}
 	return TRUE;

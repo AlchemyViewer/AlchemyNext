@@ -130,7 +130,7 @@ BOOL LLTexGlobalColorInfo::parseXml(LLXmlTreeNode* node)
 	static LLStdStringHandle name_string = LLXmlTree::addAttributeString("name");
 	if (!node->getFastAttributeString(name_string, mName))
 	{
-		LL_WARNS() << "<global_color> element is missing name attribute." << LL_ENDL;
+		ALOG_WARN("<global_color> element is missing name attribute.");
 		return FALSE;
 	}
 	// <param> sub-element

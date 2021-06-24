@@ -108,7 +108,7 @@ BOOL LLSkinJoint::setupSkinJoint( LLAvatarJoint *joint)
 	mJoint = joint;
 	if ( !mJoint )
 	{
-		LL_INFOS() << "Can't find joint" << LL_ENDL;
+		ALOG_INFO("Can't find joint");
 	}
 
 	// compute the inverse root skin matrix
@@ -319,7 +319,7 @@ void LLAvatarJointMesh::setMesh( LLPolyMesh *mesh )
 		U32 jn;
 		for (jn = 0; jn < numJointNames; jn++)
 		{
-			//LL_INFOS() << "Setting up joint " << jointNames[jn] << LL_ENDL;
+			//ALOG_INFO("Setting up joint {}", jointNames[jn]);
 			LLAvatarJoint* joint = (LLAvatarJoint*)(getRoot()->findJoint(jointNames[jn]) );
 			mSkinJoints[jn].setupSkinJoint( joint );
 		}
@@ -352,7 +352,7 @@ void LLAvatarJointMesh::setupJoint(LLAvatarJoint* current_joint)
 
 		// we've found a skinjoint for this joint..
 #ifdef SHOW_DEBUG
-        LL_DEBUGS("Avatar") << "Mesh: " << getName() << " joint " << current_joint->getName() << " matches skinjoint " << sj << LL_ENDL;
+        ALOG_DEBUG("Mesh: {} joint {} matches skinjoint {}", getName(), current_joint->getName(), sj);
 #endif
 
 		// is the last joint in the array our parent?
@@ -369,7 +369,7 @@ void LLAvatarJointMesh::setupJoint(LLAvatarJoint* current_joint)
 			LLAvatarJoint* jointp = js.mJoint;
 			jrd.push_back(new LLJointRenderData(&jointp->getWorldMatrix(), &js));
 #ifdef SHOW_DEBUG
-			LL_DEBUGS("Avatar") << "add joint[" << (jrd.size()-1) << "] = " << js.mJoint->getName() << LL_ENDL;
+			ALOG_DEBUG("add joint[{}] = {}", (jrd.size()-1), js.mJoint->getName());
 #endif
 		}
 		// otherwise add our ancestor and ourselves
@@ -377,11 +377,11 @@ void LLAvatarJointMesh::setupJoint(LLAvatarJoint* current_joint)
 		{
 			jrd.push_back(new LLJointRenderData(&ancestor->getWorldMatrix(), NULL));
 #ifdef SHOW_DEBUG
-			LL_DEBUGS("Avatar") << "add2 ancestor joint[" << (jrd.size()-1) << "] = " << ancestor->getName() << LL_ENDL;
+			ALOG_DEBUG("add2 ancestor joint[{}] = {}", (jrd.size()-1), ancestor->getName());
 #endif
 			jrd.push_back(new LLJointRenderData(&current_joint->getWorldMatrix(), &js));
 #ifdef SHOW_DEBUG
-            LL_DEBUGS("Avatar") << "add2 joint[" << (jrd.size()-1) << "] = " << current_joint->getName() << LL_ENDL;
+            ALOG_DEBUG("add2 joint[{}] = {}", (jrd.size()-1), current_joint->getName());
 #endif
 		}
 	}

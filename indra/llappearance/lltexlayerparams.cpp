@@ -51,7 +51,7 @@ LLTexLayerParam::LLTexLayerParam(LLTexLayerInterface *layer)
 	}
 	else
 	{
-		LL_ERRS() << "LLTexLayerParam constructor passed with NULL reference for layer!" << LL_ENDL;
+		ALOG_CRITICAL("LLTexLayerParam constructor passed with NULL reference for layer!");
 	}
 }
 
@@ -95,7 +95,7 @@ void LLTexLayerParamAlpha::dumpCacheByteCount()
 {
 	S32 gl_bytes = 0;
 	getCacheByteCount( &gl_bytes);
-	LL_INFOS() << "Processed Alpha Texture Cache GL:" << (gl_bytes/1024) << "KB" << LL_ENDL;
+	ALOG_INFO("Processed Alpha Texture Cache GL: {}KB", (gl_bytes/1024));
 }
 
 // static 
@@ -301,7 +301,7 @@ BOOL LLTexLayerParamAlpha::render(S32 x, S32 y, S32 width, S32 height)
 
 			if (mStaticImageTGA.isNull())
 			{
-				LL_WARNS() << "Unable to load static file: " << info->mStaticImageFileName << LL_ENDL;
+				ALOG_WARN("Unable to load static file: {}", info->mStaticImageFileName);
 				mStaticImageInvalid = TRUE; // don't try again.
 				return FALSE;
 			}
@@ -332,7 +332,7 @@ BOOL LLTexLayerParamAlpha::render(S32 x, S32 y, S32 width, S32 height)
 			mStaticImageRaw = new LLImageRaw;
 			mStaticImageTGA->decodeAndProcess(mStaticImageRaw, info->mDomain, effective_weight);
 			mNeedsCreateTexture = TRUE;			
-			LL_DEBUGS() << "Built Cached Alpha: " << info->mStaticImageFileName << ": (" << mStaticImageRaw->getWidth() << ", " << mStaticImageRaw->getHeight() << ") " << "Domain: " << info->mDomain << " Weight: " << effective_weight << LL_ENDL;
+			ALOG_DEBUG("Built Cached Alpha: {}: ({}, {}) Domain: {} Weight: {}", info->mStaticImageFileName, mStaticImageRaw->getWidth(), mStaticImageRaw->getHeight(), info->mDomain, effective_weight);
 		}
 
 		if (mCachedProcessedTexture)
@@ -403,7 +403,7 @@ BOOL LLTexLayerParamAlphaInfo::parseXml(LLXmlTreeNode* node)
 	}
 //	else
 //	{
-//		LL_WARNS() << "<param_alpha> element is missing tga_file attribute." << LL_ENDL;
+//		ALOG_WARN("<param_alpha> element is missing tga_file attribute.");
 //	}
 	
 	static LLStdStringHandle multiply_blend_string = LLXmlTree::addAttributeString("multiply_blend");
@@ -506,7 +506,7 @@ void LLTexLayerParamColor::setWeight(F32 weight)
 			}
 		}
 
-//		LL_INFOS() << "param " << mName << " = " << new_weight << LL_ENDL;
+//		ALOG_INFO("param {} = {}", mName, new_weight);
 	}
 }
 
@@ -581,13 +581,13 @@ BOOL LLTexLayerParamColorInfo::parseXml(LLXmlTreeNode *node)
 	}
 	if (!mNumColors)
 	{
-		LL_WARNS() << "<param_color> is missing <value> sub-elements" << LL_ENDL;
+		ALOG_WARN("<param_color> is missing <value> sub-elements");
 		return FALSE;
 	}
 
 	if ((mOperation == LLTexLayerParamColor::OP_BLEND) && (mNumColors != 1))
 	{
-		LL_WARNS() << "<param_color> with operation\"blend\" must have exactly one <value>" << LL_ENDL;
+		ALOG_WARN("<param_color> with operation\"blend\" must have exactly one <value>");
 		return FALSE;
 	}
 	

@@ -70,13 +70,13 @@ void LLWearableData::setWearable(const LLWearableType::EType type, U32 index, LL
 	wearableentry_map_t::iterator wearable_iter = mWearableDatas.find(type);
 	if (wearable_iter == mWearableDatas.end())
 	{
-		LL_WARNS() << "invalid type, type " << type << " index " << index << LL_ENDL; 
+		ALOG_WARN("invalid type, type {} index {}", type, index);
 		return;
 	}
 	wearableentry_vec_t& wearable_vec = wearable_iter->second;
 	if (index>=wearable_vec.size())
 	{
-		LL_WARNS() << "invalid index, type " << type << " index " << index << LL_ENDL; 
+		ALOG_WARN("invalid index, type {} index {}", type, index);
 	}
 	else
 	{
@@ -94,7 +94,7 @@ void LLWearableData::pushWearable(const LLWearableType::EType type,
 	if (wearable == NULL)
 	{
 		// no null wearables please!
-		LL_WARNS() << "Null wearable sent for type " << type << LL_ENDL;
+		ALOG_WARN("Null wearable sent for type {}", type);
 	}
 	if (canAddWearable(type))
 	{
@@ -216,7 +216,7 @@ BOOL LLWearableData::getWearableIndex(const LLWearable *wearable, U32& index_fou
 	wearableentry_map_t::const_iterator wearable_iter = mWearableDatas.find(type);
 	if (wearable_iter == mWearableDatas.end())
 	{
-		LL_WARNS() << "tried to get wearable index with an invalid type!" << LL_ENDL;
+		ALOG_WARN("tried to get wearable index with an invalid type!");
 		return FALSE;
 	}
 	const wearableentry_vec_t& wearable_vec = wearable_iter->second;
