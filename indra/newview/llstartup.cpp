@@ -129,10 +129,12 @@
 #include "llpanelpick.h"
 #include "llpanelgrouplandmoney.h"
 #include "llpanelgroupnotices.h"
+#include "llparcel.h"
 #include "llpreview.h"
 #include "llpreviewscript.h"
 #include "llproxy.h"
 #include "llproductinforequest.h"
+#include "llqueryflags.h"
 #include "llselectmgr.h"
 #include "llsky.h"
 #include "llstatview.h"
@@ -236,7 +238,6 @@ extern S32 gStartImageHeight;
 static bool gGotUseCircuitCodeAck = false;
 static std::string sInitialOutfit;
 static std::string sInitialOutfitGender;	// "male" or "female"
-static boost::signals2::connection sWearablesLoadedCon;
 
 static bool gUseCircuitCallbackCalled = false;
 
@@ -1703,8 +1704,20 @@ bool idle_startup()
 	if (STATE_INVENTORY_SEND == LLStartUp::getStartupState())
 	{
 		display_startup();
+
+        // request mute list
+        ALOG_INFO("Requesting Mute List");
+        LLMuteList::getInstance()->requestFromServer(gAgent.getID());
+
+        // Get L$ and ownership credit information
+        ALOG_INFO("Requesting Money Balance");
+        LLStatusBar::sendMoneyBalanceRequest();
+
+        display_startup();
+
 		// Inform simulator of our language preference
 		LLAgentLanguage::update();
+
 		display_startup();
 		// unpack thin inventory
 		LLSD response = LLLoginInstance::getInstance()->getResponse();
@@ -1871,14 +1884,6 @@ bool idle_startup()
 		LLLandmark::registerCallbacks(msg);
 		display_startup();
 
-		// request mute list
-		ALOG_INFO("Requesting Mute List");
-		LLMuteList::getInstance()->requestFromServer(gAgent.getID());
-		display_startup();
-		// Get L$ and ownership credit information
-		ALOG_INFO("Requesting Money Balance");
-		LLStatusBar::sendMoneyBalanceRequest();
-		display_startup();
 		// request all group information
 		ALOG_INFO("Requesting Agent Data");
 		gAgent.sendAgentDataUpdateRequest();
@@ -1939,10 +1944,6 @@ bool idle_startup()
 			// Set the show start location to true, now that the user has logged
 			// on with this install.
 			gSavedSettings.setBOOL("ShowStartLocation", TRUE);
-
-			// Open Conversation floater on first login.
-			LLFloaterReg::toggleInstanceOrBringToFront("im_container");
-
 		}
 
 		display_startup();
@@ -2297,6 +2298,14 @@ bool idle_startup()
 		LLPathfindingManager::getInstance()->initSystem();
 
 		gAgentAvatarp->sendHoverHeight();
+
+		// look for parcels we own
+		send_places_query(LLUUID::null,
+			LLUUID::null,
+			"",
+			DFQ_AGENT_OWNED,
+			LLParcel::C_ANY,
+			"");
 
 		return TRUE;
 	}
@@ -2732,11 +2741,6 @@ void LLStartUp::loadInitialOutfit( const std::string& outfit_folder_name,
 	}
 	else
 	{
-		// FIXME SH-3860 - this creates a race condition, where COF
-		// changes (base outfit link added) after appearance update
-		// request has been submitted.
-		sWearablesLoadedCon = gAgentWearables.addLoadedCallback(LLStartUp::saveInitialOutfit);
-
 		bool do_copy = true;
 		bool do_append = false;
 		LLViewerInventoryCategory *cat = gInventory.getCategory(cat_id);
@@ -2748,23 +2752,6 @@ void LLStartUp::loadInitialOutfit( const std::string& outfit_folder_name,
 
 	gAgent.setOutfitChosen(TRUE);
 	gAgentWearables.sendDummyAgentWearablesUpdate();
-}
-
-//static
-void LLStartUp::saveInitialOutfit()
-{
-	if (sInitialOutfit.empty()) {
-		ALOG_DEBUG("sInitialOutfit is empty");
-		return;
-	}
-	
-	if (sWearablesLoadedCon.connected())
-	{
-		ALOG_DEBUG("sWearablesLoadedCon is connected, disconnecting");
-		sWearablesLoadedCon.disconnect();
-	}
-	ALOG_DEBUG("calling makeNewOutfitLinks( \"{}\" )", sInitialOutfit);
-	LLAppearanceMgr::getInstance()->makeNewOutfitLinks(sInitialOutfit,false);
 }
 
 std::string& LLStartUp::getInitialOutfitName()

@@ -576,6 +576,8 @@ void send_viewer_stats(bool include_preferences)
 	fail["invalid"] = (S32) gMessageSystem->mInvalidOnCircuitPackets;
 	fail["missing_updater"] = (S32) LLAppViewer::instance()->isUpdaterMissing();
 
+	body["ui"] = LLSD();
+		
 	body["stats"]["voice"] = LLVoiceVivoxStats::getInstance()->read();
 
 	// Misc stats, two strings and two ints

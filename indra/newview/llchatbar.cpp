@@ -577,7 +577,7 @@ void LLChatBar::sendChatFromViewer(const LLWString &wtext, EChatType type, BOOL 
 	// as soon as we say something, we no longer care about teaching the user
 	// how to chat
 	gWarningSettings.setBOOL("FirstOtherChatBeforeUser", FALSE);
-	
+
 	// Look for "/20 foo" channel chats.
 	S32 channel = 0;
 	LLWString out_text = stripChannelNumber(wtext, &channel);

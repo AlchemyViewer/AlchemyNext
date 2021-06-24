@@ -61,6 +61,12 @@ void LLFloaterReg::add(const std::string& name, const std::string& filename, con
 }
 
 //static
+bool LLFloaterReg::isRegistered(const std::string& name)
+{
+    return sBuildMap.find(name) != sBuildMap.end();
+}
+
+//static
 LLFloater* LLFloaterReg::getLastFloaterInGroup(std::string_view name)
 {
 	auto it = sGroupMap.find(name);
@@ -500,7 +506,6 @@ void LLFloaterReg::toggleInstanceOrBringToFront(const LLSD& sdname, const LLSD& 
 	std::string name = sdname.asString();
 	LLFloater* instance = getInstance(name, key); 
 	
-
 	if (!instance)
 	{
 		LL_DEBUGS() << "Unable to get instance of floater '" << name << "'" << LL_ENDL;
