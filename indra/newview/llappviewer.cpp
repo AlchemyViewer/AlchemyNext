@@ -752,8 +752,6 @@ LLAppViewer::~LLAppViewer()
 
 	// If we got to this destructor somehow, the app didn't hang.
 	removeMarkerFiles();
-
-	ALLog::shutdown();
 }
 
 class LLUITranslationBridge : public LLTranslationBridge

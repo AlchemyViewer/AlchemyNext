@@ -156,6 +156,8 @@ LLApp::~LLApp()
 	}
 	
 	SUBSYSTEM_CLEANUP_DBG(LLCommon);
+
+	ALLog::shutdown();
 }
 
 // static
