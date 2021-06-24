@@ -167,8 +167,9 @@ int main(int argc, char **argv)
 
 		ALLog::LogConfig log_config = {};
 		log_config.async_logging = false;
+		log_config.default_level = ALLog::ELevel::info;
 		ALLog::init(log_config);
-		ALLog::setLevel(ALLog::ELevel::info);
+		//ALLog::logToFile("slplugin.log");
 		ALOG_INFO("Beep Beep I'm a sheep.");
 	}
 

@@ -111,9 +111,8 @@ class linebuffer_sink : public spdlog::sinks::base_sink <Mutex>
 {
 	using base_t = spdlog::sinks::base_sink <Mutex>;
 public:
-	using linebuffer_func_t = std::function<void(const std::vector<std::string>& outvec)>;
-	linebuffer_sink(linebuffer_func_t buffer_func) 
-		: base_t(), mLineBuffer(std::move(buffer_func))
+	linebuffer_sink(LLLineBuffer* bufferp)
+		: base_t(), mLineBuffer(bufferp)
 	{
 	}
 protected:
@@ -129,12 +128,15 @@ protected:
 	{
 		if (mLineBuffer)
 		{
-			mLineBuffer(mLogMessages);
+			for (const auto& log_message : mLogMessages)
+			{
+				mLineBuffer->addLine(log_message);
+			}
 		}
 		mLogMessages.clear();
 	}
 
-	linebuffer_func_t mLineBuffer;
+	LLLineBuffer* mLineBuffer;
 	std::vector<std::string> mLogMessages;
 };
 
@@ -150,19 +152,20 @@ std::shared_ptr<spdlog::logger> ALLog::NETWORK_LOG;
 std::shared_ptr<spdlog::logger> ALLog::RENDER_LOG;
 std::shared_ptr<spdlog::logger> ALLog::TEXTURE_LOG;
 std::shared_ptr<spdlog::logger> ALLog::UI_LOG;
+std::shared_ptr<spdlog::sinks::dup_filter_sink_mt> ALLog::sDistSink;
 std::vector<spdlog::sink_ptr> ALLog::sSinks;
 ALLog::LogConfig ALLog::sGlobalConfig;
 ALLog::fatal_func_t ALLog::sFatalFunc;
-std::unique_ptr<absl::Mutex> ALLog::sMutex;
 std::unique_ptr<absl::Mutex> ALLog::sFatalMutex;
-LLLineBuffer* ALLog::sLineBuffer = nullptr;
+
 
 // static
 void ALLog::init(const LogConfig& config)
 {
 	sGlobalConfig = config;
 
-	sMutex = std::make_unique<absl::Mutex>();
+	sSinks.resize(NUM_SINKS);
+
 	sFatalMutex = std::make_unique<absl::Mutex>();
 
 	if (config.fatal_func)
@@ -187,67 +190,48 @@ void ALLog::init(const LogConfig& config)
 
 	try
 	{
-		if(config.log_to_file && !config.log_filename.empty())
-		{
-#if LL_WINDOWS
-			auto logfilestr = ll_convert_string_to_wide(config.log_filename);
-#else
-			auto logfilestr = logfilestr;
-#endif
-			auto basic_file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilestr, config.truncate_logfile);
-			sSinks.emplace_back(std::move(basic_file));
-		}
-
-		if(config.log_to_linebuffer)
-		{
-			auto linebuffer = std::make_shared<linebuffer_sink_mt>(outputToLinebuffer);
-			sSinks.emplace_back(std::move(linebuffer)); 
-		}
+		// Create main distribution sink
+		sDistSink = std::make_shared<spdlog::sinks::dup_filter_sink_mt>(std::chrono::seconds(2));
 
 		if (config.log_to_stderr && shouldLogToStderr())
 		{
 			auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
-			sSinks.emplace_back(std::move(stderr_sink));
+			sDistSink->add_sink(stderr_sink);
+			sSinks[STDERR_SINK] = std::move(stderr_sink);
 		}
 
 #if LL_WINDOWS
 		if (IsDebuggerPresent())
 		{
 			auto msvc_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-			sSinks.emplace_back(std::move(msvc_sink));
+			sDistSink->add_sink(msvc_sink);
+			sSinks[MSVC_SINK] = std::move(msvc_sink);
 		}
 #endif
 
-		auto dup_filter = std::make_shared<spdlog::sinks::dup_filter_sink_mt>(std::chrono::seconds(3));
-		for (const auto& sink_ptr : sSinks)
-		{
-			dup_filter->add_sink(sink_ptr);
-		}
-		sSinks.emplace_back(dup_filter);
-
 		if (config.async_logging)
 		{
-			MAIN_LOG = std::make_shared<spdlog::async_logger>("mainl", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			ASSET_LOG = std::make_shared<spdlog::async_logger>("asset", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			AUDIO_LOG = std::make_shared<spdlog::async_logger>("audio", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			IO_LOG = std::make_shared<spdlog::async_logger>("iodat", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			MEDIA_LOG = std::make_shared<spdlog::async_logger>("media", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			NETWORK_LOG = std::make_shared<spdlog::async_logger>("ntwrk", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			RENDER_LOG = std::make_shared<spdlog::async_logger>("rendr", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			TEXTURE_LOG = std::make_shared<spdlog::async_logger>("textr", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
-			UI_LOG = std::make_shared<spdlog::async_logger>("uimsg", dup_filter, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			MAIN_LOG = std::make_shared<spdlog::async_logger>("mainl", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			ASSET_LOG = std::make_shared<spdlog::async_logger>("asset", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			AUDIO_LOG = std::make_shared<spdlog::async_logger>("audio", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			IO_LOG = std::make_shared<spdlog::async_logger>("iodat", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			MEDIA_LOG = std::make_shared<spdlog::async_logger>("media", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			NETWORK_LOG = std::make_shared<spdlog::async_logger>("ntwrk", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			RENDER_LOG = std::make_shared<spdlog::async_logger>("rendr", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			TEXTURE_LOG = std::make_shared<spdlog::async_logger>("textr", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
+			UI_LOG = std::make_shared<spdlog::async_logger>("uimsg", sDistSink, spdlog::thread_pool(), spdlog::async_overflow_policy::overrun_oldest);
 		}
 		else
 		{
-			MAIN_LOG = std::make_shared<spdlog::logger>("mainl", dup_filter);
-			ASSET_LOG = std::make_shared<spdlog::logger>("asset", dup_filter);
-			AUDIO_LOG = std::make_shared<spdlog::logger>("audio", dup_filter);
-			IO_LOG = std::make_shared<spdlog::logger>("io", dup_filter);
-			MEDIA_LOG = std::make_shared<spdlog::logger>("media", dup_filter);
-			NETWORK_LOG = std::make_shared<spdlog::logger>("network", dup_filter);
-			RENDER_LOG = std::make_shared<spdlog::logger>("render", dup_filter);
-			TEXTURE_LOG = std::make_shared<spdlog::logger>("textr", dup_filter);
-			UI_LOG = std::make_shared<spdlog::logger>("ui", dup_filter);
+			MAIN_LOG = std::make_shared<spdlog::logger>("mainl", sDistSink);
+			ASSET_LOG = std::make_shared<spdlog::logger>("asset", sDistSink);
+			AUDIO_LOG = std::make_shared<spdlog::logger>("audio", sDistSink);
+			IO_LOG = std::make_shared<spdlog::logger>("io", sDistSink);
+			MEDIA_LOG = std::make_shared<spdlog::logger>("media", sDistSink);
+			NETWORK_LOG = std::make_shared<spdlog::logger>("network", sDistSink);
+			RENDER_LOG = std::make_shared<spdlog::logger>("render", sDistSink);
+			TEXTURE_LOG = std::make_shared<spdlog::logger>("textr", sDistSink);
+			UI_LOG = std::make_shared<spdlog::logger>("ui", sDistSink);
 		}
 
 		// Register the loggers
@@ -274,7 +258,6 @@ void ALLog::init(const LogConfig& config)
 void ALLog::shutdown()
 {
 	setFatalFunction(nullptr);
-	setLineBuffer(nullptr);
 
 	MAIN_LOG = nullptr;
 	AUDIO_LOG = nullptr;
@@ -289,12 +272,11 @@ void ALLog::shutdown()
 
 	spdlog::shutdown();
 
-	sMutex.reset();
 	sFatalMutex.reset();
 }
 
 // static 
-ALLog::ELevel ALLog::getLevel(std::string logger/* = ""*/)
+ALLog::ELevel ALLog::getLevel(const std::string& logger/* = ""*/)
 {
 	if (!logger.empty())
 	{
@@ -308,7 +290,7 @@ ALLog::ELevel ALLog::getLevel(std::string logger/* = ""*/)
 }
 
 // static
-void ALLog::setLevel(ELevel level, std::string logger/* = ""*/)
+void ALLog::setLevel(ELevel level, const std::string& logger/* = ""*/)
 {
 	if (level >= ELevel::trace && level < ELevel::n_levels)
 	{
@@ -382,34 +364,43 @@ void ALLog::crashAndLoop(const std::string& message)
 #pragma optimize("", on)
 #endif
 
-// static 
-LLLineBuffer* ALLog::getLineBuffer()
+void ALLog::logToFile(const std::string& log_filename, bool truncate_file/* = false*/)
 {
-	LLLineBuffer* retval = nullptr;
+	auto& logfile_ptr = sSinks[FILE_SINK];
+	if (logfile_ptr)
 	{
-		absl::MutexLockMaybe mtx_lock(sMutex.get());
-		retval = sLineBuffer;
+		sDistSink->remove_sink(logfile_ptr);
+		logfile_ptr.reset();
 	}
-	return retval;
-}
-
-// static 
-void ALLog::setLineBuffer(LLLineBuffer* bufferp)
-{
-	absl::MutexLockMaybe mtx_lock(sMutex.get());
-	sLineBuffer = bufferp;
-}
-
-// static
-void ALLog::outputToLinebuffer(const std::vector<std::string>& outvec)
-{
-	absl::MutexLockMaybe mtx_lock(sMutex.get());
-	if (sLineBuffer)
+	if (!log_filename.empty())
 	{
-		for (const auto& str : outvec)
-		{
-			sLineBuffer->addLine(str);
-		}
+		const std::string default_fmt("[%Y-%m-%d %H:%M:%S.%e] [%t] [%n] [%l] [%s:%#] [%!] %v");
+	#if LL_WINDOWS
+		auto logfilestr = ll_convert_string_to_wide(log_filename);
+#else
+		auto logfilestr = log_filename;
+#endif
+		logfile_ptr = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilestr, truncate_file);
+		logfile_ptr->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(default_fmt, spdlog::pattern_time_type::utc)));
+		sDistSink->add_sink(logfile_ptr);
+	}
+}
+
+void ALLog::logToFixedBuffer(LLLineBuffer* bufferp)
+{
+	auto& logfile_ptr = sSinks[LINEBUFFER_SINK];
+	if (logfile_ptr)
+	{
+		sDistSink->remove_sink(logfile_ptr);
+		logfile_ptr.reset();
+	}
+	if (bufferp)
+	{
+		const std::string fixedbuffer_fmt("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%!] %v");
+
+		logfile_ptr = std::make_shared<linebuffer_sink_mt>(bufferp);
+		logfile_ptr->set_formatter(std::unique_ptr<spdlog::formatter>(new spdlog::pattern_formatter(fixedbuffer_fmt, spdlog::pattern_time_type::utc)));
+		sDistSink->add_sink(logfile_ptr);
 	}
 }
 

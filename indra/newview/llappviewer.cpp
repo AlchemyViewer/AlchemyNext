@@ -1769,8 +1769,7 @@ bool LLAppViewer::cleanup()
 
 	release_start_screen(); // just in case
 
-	//LLError::logToFixedBuffer(NULL); // stop the fixed buffer recorder
-	ALLog::setLineBuffer(nullptr);
+	ALLog::logToFixedBuffer(nullptr); // stop the fixed buffer recorder
 
 	ALOG_INFO("Cleaning Up");
 
@@ -2258,6 +2257,12 @@ void LLAppViewer::initLoggingAndGetLastDuration()
 	LLError::setFatalFunction(errorCallback);
 	//LLError::setTimeFunction(getRuntime);
 
+	ALLog::LogConfig log_config = {};
+	log_config.log_to_stderr = true;
+	log_config.async_logging = true;
+	log_config.fatal_func = errorCallback;
+	ALLog::init(log_config);
+
 	// Remove the last ".old" log file.
 	std::string old_log_file = gDirUtilp->getExpandedFilename(LL_PATH_LOGS,
 							     "Alchemy.old");
@@ -2323,15 +2328,7 @@ void LLAppViewer::initLoggingAndGetLastDuration()
 	LLFile::rename(spdlog_file, old_spdlog_file);
 
 	// Set the log file to SecondLife.log
-	ALLog::LogConfig log_config = {};
-	log_config.log_to_file = true;
-	log_config.log_to_linebuffer = true;
-	log_config.log_to_stderr = true;
-	log_config.log_filename = spdlog_file;
-	log_config.truncate_logfile = true;
-	log_config.async_logging = true;
-	log_config.fatal_func = errorCallback;
-	ALLog::init(log_config);
+	ALLog::logToFile(spdlog_file);
 	LLError::logToFile(log_file);
 	if (!duration_log_msg.empty())
 	{

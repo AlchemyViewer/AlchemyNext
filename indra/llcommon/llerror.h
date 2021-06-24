@@ -36,7 +36,17 @@
 #include "llpreprocessor.h"
 
 #include "absl/synchronization/mutex.h"
+
+#if defined(_DEBUG)
+#define SPDLOG_ACTIVE_LEVEL 0
+#elif defined(LL_RELEASE_WITH_DEBUG_INFO)
+#define SPDLOG_ACTIVE_LEVEL 1
+#else
+#define SPDLOG_ACTIVE_LEVEL 2
+#endif
+
 #include "spdlog/spdlog.h"
+#include "spdlog/sinks/dup_filter_sink.h"
 
 class LLLineBuffer;
 
@@ -48,34 +58,31 @@ public:
 
 	struct LogConfig
 	{
-		std::string log_filename = "";
-		bool truncate_logfile = true;
-		ALLog::fatal_func_t fatal_func = fatal_func_t();
-		bool log_to_file = true;
-		bool log_to_linebuffer = false;
 		bool log_to_stderr = true;
-		bool log_to_ostream = false;
 		bool async_logging = false;
 		ELevel default_level = ELevel::info;
 		int flush_interval = 1; // seconds
 		ELevel force_flush_level = ELevel::err;
+		ALLog::fatal_func_t fatal_func = fatal_func_t();
 	};
 
 
 	static void init(const LogConfig& config);
 	static void shutdown();
 
-	static ELevel getLevel(std::string logger = "");
-	static void setLevel(ELevel level, std::string logger = "");
+	static ELevel getLevel(const std::string& logger = "");
+	static void setLevel(ELevel level, const std::string & = "");
 
 	static fatal_func_t getFatalFunction();
 	static void setFatalFunction(fatal_func_t fatal_func);
 	static void fatalError(const std::string message);
-
 	static void crashAndLoop(const std::string& msg);
 
+	static void logToFile(const std::string& log_filename, bool truncate_file = false);
+	static void logToFixedBuffer(LLLineBuffer* bufferp);
+
 	/// temporarily override the FatalFunction for the duration of a
-	/// particular scope, e.g. for unit tests
+/// particular scope, e.g. for unit tests
 	class LL_COMMON_API OverrideFatalFunction
 	{
 	public:
@@ -93,10 +100,6 @@ public:
 		fatal_func_t mPrev;
 	};
 
-	static LLLineBuffer* getLineBuffer();
-	static void setLineBuffer(LLLineBuffer*);
-	static void outputToLinebuffer(const std::vector<std::string>& outvec);
-
 	static std::shared_ptr<spdlog::logger> MAIN_LOG;
 	static std::shared_ptr<spdlog::logger> ASSET_LOG;
 	static std::shared_ptr<spdlog::logger> AUDIO_LOG;
@@ -108,12 +111,19 @@ public:
 	static std::shared_ptr<spdlog::logger> UI_LOG;
 
 private:
+	static std::shared_ptr<spdlog::sinks::dup_filter_sink_mt> sDistSink;
+	enum
+	{
+		FILE_SINK,
+		LINEBUFFER_SINK,
+		STDERR_SINK,
+		MSVC_SINK,
+		NUM_SINKS
+	};
 	static LogConfig sGlobalConfig;
 	static std::vector<spdlog::sink_ptr> sSinks;
-	static std::unique_ptr<absl::Mutex> sMutex;
 	static std::unique_ptr<absl::Mutex> sFatalMutex;
 	static fatal_func_t sFatalFunc;
-	static LLLineBuffer* sLineBuffer;
 };
 
 #define ALOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)

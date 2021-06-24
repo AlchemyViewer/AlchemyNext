@@ -214,9 +214,12 @@ public:
 					remainptr += written;
 					remainlen -= written;
 
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG
+					char msgbuf[512]; 
+					apr_strerror(err, msgbuf, sizeof(msgbuf)); 
 					ALOG_DEBUG("wrote {} of {} bytes to {} (original {}), code {}: {}",
-						written, towrite, mDesc, total, err, [=]()->std::string { char msgbuf[512]; apr_strerror(err, msgbuf, sizeof(msgbuf)); return std::string(msgbuf); });
-
+						written, towrite, mDesc, total, err, msgbuf);
+#endif
 					// The parent end of this pipe is nonblocking. If we weren't able
 					// to write everything we wanted, don't keep banging on it -- that
 					// won't change until the child reads some. Wait for next tick().

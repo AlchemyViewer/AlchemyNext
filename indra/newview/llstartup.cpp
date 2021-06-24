@@ -1428,8 +1428,7 @@ bool idle_startup()
 		display_startup();
 
 		// direct logging to the debug console's line buffer
-		//LLError::logToFixedBuffer(gDebugView->mDebugConsolep);
-		ALLog::setLineBuffer(gDebugView->mDebugConsolep);
+		ALLog::logToFixedBuffer(gDebugView->mDebugConsolep);
 		display_startup();
 		
 		// set initial visibility of debug console

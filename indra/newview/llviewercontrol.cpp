@@ -504,6 +504,7 @@ static bool handleLogFileChanged(const LLSD& newvalue)
 	std::string log_filename = newvalue.asString();
 	LLFile::remove(log_filename);
 	LLError::logToFile(log_filename);
+	ALLog::logToFile(log_filename);
 	return true;
 }
 

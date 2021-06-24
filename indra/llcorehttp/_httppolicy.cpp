@@ -162,14 +162,14 @@ void HttpPolicy::retryOp(const HttpOpRequest::ptr_t &op)
 	// mPolicyRetries limited to 100
 	U32 delta_factor = op->mPolicyRetries <= 10 ? 1 << op->mPolicyRetries : 1024;
 	HttpTime delta = llmin(delta_min * delta_factor, delta_max);
-#ifdef SHOW_DEBUG
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG
 	bool external_delta(false);
 #endif
 
 	if (op->mReplyRetryAfter > 0 && op->mReplyRetryAfter < 30)
 	{
 		delta = op->mReplyRetryAfter * U64L(1000000);
-#ifdef SHOW_DEBUG
+#if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG
 		external_delta = true;
 #endif
 	}
