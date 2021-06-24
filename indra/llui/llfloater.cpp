@@ -199,7 +199,9 @@ LLFloater::Params::Params()
 	help_pressed_image("help_pressed_image"),
 	open_callback("open_callback"),
 	close_callback("close_callback"),
-	follows("follows")
+	follows("follows"),
+	rel_x("rel_x", 0),
+	rel_y("rel_y", 0)
 {
 	changeDefault(visible, false);
 }
@@ -273,6 +275,8 @@ LLFloater::LLFloater(const LLSD& key, const LLFloater::Params& p)
 	mHasBeenDraggedWhileMinimized(FALSE),
 	mPreviousMinimizedBottom(0),
 	mPreviousMinimizedLeft(0),
+	mDefaultRelativeX(p.rel_x),
+	mDefaultRelativeY(p.rel_y),
 	mMinimizeSignal(NULL)
 //	mNotificationContext(NULL)
 {
@@ -513,7 +517,12 @@ void LLFloater::destroy()
 // virtual
 LLFloater::~LLFloater()
 {
-	LLFloaterReg::removeInstance(mInstanceName, mKey);
+    if (!isDead())
+    {
+        // If it's dead, instance is supposed to be already removed, and
+        // in case of single instance we can remove new one by accident
+        LLFloaterReg::removeInstance(mInstanceName, mKey);
+    }
 	
 	if( gFocusMgr.childHasKeyboardFocus(this))
 	{
@@ -950,6 +959,15 @@ bool LLFloater::applyRectControl()
 		{
 			mPosition.mX = x_control->getValue().asReal();
 			mPosition.mY = y_control->getValue().asReal();
+			mPositioning = LLFloaterEnums::POSITIONING_RELATIVE;
+			applyRelativePosition();
+
+			saved_rect = true;
+		}
+		else if ((mDefaultRelativeX != 0) && (mDefaultRelativeY != 0))
+		{
+			mPosition.mX = mDefaultRelativeX;
+			mPosition.mY = mDefaultRelativeY;
 			mPositioning = LLFloaterEnums::POSITIONING_RELATIVE;
 			applyRelativePosition();
 
@@ -3229,6 +3247,9 @@ void LLFloater::initFromParams(const LLFloater::Params& p)
 	mSingleInstance = p.single_instance;
 	mReuseInstance = p.reuse_instance.isProvided() ? p.reuse_instance : p.single_instance;
 	mIsReuseInitialized = p.reuse_instance.isProvided();
+
+	mDefaultRelativeX = p.rel_x;
+	mDefaultRelativeY = p.rel_y;
 
 	mPositioning = p.positioning;
 
