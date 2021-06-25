@@ -299,9 +299,7 @@ LLCoprocedurePool::LLCoprocedurePool(const std::string &poolName, size_t size):
             auto& statsd = status["status"];
             if (statsd.asString() != "running")
             {
-                LL_INFOS("CoProcMgr") << "Pool " << poolName
-                                      << " closing queue because status " << statsd
-                                      << LL_ENDL;
+                ALOG_NET_INFO("Pool {} closing queue because status {}", poolName, statsd);
                 // This should ensure that all waiting coprocedures in this
                 // pool will wake up and terminate.
                 pendingCoprocs->close();
@@ -316,8 +314,7 @@ LLCoprocedurePool::LLCoprocedurePool(const std::string &poolName, size_t size):
         //
         // If this somehow happens again it is better to crash later on shutdown due to pump
         // not stopping coroutine and see warning in logs than on startup or during login.
-        LL_WARNS("CoProcMgr") << "Attempted to register dupplicate listener name: " << poolName
-                              << "_pool. Failed to start listener." << LL_ENDL;
+        ALOG_NET_WARN("Attempted to register dupplicate listener name: {}_pool. Failed to start listener.", poolName);
 
         llassert(0); // Fix Me! Ignoring missing listener!
     }
@@ -334,7 +331,8 @@ LLCoprocedurePool::LLCoprocedurePool(const std::string &poolName, size_t size):
         mCoroMapping.insert(CoroAdapterMap_t::value_type(pooledCoro, httpAdapter));
     }
 
-    LL_INFOS("CoProcMgr") << "Created coprocedure pool named \"" << mPoolName << "\" with " << size << " items, queue max " << LLCoprocedureManager::DEFAULT_QUEUE_SIZE << LL_ENDL;
+    ALOG_NET_INFO("Created coprocedure pool named \"{}\" with {} items, queue max {}", 
+        mPoolName, size, LLCoprocedureManager::DEFAULT_QUEUE_SIZE);
 }
 
 LLCoprocedurePool::~LLCoprocedurePool() 
@@ -346,7 +344,7 @@ LLUUID LLCoprocedurePool::enqueueCoprocedure(const std::string &name, LLCoproced
 {
     LLUUID id(LLUUID::generateNewID());
 
-    LL_INFOS("CoProcMgr") << "Coprocedure(" << name << ") enqueuing with id=" << id.asString() << " in pool \"" << mPoolName << "\" at " << mPending << LL_ENDL;
+    ALOG_NET_INFO("Coprocedure({}) enqueuing with id={} in pool \"{}\" at {}", name, id.asString(), mPoolName, mPending);
     auto pushed = mPendingCoprocs->try_push(boost::make_shared<QueuedCoproc>(name, id, proc));
     if (pushed == boost::fibers::channel_op_status::success)
     {
@@ -357,12 +355,12 @@ LLUUID LLCoprocedurePool::enqueueCoprocedure(const std::string &name, LLCoproced
     // Here we didn't succeed in pushing. Shutdown could be the reason.
     if (pushed == boost::fibers::channel_op_status::closed)
     {
-        LL_WARNS("CoProcMgr") << "Discarding coprocedure '" << name << "' because shutdown" << LL_ENDL;
+        ALOG_NET_WARN("Discarding coprocedure '{}' because shutdown", name);
         return {};
     }
 
     // The queue should never fill up.
-    LL_ERRS("CoProcMgr") << "Enqueue into '" << name << "' failed (" << unsigned(pushed) << "; pending: " << mPending <<")" << LL_ENDL;
+    ALOG_NET_CRITICAL("Enqueue into '{}' failed ({}; pending: {})", name, unsigned(pushed), mPending);
     return {};                      // never executed, pacify the compiler
 }
 
@@ -403,14 +401,15 @@ void LLCoprocedurePool::coprocedureInvokerCoro(
 
         if(status == boost::fibers::channel_op_status::timeout)
         {
-            LL_DEBUGS_ONCE("CoProcMgr") << "pool '" << mPoolName << "' waiting." << LL_ENDL;
+            ALOG_NET_DEBUG("pool '{}' waiting.", mPoolName);
             continue;
         }
         // we actually popped an item
         --mPending;
         mActiveCoprocsCount++;
 
-        LL_DEBUGS("CoProcMgr") << "Dequeued and invoking coprocedure(" << coproc->mName << ") with id=" << coproc->mId.asString() << " in pool \"" << mPoolName << "\" (" << mPending << " left)" << LL_ENDL;
+        ALOG_NET_DEBUG("Dequeued and invoking coprocedure({}) with id={} in pool \"{}\" ({} left)", 
+            coproc->mName, coproc->mId.asString(), mPoolName, mPending);
 
         try
         {
@@ -418,8 +417,7 @@ void LLCoprocedurePool::coprocedureInvokerCoro(
         }
         catch (const LLCoros::Stop &e)
         {
-            LL_INFOS("LLCoros") << "coprocedureInvokerCoro terminating because "
-                << e.what() << LL_ENDL;
+            ALOG_NET_INFO("coprocedureInvokerCoro terminating because {}", e.what());
             throw; // let toplevel handle this as LLContinueError
         }
         catch (...)
@@ -432,7 +430,7 @@ void LLCoprocedurePool::coprocedureInvokerCoro(
             continue;
         }
 
-        LL_DEBUGS("CoProcMgr") << "Finished coprocedure(" << coproc->mName << ")" << " in pool \"" << mPoolName << "\"" << LL_ENDL;
+        ALOG_NET_DEBUG("Finished coprocedure({})" << " in pool \"{}\"", coproc->mName, mPoolName);
 
         mActiveCoprocsCount--;
     }

@@ -253,7 +253,7 @@ bool LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 	opj_codec_t* opj_decoder_p = opj_create_decompress(OPJ_CODEC_J2K);
 	if (!opj_decoder_p)
 	{
-		LL_DEBUGS("Texture") << "ERROR -> decodeImpl: failed to create decoder!" << LL_ENDL;
+		ALOG_TXTR_DEBUG("ERROR -> decodeImpl: failed to create decoder!");
 		base.decodeFailed();
 		return true; // done
 	}
@@ -268,7 +268,7 @@ bool LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 	/* setup the decoder decoding parameters using user parameters */
 	if (!opj_setup_decoder(opj_decoder_p, &parameters))
 	{
-		LL_DEBUGS("Texture") << "ERROR -> decodeImpl: failed to decode image!" << LL_ENDL;
+		ALOG_TXTR_DEBUG("ERROR -> decodeImpl: failed to decode image!");
 		opj_destroy_codec(opj_decoder_p);
 		base.decodeFailed();
 		return true; // done
@@ -300,7 +300,7 @@ bool LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 	// dereference the array.
 	if (!success || !image || !image->numcomps)
 	{
-		LL_DEBUGS("Texture") << "ERROR -> decodeImpl: failed to decode image!" << LL_ENDL;
+		ALOG_TXTR_DEBUG("ERROR -> decodeImpl: failed to decode image!");
 		if (image)
 		{
 			opj_image_destroy(image);
@@ -369,9 +369,7 @@ bool LLImageJ2COJ::decodeImpl(LLImageJ2C &base, LLImageRaw &raw_image, F32 decod
 		}
 		else // Some rare OpenJPEG versions have this bug.
 		{
-#ifdef SHOW_DEBUG
-			LL_DEBUGS("Texture") << "ERROR -> decodeImpl: failed to decode image! (NULL comp data - OpenJPEG bug)" << LL_ENDL;
-#endif
+			ALOG_TXTR_DEBUG("ERROR -> decodeImpl: failed to decode image! (NULL comp data - OpenJPEG bug)");
 			opj_image_destroy(image);
 			base.decodeFailed();
 			return true; // done
@@ -486,7 +484,7 @@ bool LLImageJ2COJ::encodeImpl(LLImageJ2C &base, const LLImageRaw &raw_image, con
 	{
 		opj_destroy_codec(opj_encoder_p);
 		opj_image_destroy(image);
-		LL_DEBUGS("Texture") << "Failed to encode image." << LL_ENDL;
+		ALOG_TXTR_DEBUG("Failed to encode image.");
 		return false;
 	}
 
@@ -508,7 +506,7 @@ bool LLImageJ2COJ::encodeImpl(LLImageJ2C &base, const LLImageRaw &raw_image, con
 		opj_stream_destroy(opj_stream_p);
 		opj_destroy_codec(opj_encoder_p);
 		opj_image_destroy(image);
-		LL_DEBUGS("Texture") << "Failed to encode image." << LL_ENDL;
+		ALOG_TXTR_DEBUG("Failed to encode image.");
 		return false;
 	}
 

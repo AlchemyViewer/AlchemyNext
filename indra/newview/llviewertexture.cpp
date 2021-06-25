@@ -2323,7 +2323,7 @@ void LLViewerFetchedTexture::setIsMissingAsset(BOOL is_missing)
 
 		if (mUrl.empty())
 		{
-			LL_WARNS() << mID << ": Marking image as missing" << LL_ENDL;
+			ALOG_TXTR_WARN("{}: Marking image as missing", mID);
 		}
 		else
 		{
@@ -2332,7 +2332,7 @@ void LLViewerFetchedTexture::setIsMissingAsset(BOOL is_missing)
 			// server bake texture.
 			if (getFTType() != FTT_MAP_TILE)
 			{
-				LL_WARNS() << mUrl << ": Marking image as missing" << LL_ENDL;
+				ALOG_TXTR_WARN("{}: Marking image as missing", mUrl);
 			}
 		}
 		if (mHasFetcher)
@@ -2347,7 +2347,7 @@ void LLViewerFetchedTexture::setIsMissingAsset(BOOL is_missing)
 	}
 	else
 	{
-		LL_INFOS() << mID << ": un-flagging missing asset" << LL_ENDL;
+		ALOG_TXTR_INFO("{}: un-flagging missing asset", mID);
 	}
 	mIsMissingAsset = is_missing;
 }

@@ -68,7 +68,7 @@ void ll_cleanup_apr()
 {
 	gAPRInitialized = false;
 
-	LL_DEBUGS("APR") << "Cleaning up APR" << LL_ENDL;
+	ALOG_INFO("Cleaning up APR");
 
 	LLThreadLocalPointerBase::destroyAllThreadLocalStorage();
 

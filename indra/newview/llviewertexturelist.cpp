@@ -1643,14 +1643,14 @@ void LLViewerTextureList::processImageNotInDatabase(LLMessageSystem *msg,void **
 	LLViewerFetchedTexture* image = gTextureList.findImage( image_id, TEX_LIST_STANDARD);
 	if( image )
 	{
-		LL_WARNS() << "Image not in db" << LL_ENDL;
+		ALOG_TXTR_WARN("Image not in db");
 		image->setIsMissingAsset();
 	}
 
     image = gTextureList.findImage(image_id, TEX_LIST_SCALE);
     if (image)
     {
-        LL_WARNS() << "Icon not in db" << LL_ENDL;
+		ALOG_TXTR_WARN("Icon not in db");
         image->setIsMissingAsset();
     }
 }

@@ -1858,7 +1858,7 @@ bool LLImageRaw::createFromFile(const std::string &filename, bool j2c_lowest_mip
 	if (!ifs.is_open())
 	{
 		// SJB: changed from LL_INFOS() to LL_DEBUGS() to reduce spam
-		LL_DEBUGS() << "Unable to open image file: " << name << LL_ENDL;
+		ALOG_TXTR_DEBUG("Unable to open image file: {}", name);
 		return false;
 	}
 	
