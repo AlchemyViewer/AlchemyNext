@@ -28,6 +28,7 @@
 #define LL_DIRGUARD_H
 
 #include "linden_common.h"
+#include "llwin32headerslean.h"
 #include "llerror.h"
 
 #if LL_WINDOWS
@@ -46,9 +47,7 @@ public:
 			(wcsncmp(mOrigDir,mFinalDir,mOrigDirLen)!=0))
 		{
 			// Dir has changed
-			std::string mOrigDirUtf8 = utf16str_to_utf8str(llutf16string(mOrigDir));
-			std::string mFinalDirUtf8 = utf16str_to_utf8str(llutf16string(mFinalDir));
-			LL_INFOS() << "Resetting working dir from " << mFinalDirUtf8 << " to " << mOrigDirUtf8 << LL_ENDL;
+			ALOG_IO_INFO(FMT_STRING(TEXT("Resetting working dir from {:s} to {:s}")), mFinalDir, mOrigDir);
 			SetCurrentDirectory(mOrigDir);
 		}
 	}

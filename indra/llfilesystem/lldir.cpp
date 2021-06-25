@@ -138,7 +138,7 @@ S32 LLDir::deleteFilesInDir(const std::string &dirname, const std::string &mask)
 	// File masks starting with "/" will match nothing, so we consider them invalid.
 	if (LLStringUtil::startsWith(mask, getDirDelimiter()))
 	{
-		LL_WARNS() << "Invalid file mask: " << mask << LL_ENDL;
+		ALOG_IO_WARN("Invalid file mask: {}", mask);
 		llassert(!"Invalid file mask");
 	}
 
@@ -161,12 +161,11 @@ S32 LLDir::deleteFilesInDir(const std::string &dirname, const std::string &mask)
 			{
 				retry_count++;
 				result = errno;
-				LL_WARNS() << "Problem removing " << fullpath << " - errorcode: "
-						<< result << " attempt " << retry_count << LL_ENDL;
+				ALOG_IO_WARN("Problem removing {} - errorcode: {} attempt {}", fullpath, result, retry_count);
 
 				if(retry_count >= 5)
 				{
-					LL_WARNS() << "Failed to remove " << fullpath << LL_ENDL ;
+					ALOG_IO_WARN("Failed to remove {}", fullpath);
 					return count ;
 				}
 
@@ -176,7 +175,7 @@ S32 LLDir::deleteFilesInDir(const std::string &dirname, const std::string &mask)
 			{
 				if (retry_count)
 				{
-					LL_WARNS() << "Successfully removed " << fullpath << LL_ENDL;
+					ALOG_IO_WARN("Successfully removed {}", fullpath);
 				}
 				break;
 			}			
@@ -208,7 +207,7 @@ U32 LLDir::deleteDirAndContents(const std::string& dir_name)
 			  num_deleted = boost::filesystem::remove_all(dir_path, ec);
 			  if (ec.failed())
 			  {
-				  LL_WARNS() << "Failed to delete file " << dir_path << ": " << ec.message() << LL_ENDL;
+				  ALOG_IO_WARN("Failed to delete file {}: {}", dir_path, ec.message());
 			  }
 		  }
 		  else
@@ -217,14 +216,14 @@ U32 LLDir::deleteDirAndContents(const std::string& dir_name)
 			 num_deleted = boost::filesystem::remove(dir_path, ec);
 			 if (ec.failed())
 			 {
-				 LL_WARNS() << "Failed to delete folder " << dir_path << ": " << ec.message() << LL_ENDL;
+				 ALOG_IO_WARN("Failed to delete folder {}: {}", dir_path, ec.message());
 			 }
 		  }
 	   }
 	}
 	catch (const boost::filesystem::filesystem_error &er)
 	{ 
-		LL_WARNS() << "Failed to delete " << dir_name << " with error " << er.code().message() << LL_ENDL;
+		ALOG_IO_WARN("Failed to delete {} with error {}", dir_name, er.code().message());
 	} 
 	return num_deleted;
 }
@@ -309,7 +308,7 @@ const std::string &LLDir::getLindenUserDir() const
 {
 	if (mLindenUserDir.empty())
 	{
-		LL_DEBUGS() << "getLindenUserDir() called early, we don't have the user name yet - returning empty string to caller" << LL_ENDL;
+		ALOG_IO_DEBUG("getLindenUserDir() called early, we don't have the user name yet - returning empty string to caller");
 	}
 
 	return mLindenUserDir;
@@ -553,7 +552,7 @@ std::string LLDir::getExpandedFilename(ELLPath location, const std::string& subd
 		{
 			// potentially directory was not set yet
 			// intentionally return a blank string to the caller
-			LL_DEBUGS("LLDir") << "Conversation log directory is not yet set" << LL_ENDL;
+			ALOG_IO_DEBUG("Conversation log directory is not yet set");
 			return std::string();
 		}
 		break;
@@ -600,9 +599,7 @@ std::string LLDir::getExpandedFilename(ELLPath location, const std::string& subd
 
 	if (prefix.empty())
 	{
-		LL_WARNS() << ELLPathToString(location)
-				<< ", '" << subdir1 << "', '" << subdir2 << "', '" << in_filename
-				<< "': prefix is empty, possible bad filename" << LL_ENDL;
+		ALOG_IO_WARN("{:s}, '{:s}', '{:s}', '{:s}': prefix is empty, possible bad filename", ELLPathToString(location), subdir1, subdir2, in_filename);
 	}
 
 	std::string expanded_filename = add(prefix, subdir1, subdir2);
@@ -747,7 +744,7 @@ std::vector<std::string> LLDir::findSkinnedFilenames(const std::string& subdir,
 	// Disallow filenames that may escape subdir
 	if (filename.find("..") != std::string::npos)
 	{
-		LL_WARNS("LLDir") << "Ignoring potentially relative filename '" << filename << "'" << LL_ENDL;
+		ALOG_IO_WARN("Ignoring potentially relative filename '{}'", filename);
 		return results;
 	}
 
@@ -862,16 +859,7 @@ std::vector<std::string> LLDir::findSkinnedFilenames(const std::string& subdir,
 		}
 	}
 
-#ifdef SHOW_DEBUG
-	LL_DEBUGS("LLDir") << std::string();
-	const char* comma = "";
-	for (const std::string& path : results)
-	{
-		LL_CONT << comma << "'" << path << "'";
-		comma = ", ";
-	}
-	LL_CONT << LL_ENDL;
-#endif
+	ALOG_IO_DEBUG("{}", fmt::join(results, ", "));
 
 	return results;
 }
@@ -924,7 +912,7 @@ void LLDir::setLindenUserDir(const std::string &username)
 	}
 	else
 	{
-		LL_ERRS() << "NULL name for LLDir::setLindenUserDir" << LL_ENDL;
+		ALOG_IO_CRITICAL("NULL name for LLDir::setLindenUserDir");
 	}
 
 	dumpCurrentDirectories();	
@@ -938,7 +926,7 @@ void LLDir::setChatLogsDir(const std::string &path)
 	}
 	else
 	{
-		LL_WARNS() << "Invalid name for LLDir::setChatLogsDir" << LL_ENDL;
+		ALOG_IO_WARN("Invalid name for LLDir::setChatLogsDir");
 	}
 }
 
@@ -963,14 +951,13 @@ void LLDir::setPerAccountChatLogsDir(const std::string &username)
 	}
 	else
 	{
-		LL_ERRS() << "NULL name for LLDir::setPerAccountChatLogsDir" << LL_ENDL;
+		ALOG_IO_CRITICAL("NULL name for LLDir::setPerAccountChatLogsDir");
 	}
 }
 
 void LLDir::setSkinFolder(const std::string &skin_folder, const std::string& language)
 {
-	LL_DEBUGS("LLDir") << "Setting skin '" << skin_folder << "', language '" << language << "'"
-					   << LL_ENDL;
+	ALOG_IO_DEBUG("Setting skin '{}', language '{}'", skin_folder, language);
 	mSkinName = skin_folder;
 	mLanguage = language;
 
@@ -1007,7 +994,7 @@ void LLDir::addSearchSkinDir(const std::string& skindir)
 {
 	if (std::find(mSearchSkinDirs.begin(), mSearchSkinDirs.end(), skindir) == mSearchSkinDirs.end())
 	{
-		LL_DEBUGS("LLDir") << "search skin: '" << skindir << "'" << LL_ENDL;
+		ALOG_IO_DEBUG("search skin: '{}'", skindir);
 		mSearchSkinDirs.push_back(skindir);
 	}
 }
@@ -1046,25 +1033,25 @@ bool LLDir::setCacheDir(const std::string &path)
 	}
 }
 
-void LLDir::dumpCurrentDirectories(LLError::ELevel level)
+void LLDir::dumpCurrentDirectories(ALLog::ELevel level)
 {
-	LL_VLOGS(level, "AppInit","Directories") << "Current Directories:" << LL_ENDL;
+	ALOG_IO_CALL(level,"Current Directories:");
 
-	LL_VLOGS(level, "AppInit", "Directories") << "  CurPath:               " << getCurPath() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  AppName:               " << getAppName() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  ExecutableFilename:    " << getExecutableFilename() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  ExecutableDir:         " << getExecutableDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  ExecutablePathAndName: " << getExecutablePathAndName() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  WorkingDir:            " << getWorkingDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  AppRODataDir:          " << getAppRODataDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  OSUserDir:             " << getOSUserDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  OSUserAppDir:          " << getOSUserAppDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  LindenUserDir:         " << getLindenUserDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  TempDir:               " << getTempDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  CAFile:                " << getCAFile() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  SkinBaseDir:           " << getSkinBaseDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  SkinDir:               " << getSkinDir() << LL_ENDL;
-	LL_VLOGS(level, "AppInit", "Directories") << "  UserSkinDir:           " << getUserSkinDir() << LL_ENDL;
+	ALOG_IO_CALL(level,"  CurPath:               {}", getCurPath());
+	ALOG_IO_CALL(level,"  AppName:               {}", getAppName());
+	ALOG_IO_CALL(level,"  ExecutableFilename:    {}", getExecutableFilename());
+	ALOG_IO_CALL(level,"  ExecutableDir:         {}", getExecutableDir());
+	ALOG_IO_CALL(level,"  ExecutablePathAndName: {}", getExecutablePathAndName());
+	ALOG_IO_CALL(level,"  WorkingDir:            {}", getWorkingDir());
+	ALOG_IO_CALL(level,"  AppRODataDir:          {}", getAppRODataDir());
+	ALOG_IO_CALL(level,"  OSUserDir:             {}", getOSUserDir());
+	ALOG_IO_CALL(level,"  OSUserAppDir:          {}", getOSUserAppDir());
+	ALOG_IO_CALL(level,"  LindenUserDir:         {}", getLindenUserDir());
+	ALOG_IO_CALL(level,"  TempDir:               {}", getTempDir());
+	ALOG_IO_CALL(level,"  CAFile:                {}", getCAFile());
+	ALOG_IO_CALL(level,"  SkinBaseDir:           {}", getSkinBaseDir());
+	ALOG_IO_CALL(level,"  SkinDir:               {}", getSkinDir());
+	ALOG_IO_CALL(level,"  UserSkinDir:           {}", getUserSkinDir());
 }
 
 void LLDir::append(std::string& destpath, const std::string& name) const
@@ -1127,13 +1114,12 @@ void dir_exists_or_crash(const std::string &dir_name)
 		{
 		   if(0 != LLFile::mkdir(dir_name, 0700))		// octal
 		   {
-			   LL_ERRS() << "Unable to create directory: " << dir_name << LL_ENDL;
+			   ALOG_IO_CRITICAL("Unable to create directory: {}", dir_name);
 		   }
 		}
 		else
 		{
-			LL_ERRS() << "Unable to stat: " << dir_name << " errno = " << stat_rv
-				   << LL_ENDL;
+			ALOG_IO_CRITICAL("Unable to stat: {} errno = {}", dir_name, stat_rv);
 		}
 	}
 	else
@@ -1141,7 +1127,7 @@ void dir_exists_or_crash(const std::string &dir_name)
 		// data_dir exists, make sure it's a directory.
 		if(!S_ISDIR(dir_stat.st_mode))
 		{
-			LL_ERRS() << "Data directory collision: " << dir_name << LL_ENDL;
+			ALOG_IO_CRITICAL("Data directory collision: {}", dir_name);
 		}
 	}
 #endif

@@ -66,13 +66,13 @@ LLDirIterator::Impl::Impl(const std::string &dirname, const std::string &mask)
 	}
 	catch (const fs::filesystem_error& e)
 	{
-		LL_WARNS() << e.what() << LL_ENDL;
+		ALOG_IO_WARN(e.what());
 		return;
 	}
 
 	if (!is_dir)
 	{
-		LL_WARNS() << "Invalid path: \"" << dir_path.string() << "\"" << LL_ENDL;
+		ALOG_IO_WARN("Invalid path: \"{}\"", dir_path.string());
 		return;
 	}
 
@@ -83,7 +83,7 @@ LLDirIterator::Impl::Impl(const std::string &dirname, const std::string &mask)
 	}
 	catch (const fs::filesystem_error& e)
 	{
-		LL_WARNS() << e.what() << LL_ENDL;
+		ALOG_IO_WARN(e.what());
 		return;
 	}
 
@@ -99,8 +99,7 @@ LLDirIterator::Impl::Impl(const std::string &dirname, const std::string &mask)
 	}
 	catch (const boost::regex_error& e)
 	{
-		LL_WARNS() << "\"" << exp << "\" is not a valid regular expression: "
-				<< e.what() << LL_ENDL;
+		ALOG_IO_WARN("\"{}\" is not a valid regular expression: {}", exp, e.what());
 		return;
 	}
 
@@ -113,7 +112,7 @@ bool LLDirIterator::Impl::next(std::string &fname)
 
 	if (!mIsValid)
 	{
-		LL_WARNS() << "The iterator is not correctly initialized." << LL_ENDL;
+		ALOG_IO_WARN("The iterator is not correctly initialized.");
 		return false;
 	}
 
@@ -138,7 +137,7 @@ bool LLDirIterator::Impl::next(std::string &fname)
 	}
 	catch (const fs::filesystem_error& e)
 	{
-		LL_WARNS() << e.what() << LL_ENDL;
+		ALOG_IO_WARN(e.what());
 	}
 
 	return found;
@@ -186,7 +185,7 @@ std::string glob_to_regex(const std::string& glob)
 			case '}':
 				if (!braces)
 				{
-					LL_ERRS() << "glob_to_regex: Closing brace without an equivalent opening brace: " << glob << LL_ENDL;
+					ALOG_IO_CRITICAL("glob_to_regex: Closing brace without an equivalent opening brace: {}", glob);
 				}
 
 				regex+=')';
@@ -218,7 +217,7 @@ std::string glob_to_regex(const std::string& glob)
 
 	if (braces)
 	{
-		LL_ERRS() << "glob_to_regex: Unterminated brace expression: " << glob << LL_ENDL;
+		ALOG_IO_CRITICAL("glob_to_regex: Unterminated brace expression: {}", glob);
 	}
 
 	return regex;

@@ -99,7 +99,7 @@ LLLFSThread::handle_t LLLFSThread::read(const std::string& filename,	/* Flawfind
 	bool res = addRequest(req);
 	if (!res)
 	{
-		LL_ERRS() << "LLLFSThread::read called after LLLFSThread::cleanupClass()" << LL_ENDL;
+		ALOG_IO_CRITICAL("LLLFSThread::read called after LLLFSThread::cleanupClass()");
 	}
 
 	return handle;
@@ -121,7 +121,7 @@ LLLFSThread::handle_t LLLFSThread::write(const std::string& filename,
 	bool res = addRequest(req);
 	if (!res)
 	{
-		LL_ERRS() << "LLLFSThread::read called after LLLFSThread::cleanupClass()" << LL_ENDL;
+		ALOG_IO_CRITICAL("LLLFSThread::read called after LLLFSThread::cleanupClass()");
 	}
 	
 	return handle;
@@ -146,7 +146,7 @@ LLLFSThread::Request::Request(LLLFSThread* thread,
 {
 	if (numbytes <= 0)
 	{
-		LL_WARNS() << "LLLFSThread: Request with numbytes = " << numbytes << LL_ENDL;
+		ALOG_IO_WARN("LLLFSThread: Request with numbytes = {}", numbytes);
 	}
 }
 
@@ -168,7 +168,7 @@ void LLLFSThread::Request::deleteRequest()
 {
 	if (getStatus() == STATUS_QUEUED)
 	{
-		LL_ERRS() << "Attempt to delete a queued LLLFSThread::Request!" << LL_ENDL;
+		ALOG_IO_CRITICAL("Attempt to delete a queued LLLFSThread::Request!");
 	}	
 	if (mResponder.notNull())
 	{
@@ -188,7 +188,7 @@ bool LLLFSThread::Request::processRequest()
 		infile.open(mFileName, LL_APR_RB, mThread->getLocalAPRFilePool());
 		if (!infile.getFileHandle())
 		{
-			LL_WARNS() << "LLLFS: Unable to read file: " << mFileName << LL_ENDL;
+			ALOG_IO_WARN("LLLFS: Unable to read file: {}", mFileName);
 			mBytesRead = 0; // fail
 			return true;
 		}
@@ -200,7 +200,7 @@ bool LLLFSThread::Request::processRequest()
 		llassert_always(off >= 0);
 		mBytesRead = infile.read(mBuffer, mBytes );
 		complete = true;
-// 		LL_INFOS() << "LLLFSThread::READ:" << mFileName << " Bytes: " << mBytesRead << LL_ENDL;
+// 		ALOG_IO_INFO("LLLFSThread::READ: {} Bytes: {}", mFileName, mBytesRead);
 	}
 	else if (mOperation ==  FILE_WRITE)
 	{
@@ -211,7 +211,7 @@ bool LLLFSThread::Request::processRequest()
 		outfile.open(mFileName, flags, mThread->getLocalAPRFilePool());
 		if (!outfile.getFileHandle())
 		{
-			LL_WARNS() << "LLLFS: Unable to write file: " << mFileName << LL_ENDL;
+			ALOG_IO_WARN("LLLFS: Unable to write file: {}", mFileName);
 			mBytesRead = 0; // fail
 			return true;
 		}
@@ -220,7 +220,7 @@ bool LLLFSThread::Request::processRequest()
 			S32 seek = outfile.seek(APR_SET, mOffset);
 			if (seek < 0)
 			{
-				LL_WARNS() << "LLLFS: Unable to write file (seek failed): " << mFileName << LL_ENDL;
+				ALOG_IO_WARN("LLLFS: Unable to write file (seek failed): {}", mFileName);
 				mBytesRead = 0; // fail
 				return true;
 			}
@@ -231,7 +231,7 @@ bool LLLFSThread::Request::processRequest()
 	}
 	else
 	{
-		LL_ERRS() << "LLLFSThread::unknown operation: " << (S32)mOperation << LL_ENDL;
+		ALOG_IO_CRITICAL("LLLFSThread::unknown operation: {}", (S32)mOperation);
 	}
 	return complete;
 }

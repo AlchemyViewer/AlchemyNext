@@ -75,13 +75,13 @@ BOOL LLFileSystem::read(U8* buffer, S32 bytes)
 {
     if (!mFile)
     {
-        LL_WARNS() << "Attempt to write to file " << mFileID << " that is not open" << LL_ENDL;
+        ALOG_IO_WARN(FMT_STRING("Attempt to write to file {} that is not open"), mFileID);
         return FALSE;
     }
 
     if (!(mMode & READ))
     {
-        LL_WARNS() << "Attempt to read from file " << mFileID << " opened with mode " << std::hex << mMode << std::dec << LL_ENDL;
+        ALOG_IO_WARN(FMT_STRING("Attempt to read from file {} opened with mode {:x}"), mFileID, mMode);
         return FALSE;
     }
 
@@ -147,13 +147,13 @@ BOOL LLFileSystem::write(const U8* buffer, S32 bytes)
 {
     if (!mFile)
     {
-        LL_WARNS() << "Attempt to write to file " << mFileID << " that is not open" << LL_ENDL;
+        ALOG_IO_WARN(FMT_STRING("Attempt to write to file {} that is not open"), mFileID);
         return FALSE;
     }
 
     if (!(mMode & WRITE) || !(mMode & APPEND))
     {
-        LL_WARNS() << "Attempt to write to file " << mFileID << " opened with mode " << std::hex << mMode << std::dec << LL_ENDL;
+        ALOG_IO_WARN(FMT_STRING("Attempt to write to file {} opened with mode {:x}"), mFileID, mMode);
         return FALSE;
     }
 
@@ -211,14 +211,14 @@ BOOL LLFileSystem::seek(S32 offset, S32 origin)
 
     if (new_pos > size)
     {
-        LL_WARNS() << "Attempt to seek past end of file" << LL_ENDL;
+        ALOG_IO_WARN("Attempt to seek past end of file");
 
         mPosition = size;
         return FALSE;
     }
     else if (new_pos < 0)
     {
-        LL_WARNS() << "Attempt to seek past beginning of file" << LL_ENDL;
+        ALOG_IO_WARN("Attempt to seek past beginning of file");
 
         mPosition = 0;
         return FALSE;
@@ -279,7 +279,7 @@ BOOL LLFileSystem::rename(const LLUUID& new_id, const LLAssetType::EType new_typ
         // failed but the original code does not and doing so seems to
         // break a lot of things so we go with the flow...
         //return FALSE;
-        LL_WARNS() << "Failed to rename " << mFileID << " to " << new_id << " reason: " << strerror(errno) << LL_ENDL;
+        ALOG_IO_WARN(FMT_STRING("Failed to rename {} to {} reason: {:s}"), mFileID, new_id, strerror(errno));
     }
 
     mFileID = new_id;
@@ -330,7 +330,7 @@ void LLFileSystem::updateFileAccessTime()
     const std::time_t last_write_time = boost::filesystem::last_write_time(mFilePath, ec);
     if (ec.failed())
     {
-        LL_WARNS() << "Failed to read last write time for cache file " << mFilePath << ": " << ec.message() << LL_ENDL;
+        ALOG_IO_WARN(FMT_STRING("Failed to read last write time for cache file {:s} : {:s}"), mFilePath, ec.message());
         return;
     }
 
@@ -344,7 +344,7 @@ void LLFileSystem::updateFileAccessTime()
         boost::filesystem::last_write_time(mFilePath, cur_time, ec);
 		if (ec.failed())
 		{
-			LL_WARNS() << "Failed to update last write time for cache file " << mFilePath << ": " << ec.message() << LL_ENDL;
+            ALOG_IO_WARN(FMT_STRING("Failed to update last write time for cache file {:s} : {:s}"), mFilePath, ec.message());
 		}
     }
 }

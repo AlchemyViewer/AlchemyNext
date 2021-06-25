@@ -283,7 +283,7 @@ LLDir_Win32::LLDir_Win32()
 	int res = LLFile::mkdir(mDefaultCacheDir);
 	if (res == -1)
 	{
-		LL_WARNS() << "Couldn't create LL_PATH_CACHE dir " << mDefaultCacheDir << LL_ENDL;
+		ALOG_IO_WARN("Couldn't create LL_PATH_CACHE dir {}", mDefaultCacheDir);
 	}
 
 	mLLPluginDir = add(mExecutableDir, "llplugin");
@@ -310,8 +310,8 @@ void LLDir_Win32::initAppDirs(const std::string &app_name,
 	int res = LLFile::mkdir(mOSUserAppDir);
 	if (res == -1)
 	{
-		LL_WARNS() << "Couldn't create app user dir " << mOSUserAppDir << LL_ENDL;
-		LL_WARNS() << "Default to base dir" << mOSUserDir << LL_ENDL;
+		ALOG_IO_WARN("Couldn't create app user dir {}", mOSUserAppDir);
+		ALOG_IO_WARN("Default to base dir {}", mOSUserDir);
 		mOSUserAppDir = mOSUserDir;
 	}
 	//dumpCurrentDirectories();
@@ -319,19 +319,19 @@ void LLDir_Win32::initAppDirs(const std::string &app_name,
 	res = LLFile::mkdir(getExpandedFilename(LL_PATH_LOGS,""));
 	if (res == -1)
 	{
-		LL_WARNS() << "Couldn't create LL_PATH_LOGS dir " << getExpandedFilename(LL_PATH_LOGS,"") << LL_ENDL;
+		ALOG_IO_WARN("Couldn't create LL_PATH_LOGS dir {}", getExpandedFilename(LL_PATH_LOGS,""));
 	}
 
 	res = LLFile::mkdir(getExpandedFilename(LL_PATH_USER_SETTINGS,""));
 	if (res == -1)
 	{
-		LL_WARNS() << "Couldn't create LL_PATH_USER_SETTINGS dir " << getExpandedFilename(LL_PATH_USER_SETTINGS,"") << LL_ENDL;
+		ALOG_IO_WARN("Couldn't create LL_PATH_USER_SETTINGS dir {}", getExpandedFilename(LL_PATH_USER_SETTINGS,""));
 	}
 
 	res = LLFile::mkdir(getExpandedFilename(LL_PATH_CACHE,""));
 	if (res == -1)
 	{
-		LL_WARNS() << "Couldn't create LL_PATH_CACHE dir " << getExpandedFilename(LL_PATH_CACHE,"") << LL_ENDL;
+		ALOG_IO_WARN("Couldn't create LL_PATH_CACHE dir {}", getExpandedFilename(LL_PATH_CACHE,""));
 	}
 
 	mCAFile = getExpandedFilename( LL_PATH_EXECUTABLE, "ca-bundle.crt" );

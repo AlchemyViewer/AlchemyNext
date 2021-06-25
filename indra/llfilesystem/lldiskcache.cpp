@@ -37,6 +37,10 @@
 #include <boost/range/iterator_range.hpp>
 #include <chrono>
 
+#include <fmt/chrono.h>
+
+#include "spdlog/stopwatch.h"
+
 #include "lldiskcache.h"
 
 std::string LLDiskCache::sCacheDir = "";
@@ -67,10 +71,9 @@ void LLDiskCache::purge()
 {
     if (mEnableCacheDebugInfo)
     {
-        LL_INFOS() << "Total dir size before purge is " << dirFileSize(sCacheDir) << LL_ENDL;
+        ALOG_IO_INFO("Total dir size before purge is {}", dirFileSize(sCacheDir));
     }
-
-    auto start_time = std::chrono::high_resolution_clock::now();
+    spdlog::stopwatch sw;
 
     typedef std::pair<std::time_t, std::pair<uintmax_t, boost::filesystem::path>> file_info_t;
     std::vector<file_info_t> file_info;
@@ -93,13 +96,13 @@ void LLDiskCache::purge()
                     const uintmax_t file_size = boost::filesystem::file_size(entry, ec);
                     if (ec.failed())
                     {
-                        LL_WARNS() << "Failed to read file size for cache file " << entry.path().string() << ": " << ec.message() << LL_ENDL;
+                        ALOG_IO_WARN("Failed to read file size for cache file {}: {}", entry.path().string(), ec.message());
                         continue;
                     }
                     const std::time_t file_time = boost::filesystem::last_write_time(entry, ec);
 					if (ec.failed())
 					{
-						LL_WARNS() << "Failed to read last write time for cache file " << entry.path().string() << ": " << ec.message() << LL_ENDL;
+                        ALOG_IO_WARN("Failed to read last write time for cache file {}: {}", entry.path().string(), ec.message());
                         continue;
 					}
 
@@ -114,7 +117,7 @@ void LLDiskCache::purge()
         return x.first > y.first;
     });
 
-    LL_INFOS() << "Purging cache to a maximum of " << mMaxSizeBytes << " bytes" << LL_ENDL;
+    ALOG_IO_INFO("Purging cache to a maximum of {} bytes", mMaxSizeBytes);
 
     uintmax_t file_size_total = 0;
     for (const file_info_t& entry : file_info)
@@ -129,31 +132,21 @@ void LLDiskCache::purge()
             boost::filesystem::remove(entry.second.second, ec);
             if (ec.failed())
             {
-                LL_WARNS() << "Failed to delete cached file " << entry.second.second << ": " << ec.message() << LL_ENDL;
+                ALOG_IO_WARN("Failed to delete cached file {}: {}", entry.second.second, ec.message());
                 continue;
             }
         }
 
         if (mEnableCacheDebugInfo)
         {
-            // have to do this because of LL_INFO/LL_END weirdness
-            std::ostringstream line;
-
-            line << (remove_file ? "DELETE:" : "  KEEP:" ) << "  ";
-            line << entry.first << "  ";
-            line << entry.second.first << "  ";
-            line << entry.second.second;
-            line << " (" << file_size_total << "/" << mMaxSizeBytes << ")";
-            LL_INFOS() << line.str() << LL_ENDL;
+            ALOG_IO_INFO(FMT_STRING("{:s} {} {:d} {:s} ({:d}/{:d})"), (remove_file ? "DELETE:" : "  KEEP:"), entry.first, entry.second.first, entry.second.second, file_size_total, mMaxSizeBytes);
         }
     }
 
     if (mEnableCacheDebugInfo)
     {
-        auto end_time = std::chrono::high_resolution_clock::now();
-        auto execute_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-        LL_INFOS() << "Total dir size after purge is " << dirFileSize(sCacheDir) << LL_ENDL;
-        LL_INFOS() << "Cache purge took " << execute_time << " ms to execute for " << file_info.size() << " files" << LL_ENDL;
+        ALOG_IO_INFO("Total dir size after purge is {}", dirFileSize(sCacheDir));
+        ALOG_IO_INFO("Cache purge took {} to execute for {} files", std::chrono::duration_cast<std::chrono::milliseconds>(sw.elapsed()), file_info.size());
     }
 }
 
@@ -220,7 +213,7 @@ const std::string LLDiskCache::getCacheInfo()
     uintmax_t max_in_mb = mMaxSizeBytes / (1024U * 1024U);
     F64 percent_used = ((F64)cache_used_mb / (F64)max_in_mb) * 100.0;
 
-    return llformat("%juMB / %juMB (%.1f%% used)", cache_used_mb, max_in_mb, percent_used);
+    return fmt::format(FMT_STRING("{:d}MB / {:d}MB ({:.1f}% used)"), cache_used_mb, max_in_mb, percent_used);
 }
 
 void LLDiskCache::clearCache()
@@ -242,7 +235,7 @@ void LLDiskCache::clearCache()
         boost::filesystem::remove_all(cache_path, ec);
         if (ec.failed())
         {
-            LL_WARNS() << "Failed to delete cached files " << cache_path << " : " << ec.message() << LL_ENDL;
+            ALOG_IO_WARN("Failed to delete cached files {} : {}", cache_path, ec.message());
         }
 
         createCache();
@@ -280,7 +273,7 @@ uintmax_t LLDiskCache::dirFileSize(const std::string dir)
                     uintmax_t file_size = boost::filesystem::file_size(entry, ec);
                     if (ec.failed())
                     {
-                        LL_WARNS() << "Failed to get file size for cache file " << entry.path().string() << " : " << ec.message() << LL_ENDL;
+                        ALOG_IO_WARN("Failed to get file size for cache file {} : {}", entry.path().string(), ec.message());
                         continue;
                     }
                     total_file_size += file_size;
