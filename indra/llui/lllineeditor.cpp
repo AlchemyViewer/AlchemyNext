@@ -869,18 +869,15 @@ BOOL LLLineEditor::handleHover(S32 x, S32 y, MASK mask)
 		mKeystrokeTimer.reset();
 
 		getWindow()->setCursor(UI_CURSOR_IBEAM);
-#ifdef SHOW_DEBUG
-		LL_DEBUGS("UserInput") << "hover handled by " << getName() << " (active)" << LL_ENDL;	
-#endif
+		ALOG_UI_DEBUG("hover handled by {} (active)", getName());
 		handled = TRUE;
 	}
 
 	if( !handled  )
 	{
 		getWindow()->setCursor(UI_CURSOR_IBEAM);
-#ifdef SHOW_DEBUG
-		LL_DEBUGS("UserInput") << "hover handled by " << getName() << " (inactive)" << LL_ENDL;		
-#endif
+		ALOG_UI_DEBUG("hover handled by {} (inactive)", getName());
+
 		handled = TRUE;
 	}
 

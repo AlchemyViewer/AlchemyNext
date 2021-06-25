@@ -1641,7 +1641,7 @@ void LLTextBase::reflow()
 		// use an even number of iterations to avoid user visible oscillation of the layout
 		if(++reflow_count > 2)
 		{
-			LL_DEBUGS() << "Breaking out of reflow due to possible infinite loop in " << getName() << LL_ENDL;
+			ALOG_UI_DEBUG("Breaking out of reflow due to possible infinite loop in {}", getName());
 			break;
 		}
 	
@@ -2406,9 +2406,8 @@ void LLTextBase::setFont(const LLFontGL* font)
 
 void LLTextBase::needsReflow(S32 index)
 {
-#ifdef SHOW_DEBUG
-	LL_DEBUGS() << "reflow on object " << (void*)this << " index = " << mReflowIndex << ", new index = " << index << LL_ENDL;
-#endif
+	ALOG_UI_DEBUG("reflow on object {} index = {}, new index = {}", fmt::ptr(this), mReflowIndex, index);
+
 	mReflowIndex = llmin(mReflowIndex, index);
 
 // [SL:KB] - Patch: Control-TextHighlight | Checked: 2013-12-30 (Catznip-3.6)

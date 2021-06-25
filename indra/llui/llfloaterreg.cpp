@@ -508,7 +508,7 @@ void LLFloaterReg::toggleInstanceOrBringToFront(const LLSD& sdname, const LLSD& 
 	
 	if (!instance)
 	{
-		LL_DEBUGS() << "Unable to get instance of floater '" << name << "'" << LL_ENDL;
+		ALOG_UI_DEBUG("Unable to get instance of floater '{}'", name);
 		return;
 	}
 	

@@ -336,9 +336,7 @@ void LLUICtrl::onMouseLeave(S32 x, S32 y, MASK mask)
 //virtual 
 BOOL LLUICtrl::handleMouseDown(S32 x, S32 y, MASK mask)
 {
-#ifdef SHOW_DEBUG
-	LL_DEBUGS() << "LLUICtrl::handleMouseDown calling	LLView)'s handleMouseUp (first initialized xui to: " << getPathname() << " )" << LL_ENDL;
-#endif
+	ALOG_UI_DEBUG("LLUICtrl::handleMouseDown calling	LLView)'s handleMouseUp (first initialized xui to: {} )", getPathname());
   
 	BOOL handled  = LLView::handleMouseDown(x,y,mask);
 	
@@ -346,9 +344,7 @@ BOOL LLUICtrl::handleMouseDown(S32 x, S32 y, MASK mask)
 	{
 		(*mMouseDownSignal)(this,x,y,mask);
 	}
-#ifdef SHOW_DEBUG
-	LL_DEBUGS() << "LLUICtrl::handleMousedown - handled is returning as: " << handled << "	  " << LL_ENDL;
-#endif
+	ALOG_UI_DEBUG("LLUICtrl::handleMousedown - handled is returning as: {}", handled);
 	
 #if AL_VIEWER_EVENT_RECORDER
 	if (handled && LLViewerEventRecorder::getLoggingStatus()) {
@@ -361,10 +357,7 @@ BOOL LLUICtrl::handleMouseDown(S32 x, S32 y, MASK mask)
 //virtual
 BOOL LLUICtrl::handleMouseUp(S32 x, S32 y, MASK mask)
 {
-#ifdef SHOW_DEBUG
-	LL_DEBUGS() << "LLUICtrl::handleMouseUp calling LLView)'s handleMouseUp (first initialized xui to: " << getPathname() << " )" << LL_ENDL;
-#endif
-
+	ALOG_UI_DEBUG("LLUICtrl::handleMouseUp calling LLView)'s handleMouseUp (first initialized xui to: {} )", getPathname());
 	BOOL handled  = LLView::handleMouseUp(x,y,mask);
 
 #if AL_VIEWER_EVENT_RECORDER
@@ -377,9 +370,7 @@ BOOL LLUICtrl::handleMouseUp(S32 x, S32 y, MASK mask)
 		(*mMouseUpSignal)(this,x,y,mask);
 	}
 
-#ifdef SHOW_DEBUG
-	LL_DEBUGS() << "LLUICtrl::handleMouseUp - handled for xui " << getPathname() << "  -  is returning as: " << handled << "   " << LL_ENDL;
-#endif
+	ALOG_UI_DEBUG("LLUICtrl::handleMouseUp - handled for xui {}  -  is returning as: {}", getPathname(), handled);
 
 	return handled;
 }
@@ -429,7 +420,7 @@ void LLUICtrl::onCommit()
 	{
 		if (!mFunctionName.empty())
 		{
-			LL_DEBUGS("UIUsage") << "calling commit function " << mFunctionName << LL_ENDL;
+			ALOG_UI_DEBUG("calling commit function {}", mFunctionName);
 		}
 		else
 		{

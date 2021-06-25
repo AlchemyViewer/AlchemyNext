@@ -192,11 +192,8 @@ LLMenuItemGL::LLMenuItemGL(const LLMenuItemGL::Params& p)
 
 	LLKeyboard::keyFromString(key_str, &mAcceleratorKey);
 
-	LL_DEBUGS("HotKeys") << "Process short cut key: shortcut: " << shortcut
-		<< ", key str: " << key_str
-		<< ", accelerator mask: " << mAcceleratorMask
-		<< ", accelerator key: " << mAcceleratorKey
-		<< LL_ENDL;
+	ALOG_UI_DEBUG("Process short cut key: shortcut: {}, key str: {}, accelerator mask: {}, accelerator key: {}", 
+		shortcut, key_str, mAcceleratorMask, mAcceleratorKey);
 }
 
 //virtual
@@ -316,9 +313,7 @@ BOOL LLMenuItemGL::addToAcceleratorList(std::list <LLMenuKeyboardBinding*> *list
 void LLMenuItemGL::appendAcceleratorString( std::string& st ) const
 {
 	st = LLKeyboard::stringFromAccelerator( mAcceleratorMask, mAcceleratorKey );
-#ifdef SHOW_DEBUG
-	LL_DEBUGS("HotKeys") << "appendAcceleratorString: " << st << LL_ENDL;
-#endif
+	ALOG_UI_DEBUG("appendAcceleratorString: {}",  st);
 }
 
 void LLMenuItemGL::setJumpKey(KEY key)

@@ -69,7 +69,7 @@ public:
 		}
 		else
 		{
-			LL_ERRS() << "attempt to store duplicate name '" << name << "' in LLFunctorRegistry. NOT ADDED." << LL_ENDL;
+			ALOG_UI_CRITICAL("attempt to store duplicate name '{}' in LLFunctorRegistry. NOT ADDED.", name);
 			retval = false;
 		}
 		
@@ -80,7 +80,7 @@ public:
 	{
 		if (mMap.count(name) == 0)
 		{
-			LL_WARNS() << "trying to remove '" << name << "' from LLFunctorRegistry but it's not there." << LL_ENDL;
+			ALOG_UI_WARN("trying to remove '{}' from LLFunctorRegistry but it's not there.", name);
 			return false;
 		}
 		mMap.erase(name);
@@ -95,7 +95,7 @@ public:
 		}
 		else
 		{
-			LL_DEBUGS() << "tried to find '" << name << "' in LLFunctorRegistry, but it wasn't there." << LL_ENDL;
+			ALOG_UI_DEBUG("tried to find '{}' in LLFunctorRegistry, but it wasn't there.", name);
 			return mMap[LOGFUNCTOR];
 		}
 	}
@@ -107,7 +107,7 @@ private:
 
 	static void log_functor(const LLSD& notification, const LLSD& payload)
 	{
-		LL_DEBUGS() << "log_functor called with payload: " << payload << LL_ENDL;
+		ALOG_UI_DEBUG("log_functor called with payload: {}", payload);
 	}
 
 	static void do_nothing(const LLSD& notification, const LLSD& payload)

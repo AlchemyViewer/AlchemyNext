@@ -292,7 +292,7 @@ void LLKeywords::processTokensGroup(const LLSD& tokens, const std::string& group
 	}
 
 	color_group = getColorGroup(group);
-	LL_DEBUGS("SyntaxLSL") << "Group: '" << group << "', using color: '" << color_group << "'" << LL_ENDL;
+	ALOG_UI_DEBUG("Group: '{}', using color: '{}'", group, color_group);
 
 	if (tokens.isMap())
 	{
