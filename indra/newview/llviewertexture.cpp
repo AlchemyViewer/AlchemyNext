@@ -739,9 +739,7 @@ void LLViewerTexture::dump()
 {
 	LLGLTexture::dump();
 
-	LL_INFOS() << "LLViewerTexture"
-			<< " mID " << mID
-			<< LL_ENDL;
+	ALOG_TXTR_INFO("LLViewerTexture mID {}", mID);
 }
 
 void LLViewerTexture::setBoostLevel(S32 level)
@@ -804,7 +802,7 @@ bool LLViewerTexture::bindDefaultImage(S32 stage)
 	}
 	if (!res)
 	{
-		LL_WARNS() << "LLViewerTexture::bindDefaultImage failed." << LL_ENDL;
+		ALOG_TXTR_WARN("LLViewerTexture::bindDefaultImage failed.");
 	}
 	stop_glerror();
 
@@ -1076,7 +1074,7 @@ LLViewerFetchedTexture::LLViewerFetchedTexture(const LLUUID& id, FTType f_type, 
 	mFTType = f_type;
 	if (mFTType == FTT_HOST_BAKE)
 	{
-		LL_WARNS() << "Unsupported fetch type " << mFTType << LL_ENDL;
+		ALOG_TXTR_WARN("Unsupported fetch type {}", mFTType);
 	}
 	generateGLTexture();
 	mGLTexturep->setNeedsAlphaAndPickMask(TRUE);
@@ -1244,7 +1242,7 @@ void LLViewerFetchedTexture::loadFromFastCache()
 		{ 
 			//discard all oversized textures.
 			destroyRawImage();
-			LL_WARNS() << "oversized, setting as missing" << LL_ENDL;
+			ALOG_TXTR_WARN("oversized, setting as missing");
 			setIsMissingAsset();
 			mRawDiscardLevel = INVALID_DISCARD_LEVEL;
 		}
@@ -1481,11 +1479,11 @@ BOOL LLViewerFetchedTexture::createTexture(S32 usename/*= 0*/)
 	mNeedsCreateTexture = FALSE;
 	if (mRawImage.isNull())
 	{
-		LL_ERRS() << "LLViewerTexture trying to create texture with no Raw Image" << LL_ENDL;
+		ALOG_TXTR_CRITICAL("LLViewerTexture trying to create texture with no Raw Image");
 	}
 	if (mRawImage->isBufferInvalid())
 	{
-		LL_WARNS() << "Can't create a texture: invalid image data" << LL_ENDL;
+		ALOG_TXTR_WARN("Can't create a texture: invalid image data");
 		destroyRawImage();
 		return FALSE;
 	}
@@ -1554,7 +1552,7 @@ BOOL LLViewerFetchedTexture::createTexture(S32 usename/*= 0*/)
 		// An inappropriately-sized image was uploaded (through a non standard client)
 		// We treat these images as missing assets which causes them to
 		// be renderd as 'missing image' and to stop requesting data
-		LL_WARNS() << "!size_ok, setting as missing" << LL_ENDL;
+		ALOG_TXTR_WARN("!size_ok, setting as missing");
 		setIsMissingAsset();
 		destroyRawImage();
 		return FALSE;
@@ -1567,7 +1565,7 @@ BOOL LLViewerFetchedTexture::createTexture(S32 usename/*= 0*/)
         if ((format == GL_RGBA && components < 4)
             || (format == GL_RGB && components < 3))
         {
-            LL_WARNS() << "Can't create a texture " << mID << ": invalid image format " << std::hex << format << " vs components " << (U32)components << LL_ENDL;
+			ALOG_TXTR_WARN("Can't create a texture {}: invalid image format {:x} vs components {}", mID, format, (U32)components);
             // Was expecting specific format but raw texture has insufficient components for
             // such format, using such texture will result in crash or will display wrongly
             // if we change format. Texture might be corrupted server side, so just set as
@@ -2069,7 +2067,7 @@ bool LLViewerFetchedTexture::updateFetch()
 				{ 
 					//discard all oversized textures.
 					destroyRawImage();
-					LL_WARNS() << "oversize, setting as missing" << LL_ENDL;
+					ALOG_TXTR_WARN("oversize, setting as missing");
 					setIsMissingAsset();
 					mRawDiscardLevel = INVALID_DISCARD_LEVEL;
 					mIsFetching = FALSE;
@@ -2113,19 +2111,15 @@ bool LLViewerFetchedTexture::updateFetch()
 				{
 					if (getFTType() != FTT_MAP_TILE)
 					{
-						LL_WARNS() << mID
-								<< " Fetch failure, setting as missing, decode_priority " << decode_priority
-								<< " mRawDiscardLevel " << mRawDiscardLevel
-								<< " current_discard " << current_discard
-								<< " stats " << mLastHttpGetStatus.toHex()
-								<< LL_ENDL;
+						ALOG_TXTR_WARN("{} Fetch failure, setting as missing, decode_priority {} mRawDiscardLevel {} current_discard {} stats {}",
+							mID, decode_priority, mRawDiscardLevel, current_discard, mLastHttpGetStatus.toHex());
 					}
 					setIsMissingAsset();
 					desired_discard = -1;
 				}
 				else
 				{
-					//LL_WARNS() << mID << ": Setting min discard to " << current_discard << LL_ENDL;
+					//ALOG_TXTR_WARN("{}: Setting min discard to {}", mID, current_discard);
 					if(current_discard >= 0)
 					{
 						mMinDiscardLevel = current_discard;
@@ -2400,7 +2394,7 @@ void LLViewerFetchedTexture::setLoadedCallback( loaded_callback_func loaded_call
 		else
 		{
 			// We need aux data, but we've already loaded the image, and it didn't have any
-			LL_WARNS() << "No aux data available for callback for image:" << getID() << LL_ENDL;
+			ALOG_TXTR_WARN("No aux data available for callback for image:{}", getID());
 		}
 	}
 	mLastCallBackActiveTime = sCurrentTime ;
@@ -2591,8 +2585,7 @@ bool LLViewerFetchedTexture::doLoadedCallbacks()
 		if (mFTType == FTT_SERVER_BAKE)
 		{
 			//output some debug info
-			LL_INFOS() << "baked texture: " << mID << "is missing." << LL_ENDL;
-			LL_INFOS() << mUrl << LL_ENDL;
+			ALOG_TXTR_INFO("baked texture: {} is missing.\n{}", mID, mUrl);;
 		}
 
 		for(callback_list_t::iterator iter = mLoadedCallbackList.begin();
@@ -2733,7 +2726,7 @@ bool LLViewerFetchedTexture::doLoadedCallbacks()
 				//llassert_always(mRawImage.notNull());
 				if(mNeedsAux && mAuxRawImage.isNull())
 				{
-					LL_WARNS() << "Raw Image with no Aux Data for callback" << LL_ENDL;
+					ALOG_TXTR_WARN("Raw Image with no Aux Data for callback");
 				}
 				BOOL final = mRawDiscardLevel <= entryp->mDesiredDiscard ? TRUE : FALSE;
 				//LL_INFOS() << "Running callback for " << getID() << LL_ENDL;
@@ -3645,7 +3638,7 @@ void LLViewerMediaTexture::addFace(U32 ch, LLFace* facep)
 	
 	if(te && te->getID().notNull()) //should have a texture
 	{
-		LL_ERRS() << "The face does not have a valid texture before media texture." << LL_ENDL;
+		ALOG_TXTR_CRITICAL("The face does not have a valid texture before media texture.");
 	}
 }
 
@@ -3754,7 +3747,7 @@ void LLViewerMediaTexture::removeFace(U32 channel, LLFace* facep)
 
 	if(te && te->getID().notNull()) //should have a texture but none found
 	{
-		LL_ERRS() << "mTextureList texture reference number is corrupted. Texture id: " << te->getID() << " List size: " << (U32)mTextureList.size() << LL_ENDL;
+		ALOG_TXTR_CRITICAL("mTextureList texture reference number is corrupted. Texture id: {} List size: {}", te->getID(), mTextureList.size());
 	}
 }
 
@@ -4111,7 +4104,7 @@ void LLTexturePipelineTester::compareTestSessions(llofstream* os)
 	LLTexturePipelineTester::LLTextureTestSession* current_sessionp = dynamic_cast<LLTexturePipelineTester::LLTextureTestSession*>(mCurrentSessionp);
 	if(!base_sessionp || !current_sessionp)
 	{
-		LL_ERRS() << "type of test session does not match!" << LL_ENDL;
+		ALOG_TXTR_CRITICAL("type of test session does not match!");
 	}
 
 	//compare and output the comparison

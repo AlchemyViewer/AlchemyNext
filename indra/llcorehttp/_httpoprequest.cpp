@@ -640,9 +640,7 @@ HttpStatus HttpOpRequest::prepareRequest(HttpService * service)
         break;
 
 	default:
-		LL_ERRS(LOG_CORE) << "Invalid HTTP method in request:  "
-						  << int(mReqMethod)  << ".  Can't recover."
-						  << LL_ENDL;
+		ALOG_NET_CRITICAL("Invalid HTTP method in request:  {}.  Can't recover.", int(mReqMethod));
 		break;
 	}
 
