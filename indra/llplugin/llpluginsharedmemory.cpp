@@ -401,7 +401,7 @@ bool LLPluginSharedMemory::map(void)
 		
 	if(mMappedAddress == NULL)
 	{
-		ALOG_WARN("MapViewOfFile failed: {}", windows_message<std::string>(GetLastError()));
+		ALOG_WARN("MapViewOfFile failed: {}", std::system_category().message(GetLastError()));
 		return false;
 	}
 	
@@ -455,7 +455,7 @@ bool LLPluginSharedMemory::create(size_t size)
 
 	if(mImpl->mMapFile == NULL)
 	{
-		ALOG_WARN("CreateFileMapping failed: {}", windows_message<std::string>(GetLastError()));
+		ALOG_WARN("CreateFileMapping failed: {}", std::system_category().message(GetLastError()));
 		return false;
 	}
 
@@ -483,7 +483,7 @@ bool LLPluginSharedMemory::attach(const std::string &name, size_t size)
 	
 	if(mImpl->mMapFile == NULL)
 	{
-		ALOG_WARN("OpenFileMapping failed: {}", windows_message<std::string>(GetLastError()));
+		ALOG_WARN("OpenFileMapping failed: {}", std::system_category().message(GetLastError()));
 		return false;
 	}
 		

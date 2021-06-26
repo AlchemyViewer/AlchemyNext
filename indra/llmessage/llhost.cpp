@@ -133,17 +133,17 @@ BOOL LLHost::setHostByName(const std::string& hostname)
 		switch(error_number) 
 		{
 			case TRY_AGAIN:	// XXX how to handle this case? 
-				LL_WARNS() << "LLHost::setAddress(): try again" << LL_ENDL;
+				ALOG_NET_WARN("LLHost::setAddress(): try again");
 				break;
 			case HOST_NOT_FOUND:
 			case NO_ADDRESS:	// NO_DATA
-				LL_WARNS() << "LLHost::setAddress(): host not found" << LL_ENDL;
+				ALOG_NET_WARN("LLHost::setAddress(): host not found");
 				break;
 			case NO_RECOVERY:
-				LL_WARNS() << "LLHost::setAddress(): unrecoverable error" << LL_ENDL;
+				ALOG_NET_WARN("LLHost::setAddress(): unrecoverable error");
 				break;
 			default:
-				LL_WARNS() << "LLHost::setAddress(): unknown error - " << error_number << LL_ENDL;
+				ALOG_NET_WARN("LLHost::setAddress(): unknown error - ec: {} message: {}", error_number, std::system_category().message(error_number));
 				break;
 		}
 		return FALSE;

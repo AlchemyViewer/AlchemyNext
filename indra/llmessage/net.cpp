@@ -33,6 +33,7 @@
 
 #if LL_WINDOWS
 #include "llwin32headerslean.h"
+#include <system_error>
 #else
 	#include <sys/types.h>
 	#include <sys/socket.h>
@@ -195,8 +196,8 @@ S32 start_net(S32& socket_out, int& nPort)
 	if (WSAStartup(0x0202, &stWSAData))
 	{
 		S32 err = WSAGetLastError();
+		ALOG_NET_WARN("Windows Sockets initialization failed, ec: {} message: {}", err, std::system_category().message(err));
 		WSACleanup();
-		LL_WARNS("AppInit") << "Windows Sockets initialization failed, err " << err << LL_ENDL;
 		return 1;
 	}
 
@@ -205,8 +206,8 @@ S32 start_net(S32& socket_out, int& nPort)
 	if (hSocket == INVALID_SOCKET)
 	{
 		S32 err = WSAGetLastError();
+		ALOG_NET_WARN("socket() failed, ec: {} message: {}", err, std::system_category().message(err));
 		WSACleanup();
-		LL_WARNS("AppInit") << "socket() failed, err " << err << LL_ENDL;
 		return 2;
 	}
 
@@ -269,8 +270,8 @@ S32 start_net(S32& socket_out, int& nPort)
 	nRet = ioctlsocket (hSocket, FIONBIO, &argp);
 	if (nRet == SOCKET_ERROR) 
 	{
-		printf("Failed to set socket non-blocking, Err: %d\n", 
-		WSAGetLastError());
+		S32 err = WSAGetLastError();
+		ALOG_NET_WARN("Failed to set socket non-blocking, ec: {} message: {}", err, std::system_category().message(err));
 	}
 
 	// set a large receive buffer
@@ -322,11 +323,12 @@ S32 receive_packet(int hSocket, char * receiveBuffer)
 	nRet = recvfrom(hSocket, receiveBuffer, NET_BUFFER_SIZE, 0, (struct sockaddr*)&stSrcAddr, &addr_size);
 	if (nRet == SOCKET_ERROR ) 
 	{
-		if (WSAEWOULDBLOCK == WSAGetLastError())
+		auto last_error = WSAGetLastError();
+		if (WSAEWOULDBLOCK == last_error)
 			return 0;
-		if (WSAECONNRESET == WSAGetLastError())
+		if (WSAECONNRESET == last_error)
 			return 0;
-		LL_INFOS() << "receivePacket() failed, Error: " << WSAGetLastError() << LL_ENDL;
+		ALOG_NET_WARN("receivePacket() failed, ec: {} message: {}", last_error, std::system_category().message(last_error));
 	}
 	
 	return nRet;
@@ -360,8 +362,7 @@ BOOL send_packet(int hSocket, const char *sendBuffer, int size, U32 recipient, i
 				{
 					return TRUE;
 				}
-				LL_INFOS() << "sendto() failed to " << u32_to_ip_string(recipient) << ":" << nPort 
-					<< ", Error " << last_error << LL_ENDL;
+				ALOG_NET_WARN("sendto() failed to {}:{}, ec: {} message: {}", u32_to_ip_string(recipient), nPort, last_error, std::system_category().message(last_error));
 			}
 		}
 	} while (  (nRet == SOCKET_ERROR)

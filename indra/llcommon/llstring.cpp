@@ -926,7 +926,7 @@ boost::optional<std::wstring> llstring_getoptenv(const std::string& key)
     if (last_error != ERROR_ENVVAR_NOT_FOUND)
     {
         LL_WARNS() << "GetEnvironmentVariableW('" << key << "') failed: "
-                   << windows_message<std::string>(last_error) << LL_ENDL;
+                   << std::system_category().message(last_error) << LL_ENDL;
     }
     // return empty boost::optional
     return {};

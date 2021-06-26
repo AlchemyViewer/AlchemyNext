@@ -1139,7 +1139,7 @@ std::ostream& operator<<(std::ostream& out, const LLProcess::Params& params)
 *****************************************************************************/
 #if LL_WINDOWS
 
-static std::string WindowsErrorString(const std::string& operation);
+static std::string WindowsErrorString(const std::string_view operation);
 
 void LLProcess::autokill()
 {
@@ -1198,11 +1198,10 @@ static LLProcess::Status interpret_status(int status)
 }
 
 /// GetLastError()/FormatMessage() boilerplate
-static std::string WindowsErrorString(const std::string& operation)
+static std::string WindowsErrorString(const std::string_view operation)
 {
 	auto result = GetLastError();
-	return STRINGIZE(operation << " failed (" << result << "): "
-					 << windows_message<std::string>(result));
+	return fmt::format("{} failed ({}): {}", operation, result, std::system_category().message(result));
 }
 
 /*****************************************************************************
