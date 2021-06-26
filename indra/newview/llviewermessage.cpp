@@ -4004,12 +4004,12 @@ void process_kill_object(LLMessageSystem *mesgsys, void **user_data)
 		LLViewerObjectList::getUUIDFromLocal(id, local_id, ip, port); 
 		if (id == LLUUID::null)
 		{
-			LL_DEBUGS("Messaging") << "Unknown kill for local " << local_id << LL_ENDL;
+			ALOG_NET_DEBUG("Unknown kill for local {}", local_id);
 			continue;
 		}
 		else
 		{
-			LL_DEBUGS("Messaging") << "Kill message for local " << local_id << LL_ENDL;
+			ALOG_NET_DEBUG("Kill message for local {}", local_id);
 		}
 
 		if (id == gAgentID)

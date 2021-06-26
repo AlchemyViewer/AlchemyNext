@@ -1047,12 +1047,12 @@ BOOL LLViewerInput::handleKey(KEY translated_key, MASK translated_mask, BOOL rep
 		return FALSE;
 	}
 
-	LL_DEBUGS("UserInput") << "keydown -" << translated_key << "-" << LL_ENDL;
+	ALOG_DEBUG("keydown -{}-", translated_key);
 	// skip skipped keys
 	if(mKeysSkippedByUI.find(translated_key) != mKeysSkippedByUI.end()) 
 	{
 		mKeyHandledByUI[translated_key] = FALSE;
-		LL_INFOS_ONCE("KeyboardHandling") << "Key wasn't handled by UI!" << LL_ENDL;
+		ALOG_INFO("Key wasn't handled by UI!");
 	}
 	else
 	{

@@ -254,11 +254,11 @@ void LLLoginInstance::constructAuthParams(LLPointer<LLCredential> user_credentia
 
 bool LLLoginInstance::handleLoginEvent(const LLSD& event)
 {
-	LL_DEBUGS("LLLogin") << "LoginListener called!: \n" << event << LL_ENDL;
+	ALOG_DEBUG("LoginListener called!: \n", event);
 
 	if(!(event.has("state") && event.has("change") && event.has("progress")))
 	{
-		LL_ERRS("LLLogin") << "Unknown message from LLLogin: " << event << LL_ENDL;
+		ALOG_CRITICAL("Unknown message from LLLogin: ", event);
 	}
 
 	mLoginState = event["state"].asString();

@@ -463,9 +463,9 @@ void LLAssetStorage::getAssetData(const LLUUID uuid,
                                   void *user_data, 
                                   BOOL is_priority)
 {
-    LL_DEBUGS("AssetStorage") << "LLAssetStorage::getAssetData() - " << uuid << "," << LLAssetType::lookup(type) << LL_ENDL;
+    ALOG_ASSET_TRACE("LLAssetStorage::getAssetData() - {},{}", uuid, LLAssetType::lookup(type));
 
-    LL_DEBUGS("AssetStorage") << "ASSET_TRACE requesting " << uuid << " type " << LLAssetType::lookup(type) << LL_ENDL;
+    ALOG_ASSET_TRACE("ASSET_TRACE requesting {} type {}", uuid, LLAssetType::lookup(type));
 
     if (user_data)
     {
@@ -475,7 +475,7 @@ void LLAssetStorage::getAssetData(const LLUUID uuid,
 
     if (mShutDown)
     {
-        LL_DEBUGS("AssetStorage") << "ASSET_TRACE cancelled " << uuid << " type " << LLAssetType::lookup(type) << " shutting down" << LL_ENDL;
+        ALOG_ASSET_TRACE("ASSET_TRACE cancelled {} type {} shutting down", uuid, LLAssetType::lookup(type));
 
         if (callback)
         {
@@ -498,7 +498,7 @@ void LLAssetStorage::getAssetData(const LLUUID uuid,
 
     if (findInCacheAndInvokeCallback(uuid,type,callback,user_data))
     {
-        LL_DEBUGS("AssetStorage") << "ASSET_TRACE asset " << uuid << " found in cache" << LL_ENDL;
+        ALOG_ASSET_TRACE("ASSET_TRACE asset {} found in cache", uuid);
         return;
     }
 
@@ -516,13 +516,13 @@ void LLAssetStorage::getAssetData(const LLUUID uuid,
             callback(uuid, type, user_data, LL_ERR_NOERR, LLExtStat::CACHE_CACHED);
         }
 
-        LL_DEBUGS("AssetStorage") << "ASSET_TRACE asset " << uuid << " found in cache" << LL_ENDL;
+        ALOG_ASSET_TRACE("ASSET_TRACE asset {} found in cache", uuid);
     }
     else
     {
         if (exists)
         {
-            LL_WARNS("AssetStorage") << "Asset vfile " << uuid << ":" << type << " found with bad size " << size << ", removing" << LL_ENDL;
+           ALOG_ASSET_WARN("Asset vfile {}:{} found with bad size {}, removing", uuid, type, size);
             file.remove();
         }
         
@@ -538,8 +538,7 @@ void LLAssetStorage::getAssetData(const LLUUID uuid,
                 if (callback == tmp->mDownCallback && user_data == tmp->mUserData)
                 {
                     // this is a duplicate from the same subsystem - throw it away
-                    LL_WARNS("AssetStorage") << "Discarding duplicate request for asset " << uuid
-                                             << "." << LLAssetType::lookup(type) << LL_ENDL;
+                    ALOG_ASSET_WARN("Discarding duplicate request for asset {}.{}", uuid, LLAssetType::lookup(type));
                     return;
                 }
                 
@@ -550,8 +549,7 @@ void LLAssetStorage::getAssetData(const LLUUID uuid,
         }
         if (duplicate)
         {
-            LL_DEBUGS("AssetStorage") << "Adding additional non-duplicate request for asset " << uuid 
-                                      << "." << LLAssetType::lookup(type) << LL_ENDL;
+            ALOG_ASSET_DEBUG("Adding additional non-duplicate request for asset {}.{}", uuid, LLAssetType::lookup(type));
         }
         
         _queueDataRequest(uuid, type, callback, user_data, duplicate, is_priority);     

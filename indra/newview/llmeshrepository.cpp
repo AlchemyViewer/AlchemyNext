@@ -4613,11 +4613,7 @@ F32 LLMeshCostData::getRadiusWeightedTris(F32 radius)
 
 F32 LLMeshCostData::getEstTrisForStreamingCost()
 {
-    LL_DEBUGS("StreamingCost") << "tris_by_lod: "
-                               << mEstTrisByLOD[0] << ", "
-                               << mEstTrisByLOD[1] << ", "
-                               << mEstTrisByLOD[2] << ", "
-                               << mEstTrisByLOD[3] << LL_ENDL;
+	ALOG_ASSET_DEBUG("tris_by_lod: {}, {}, {}, {}", mEstTrisByLOD[0], mEstTrisByLOD[1], mEstTrisByLOD[2], mEstTrisByLOD[3]);
 
     F32 charged_tris = mEstTrisByLOD[3];
     F32 allowed_tris = mEstTrisByLOD[3];
@@ -4631,7 +4627,7 @@ F32 LLMeshCostData::getEstTrisForStreamingCost()
         F32 excess_tris = mEstTrisByLOD[i]-allowed_tris;
         if (excess_tris>0.f)
         {
-            LL_DEBUGS("StreamingCost") << "excess tris in lod[" << i << "] " << excess_tris << " allowed " << allowed_tris <<  LL_ENDL;
+			ALOG_ASSET_DEBUG("excess tris in lod[{}] {} allowed {}", i, excess_tris, allowed_tris);
             charged_tris += excess_tris;
         }
     }

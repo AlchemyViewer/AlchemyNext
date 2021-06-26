@@ -170,7 +170,7 @@ LLView::~LLView()
 	//LL_INFOS() << "Deleting view " << mName << ":" << (void*) this << LL_ENDL;
 	if (LLView::sIsDrawing)
 	{
-		LL_DEBUGS() << "Deleting view " << mName << " during UI draw() phase" << LL_ENDL;
+		ALOG_UI_DEBUG("Deleting view {} during UI draw() phase", mName);
 	}
 // 	llassert(LLView::sIsDrawing == FALSE);
 	

@@ -123,8 +123,7 @@ void LLAvatarRenderInfoAccountant::avatarRenderInfoGetCoro(std::string url, U64 
                     const LLSD & agent_info_map = agent_iter->second;
                     if (agent_info_map.isMap())
                     {
-                        LL_DEBUGS("AvatarRenderInfo") << " Agent " << target_agent_id 
-                                                      << ": " << agent_info_map << LL_ENDL;
+                        ALOG_NET_DEBUG("Agent {}: {}", target_agent_id, agent_info_map);
 
                         if (agent_info_map.has(KEY_WEIGHT))
                         {
@@ -141,7 +140,7 @@ void LLAvatarRenderInfoAccountant::avatarRenderInfoGetCoro(std::string url, U64 
                 }
                 else
                 {
-                    LL_DEBUGS("AvatarRenderInfo") << "Unknown agent " << target_agent_id << LL_ENDL;
+                    ALOG_NET_DEBUG("Unknown agent {}", target_agent_id);
                 }
             } // for agent_iter
         }
@@ -161,7 +160,7 @@ void LLAvatarRenderInfoAccountant::avatarRenderInfoGetCoro(std::string url, U64 
         U32 reporting = result[KEY_REPORTING_COMPLEXITY_LIMIT].asInteger();
         U32 overlimit = result[KEY_OVER_COMPLEXITY_LIMIT].asInteger();
 
-        LL_DEBUGS("AvatarRenderInfo") << "complexity limit: "<<reporting<<" reporting, "<<overlimit<<" over limit"<<LL_ENDL;
+        ALOG_NET_DEBUG("complexity limit: {} reporting, {} over limit", reporting, overlimit);
 
         LLAvatarRenderNotifier::getInstance()->updateNotificationRegion(reporting, overlimit);
     }

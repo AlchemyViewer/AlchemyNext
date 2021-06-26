@@ -133,8 +133,8 @@ LLAvatarNameCache::~LLAvatarNameCache()
 
 void LLAvatarNameCache::requestAvatarNameCache_(std::string url, std::vector<LLUUID> agentIds)
 {
-    LL_DEBUGS("AvNameCache") << "Entering coroutine " << LLCoros::getName()
-        << " with url '" << url << "', requesting " << agentIds.size() << " Agent Ids" << LL_ENDL;
+	ALOG_NET_DEBUG("Entering coroutine {} with url '{}', requesting {} Agent Ids",
+		LLCoros::getName(), url, agentIds.size());
 
     // Check pointer that can be cleaned up by cleanupClass()
     if (!sHttpRequest || !sHttpOptions || !sHttpHeaders)
@@ -152,7 +152,7 @@ void LLAvatarNameCache::requestAvatarNameCache_(std::string url, std::vector<LLU
         LLCoreHttpUtil::HttpCoroutineAdapter httpAdapter("NameCache", sHttpPolicy);
         LLSD results = httpAdapter.getAndSuspend(sHttpRequest, url);
 
-        LL_DEBUGS() << results << LL_ENDL;
+		ALOG_NET_DEBUG(results);
 
         if (!results.isMap())
         {
@@ -226,9 +226,8 @@ void LLAvatarNameCache::handleAvNameCacheSuccess(const LLSD &data, const LLSD &h
         // Use expiration time from header
         av_name.mExpires = expires;
 
-#ifdef SHOW_DEBUG
-        LL_DEBUGS("AvNameCache") << "LLAvatarNameResponder::result for " << agent_id << LL_ENDL;
-#endif
+		ALOG_NET_DEBUG("LLAvatarNameResponder::result for {}", agent_id);
+
         av_name.dump();
 
         // cache it and fire signals
@@ -282,7 +281,7 @@ void LLAvatarNameCache::handleAgentError(const LLUUID& agent_id)
         LLAvatarNameCache::mPendingQueue.erase(agent_id);
 
         LLAvatarName& av_name = existing->second;
-        LL_DEBUGS("AvNameCache") << "LLAvatarNameCache use cache for agent " << agent_id << LL_ENDL;
+		ALOG_NET_DEBUG("LLAvatarNameCache use cache for agent {}", agent_id);
 		av_name.dump();
 
 		 // Reset expiry time so we don't constantly rerequest.
@@ -384,12 +383,12 @@ void LLAvatarNameCache::requestNamesViaCapability()
 
     if (!url.empty())
     {
-        LL_DEBUGS("AvNameCache") << "requested " << ids << " ids" << LL_ENDL;
+		ALOG_NET_DEBUG("requested {} ids", ids);
 
         std::string coroname = 
             LLCoros::instance().launch("LLAvatarNameCache::requestAvatarNameCache_",
             boost::bind(&LLAvatarNameCache::requestAvatarNameCache_, url, agent_ids));
-        LL_DEBUGS("AvNameCache") << coroname << " with  url '" << url << "', agent_ids.size()=" << agent_ids.size() << LL_ENDL;
+		ALOG_NET_DEBUG("{} with  url '{}', agent_ids.size()={}", coroname, url, agent_ids.size());
 
 	}
 }
@@ -444,7 +443,7 @@ void LLAvatarNameCache::requestNamesViaLegacy()
 		// invoked below.  This should never happen in practice.
 		mPendingQueue[agent_id] = now;
 
-		LL_DEBUGS("AvNameCache") << "agent " << agent_id << LL_ENDL;
+		ALOG_NET_DEBUG("agent {}", agent_id);
 
 		gCacheName->get(agent_id, false,  // legacy compatibility
 			boost::bind(&LLAvatarNameCache::legacyNameCallback, _1, _2, _3));
@@ -628,10 +627,7 @@ bool LLAvatarNameCache::getName(const LLUUID& agent_id, LLAvatarName *av_name)
 			{
 				if (!isRequestPending(agent_id))
 				{
-#ifdef SHOW_DEBUG
-					LL_DEBUGS("AvNameCache") << "LLAvatarNameCache refresh agent " << agent_id
-											 << LL_ENDL;
-#endif
+					ALOG_NET_DEBUG("LLAvatarNameCache refresh agent {}", agent_id);
 					mAskQueue.insert(agent_id);
 				}
 			}
@@ -642,9 +638,7 @@ bool LLAvatarNameCache::getName(const LLUUID& agent_id, LLAvatarName *av_name)
 
 	if (!isRequestPending(agent_id))
 	{
-#ifdef SHOW_DEBUG
-		LL_DEBUGS("AvNameCache") << "LLAvatarNameCache queue request for agent " << agent_id << LL_ENDL;
-#endif
+		ALOG_NET_DEBUG("LLAvatarNameCache queue request for agent {}", agent_id);
 		mAskQueue.insert(agent_id);
 	}
 

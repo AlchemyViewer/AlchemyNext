@@ -95,9 +95,7 @@ private:
         std::string mismatch(llsd_matches(mValidAuthResponse, response));
         if (! mismatch.empty())
         {
-            LL_ERRS("LLLogin") << "Received unrecognized event (" << mismatch << ") on "
-                               << pumpName << "pump: " << response
-                               << LL_ENDL;
+            ALOG_NET_CRITICAL("Received unrecognized event ({}) on {}pump: {}", mismatch, pumpName, response);
             return LLSD();
         }
 
@@ -114,14 +112,14 @@ private:
 
 void LLLogin::Impl::connect(const std::string& uri, const LLSD& login_params)
 {
-    LL_DEBUGS("LLLogin") << " connect with  uri '" << uri << "', login_params " << login_params << LL_ENDL;
+    ALOG_NET_DEBUG(" connect with  uri '{}', login_params {}", uri, login_params);
 	
     // Launch a coroutine with our login_() method. Run the coroutine until
     // its first wait; at that point, return here.
     std::string coroname = 
         LLCoros::instance().launch("LLLogin::Impl::login_",
                                    boost::bind(&Impl::loginCoro, this, uri, login_params));
-    LL_DEBUGS("LLLogin") << " connected with  uri '" << uri << "', login_params " << login_params << LL_ENDL;	
+    ALOG_NET_DEBUG(" connected with  uri '{}', login_params {}", uri, login_params);
 }
 
 namespace {
@@ -143,8 +141,7 @@ void LLLogin::Impl::loginCoro(std::string uri, LLSD login_params)
     }
     try
     {
-        LL_DEBUGS("LLLogin") << "Entering coroutine " << LLCoros::getName()
-                             << " with uri '" << uri << "', parameters " << printable_params << LL_ENDL;
+       ALOG_NET_DEBUG("Entering coroutine {} with uri '{}', parameters {}", LLCoros::getName(), uri, printable_params);
 
         LLEventPump& xmlrpcPump(LLEventPumps::instance().obtain("LLXMLRPCTransaction"));
         // EXT-4193: use a DIFFERENT reply pump than for the SRV request. We used
@@ -190,7 +187,7 @@ void LLLogin::Impl::loginCoro(std::string uri, LLSD login_params)
                 sendProgressEvent("offline", "downloading");
             }
 
-            LL_DEBUGS("LLLogin") << "Auth Response: " << mAuthResponse << LL_ENDL;
+            ALOG_NET_DEBUG("Auth Response: {}", mAuthResponse);
             status = mAuthResponse["status"].asString();
 
             // Okay, we've received our final status event for this
@@ -247,16 +244,15 @@ void LLLogin::Impl::loginCoro(std::string uri, LLSD login_params)
                 // consume the posted event.
                 LLCoros::OverrideConsuming oc(true);
                 // Timeout should produce the isUndefined() object passed here.
-                LL_DEBUGS("LLLogin") << "Login failure, waiting for sync from updater" << LL_ENDL;
+                ALOG_NET_DEBUG("Login failure, waiting for sync from updater");
                 LLSD updater = llcoro::suspendUntilEventOnWithTimeout(sSyncPoint, 10, LLSD());
                 if (updater.isUndefined())
                 {
-                    LL_WARNS("LLLogin") << "Failed to hear from updater, proceeding with fail.login"
-                                        << LL_ENDL;
+                    ALOG_NET_WARN("Failed to hear from updater, proceeding with fail.login");
                 }
                 else
                 {
-                    LL_DEBUGS("LLLogin") << "Got responses from updater and login.cgi" << LL_ENDL;
+                    ALOG_NET_DEBUG("Got responses from updater and login.cgi");
                 }
                 // Let the fail.login handler deal with empty updater response.
                 LLSD responses(mAuthResponse["responses"]);
@@ -272,7 +268,7 @@ void LLLogin::Impl::loginCoro(std::string uri, LLSD login_params)
         // if below.
         if( status == "Started")
         {
-            LL_DEBUGS("LLLogin") << mAuthResponse << LL_ENDL;
+            ALOG_NET_DEBUG("{}", mAuthResponse);
             continue;
         }
 |*==========================================================================*/
@@ -282,8 +278,7 @@ void LLLogin::Impl::loginCoro(std::string uri, LLSD login_params)
                || status == "XMLRPCError"
                || status == "OtherError"))
         {
-            LL_ERRS("LLLogin") << "Unexpected status from " << xmlrpcPump.getName() << " pump: "
-                               << mAuthResponse << LL_ENDL;
+            ALOG_NET_CRITICAL("Unexpected status from {} pump: {}", xmlrpcPump.getName(), mAuthResponse);
             return;
         }
 
