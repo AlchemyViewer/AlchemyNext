@@ -244,6 +244,8 @@ S32 start_net(S32& socket_out, int& nPort)
 			if (nRet == SOCKET_ERROR)
 			{
 				ALOG_NET_WARN("startNet() : Couldn't find available network port.");
+				closesocket(hSocket);
+				WSACleanup();
 				// Fail gracefully here in release
 				return 3;
 			}
@@ -253,6 +255,8 @@ S32 start_net(S32& socket_out, int& nPort)
 		{
 			auto err = WSAGetLastError();
 			ALOG_NET_WARN("bind() port: {:d} failed, ec: {:d} message {:s}", nPort, err, std::system_category().message(err));
+			closesocket(hSocket);
+			WSACleanup();
 			// Fail gracefully in release.
 			return 4;
 		}
