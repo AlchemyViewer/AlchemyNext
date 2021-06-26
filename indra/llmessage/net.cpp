@@ -168,7 +168,7 @@ U32 ip_string_to_u32(const char* ip_string)
 	if (ip == INADDR_NONE 
 			&& strncmp(ip_string, BROADCAST_ADDRESS_STRING, MAXADDRSTR) != 0)
 	{
-		LL_WARNS() << "ip_string_to_u32() failed, Error: Invalid IP string '" << ip_string << "'" << LL_ENDL;
+		ALOG_NET_WARN("ip_string_to_u32() failed, Error: Invalid IP string '{}'", ip_string);
 		return INVALID_HOST_IP_ADDRESS;
 	}
 	return ip;
@@ -217,7 +217,7 @@ S32 start_net(S32& socket_out, int& nPort)
 	stLclAddr.sin_port        = htons(nPort);
 
 	S32 attempt_port = nPort;
-	LL_DEBUGS("AppInit") << "attempting to connect on port " << attempt_port << LL_ENDL;
+	ALOG_NET_DEBUG("attempting to connect on port {}", attempt_port);
 	nRet = bind(hSocket, (struct sockaddr*) &stLclAddr, sizeof(stLclAddr));
 
 	if (nRet == SOCKET_ERROR)
@@ -231,7 +231,7 @@ S32 start_net(S32& socket_out, int& nPort)
 				attempt_port++)
 			{
 				stLclAddr.sin_port = htons(attempt_port);
-				LL_DEBUGS("AppInit") << "trying port " << attempt_port << LL_ENDL;
+				ALOG_NET_DEBUG("trying port {}", attempt_port);
 				nRet = bind(hSocket, (struct sockaddr*) &stLclAddr, sizeof(stLclAddr));
 
 				if (!(nRet == SOCKET_ERROR && 
@@ -243,7 +243,7 @@ S32 start_net(S32& socket_out, int& nPort)
 
 			if (nRet == SOCKET_ERROR)
 			{
-				LL_WARNS("AppInit") << "startNet() : Couldn't find available network port." << LL_ENDL;
+				ALOG_NET_WARN("startNet() : Couldn't find available network port.");
 				// Fail gracefully here in release
 				return 3;
 			}
@@ -251,7 +251,8 @@ S32 start_net(S32& socket_out, int& nPort)
 		else
 		// Some other socket error
 		{
-			LL_WARNS("AppInit") << llformat("bind() port: %d failed, Err: %d\n", nPort, WSAGetLastError()) << LL_ENDL;
+			auto err = WSAGetLastError();
+			ALOG_NET_WARN("bind() port: {:d} failed, ec: {:d} message {:s}", nPort, err, std::system_category().message(err));
 			// Fail gracefully in release.
 			return 4;
 		}
@@ -262,7 +263,7 @@ S32 start_net(S32& socket_out, int& nPort)
 	getsockname(hSocket, (SOCKADDR*) &socket_address, &socket_address_size);
 	attempt_port = ntohs(socket_address.sin_port);
 
-	LL_INFOS("AppInit") << "connected on port " << attempt_port << LL_ENDL;
+	ALOG_NET_INFO("connected on port {}", attempt_port);
 	nPort = attempt_port;
 	
 	// Set socket to be non-blocking
@@ -278,20 +279,20 @@ S32 start_net(S32& socket_out, int& nPort)
 	nRet = setsockopt(hSocket, SOL_SOCKET, SO_RCVBUF, (char *)&rec_size, buff_size);
 	if (nRet)
 	{
-		LL_INFOS("AppInit") << "Can't set receive buffer size!" << LL_ENDL;
+		ALOG_NET_WARN("Can't set receive buffer size!");
 	}
 
 	nRet = setsockopt(hSocket, SOL_SOCKET, SO_SNDBUF, (char *)&snd_size, buff_size);
 	if (nRet)
 	{
-		LL_INFOS("AppInit") << "Can't set send buffer size!" << LL_ENDL;
+		ALOG_NET_WARN("Can't set send buffer size!");
 	}
 
 	getsockopt(hSocket, SOL_SOCKET, SO_RCVBUF, (char *)&rec_size, &buff_size);
 	getsockopt(hSocket, SOL_SOCKET, SO_SNDBUF, (char *)&snd_size, &buff_size);
 
-	LL_DEBUGS("AppInit") << "startNet - receive buffer size : " << rec_size << LL_ENDL;
-	LL_DEBUGS("AppInit") << "startNet - send buffer size    : " << snd_size << LL_ENDL;
+	ALOG_NET_DEBUG("startNet - receive buffer size : {}", rec_size);
+	ALOG_NET_DEBUG("startNet - send buffer size    : {}", snd_size);
 
 	//  Setup a destination address
 	stDstAddr.sin_family =      AF_INET;

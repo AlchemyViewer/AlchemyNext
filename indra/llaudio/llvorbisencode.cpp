@@ -224,7 +224,7 @@ S32 encode_vorbis_file(const std::string& in_fname, const std::string& out_fname
 	std::string error_msg;
 	if ((format_error = check_for_invalid_wav_formats(in_fname, error_msg)))
 	{
-		LL_WARNS() << error_msg << ": " << in_fname << LL_ENDL;
+		ALOG_AUDIO_WARN("{}: {}", error_msg, in_fname);
 		return(format_error);
 	}
 
@@ -237,8 +237,7 @@ S32 encode_vorbis_file(const std::string& in_fname, const std::string& out_fname
 	infile.open(in_fname,LL_APR_RB);
 	if (!infile.getFileHandle())
 	{
-		LL_WARNS() << "Couldn't open temporary ogg file for writing: " << in_fname
-			<< LL_ENDL;
+		ALOG_AUDIO_WARN("Couldn't open temporary ogg file for writing: {}", in_fname);
 		return(LLVORBISENC_SOURCE_OPEN_ERR);
 	}
 
@@ -246,8 +245,7 @@ S32 encode_vorbis_file(const std::string& in_fname, const std::string& out_fname
 	outfile.open(out_fname,LL_APR_WPB);
 	if (!outfile.getFileHandle())
 	{
-		LL_WARNS() << "Couldn't open upload sound file for reading: " << in_fname
-			<< LL_ENDL;
+		ALOG_AUDIO_WARN("Couldn't open upload sound file for reading: ", in_fname);
 		return(LLVORBISENC_DEST_OPEN_ERR);
 	}
 	
@@ -308,8 +306,8 @@ S32 encode_vorbis_file(const std::string& in_fname, const std::string& out_fname
 //		vorbis_encode_ctl(&vi,OV_ECTL_RATEMANAGE_AVG,NULL) ||
 //		vorbis_encode_setup_init(&vi))
 	{
-		LL_WARNS() << "unable to initialize vorbis codec at quality " << quality << LL_ENDL;
-		//		LL_WARNS() << "unable to initialize vorbis codec at bitrate " << bitrate << LL_ENDL;
+		 ALOG_AUDIO_WARN("unable to initialize vorbis codec at quality {}", quality);
+		//		ALOG_AUDIO_WARN("unable to initialize vorbis codec at bitrate {}", bitrate);
 		return(LLVORBISENC_DEST_OPEN_ERR);
 	}
 	 
@@ -498,7 +496,7 @@ S32 encode_vorbis_file(const std::string& in_fname, const std::string& out_fname
 		libvorbis.  They're never freed or manipulated directly */
 	 
 //	 fprintf(stderr,"Vorbis encoding: Done.\n");
-	 LL_INFOS() << "Vorbis encoding: Done." << LL_ENDL;
+	 ALOG_AUDIO_INFO("Vorbis encoding: Done.");
 	 
 #endif
 	 return(LLVORBISENC_NOERR);

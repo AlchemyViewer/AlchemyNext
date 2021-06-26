@@ -209,7 +209,7 @@ BOOL LLVorbisDecodeState::initDecode()
 	mInFilep = new LLFileSystem(mUUID, LLAssetType::AT_SOUND);
 	if (!mInFilep || !mInFilep->open() || !mInFilep->getSize())
 	{
-		LL_WARNS("AudioEngine") << "unable to open vorbis source vfile for reading" << LL_ENDL;
+		ALOG_AUDIO_WARN("unable to open vorbis source vfile for reading");
 		delete mInFilep;
 		mInFilep = NULL;
 		return FALSE;
@@ -218,7 +218,7 @@ BOOL LLVorbisDecodeState::initDecode()
 	S32 r = ov_open_callbacks(mInFilep, &mVF, NULL, 0, cache_callbacks);
 	if(r < 0) 
 	{
-		LL_WARNS("AudioEngine") << r << " Input to vorbis decode does not appear to be an Ogg bitstream: " << mUUID << LL_ENDL;
+		ALOG_AUDIO_WARN("{} Input to vorbis decode does not appear to be an Ogg bitstream: {}", r, mUUID);
 		return(FALSE);
 	}
 	
@@ -236,35 +236,35 @@ BOOL LLVorbisDecodeState::initDecode()
 		if( vi->channels < 1 || vi->channels > LLVORBIS_CLIP_MAX_CHANNELS )
 		{
 			abort_decode = true;
-			LL_WARNS("AudioEngine") << "Bad channel count: " << vi->channels << LL_ENDL;
+			ALOG_AUDIO_WARN("Bad channel count: {}", vi->channels);
 		}
 	}
 	else // !vi
 	{
 		abort_decode = true;
-		LL_WARNS("AudioEngine") << "No default bitstream found" << LL_ENDL;	
+		ALOG_AUDIO_WARN("No default bitstream found");
 	}
 	
 	if( (size_t)sample_count > LLVORBIS_CLIP_REJECT_SAMPLES ||
 	    (size_t)sample_count <= 0)
 	{
 		abort_decode = true;
-		LL_WARNS("AudioEngine") << "Illegal sample count: " << sample_count << LL_ENDL;
+		ALOG_AUDIO_WARN("Illegal sample count: {}", sample_count);
 	}
 	
 	if( size_guess > LLVORBIS_CLIP_REJECT_SIZE )
 	{
 		abort_decode = true;
-		LL_WARNS("AudioEngine") << "Illegal sample size: " << size_guess << LL_ENDL;
+		ALOG_AUDIO_WARN("Illegal sample size: {}", size_guess);
 	}
 	
 	if( abort_decode )
 	{
-		LL_WARNS("AudioEngine") << "Canceling initDecode. Bad asset: " << mUUID << LL_ENDL;
+		ALOG_AUDIO_WARN("Canceling initDecode. Bad asset: {}", mUUID);
 		vorbis_comment* comment = ov_comment(&mVF,-1);
 		if (comment && comment->vendor)
 		{
-			LL_WARNS("AudioEngine") << "Bad asset encoded by: " << comment->vendor << LL_ENDL;
+			ALOG_AUDIO_WARN("Bad asset encoded by: {}", comment->vendor);
 		}
 		delete mInFilep;
 		mInFilep = NULL;
@@ -278,7 +278,7 @@ BOOL LLVorbisDecodeState::initDecode()
 	}
 	catch (const std::bad_alloc&)
 	{
-		LL_WARNS("AudioEngine") << "Out of memory when trying to alloc buffer: " << size_guess << LL_ENDL;
+		ALOG_AUDIO_WARN("Out of memory when trying to alloc buffer: {}", size_guess);
 		delete mInFilep;
 		mInFilep = NULL;
 		return FALSE;
@@ -375,12 +375,12 @@ BOOL LLVorbisDecodeState::decodeSection()
 {
 	if (!mInFilep)
 	{
-		LL_WARNS("AudioEngine") << "No cache file to decode in vorbis!" << LL_ENDL;
+		ALOG_AUDIO_WARN("No cache file to decode in vorbis!");
 		return TRUE;
 	}
 	if (mDone)
 	{
-// 		LL_WARNS("AudioEngine") << "Already done with decode, aborting!" << LL_ENDL;
+// 		ALOG_AUDIO_WARN("Already done with decode, aborting!");
 		return TRUE;
 	}
 	char pcmout[4096];	/*Flawfinder: ignore*/
@@ -400,7 +400,7 @@ BOOL LLVorbisDecodeState::decodeSection()
 		/* error in the stream.  Not a problem, just reporting it in
 		   case we (the app) cares.  In this case, we don't. */
 
-		LL_WARNS("AudioEngine") << "BAD vorbis decode in decodeSection." << LL_ENDL;
+		ALOG_AUDIO_WARN("BAD vorbis decode in decodeSection.");
 
 		mValid = FALSE;
 		mDone = TRUE;
@@ -421,7 +421,7 @@ BOOL LLVorbisDecodeState::finishDecode()
 {
 	if (!isValid())
 	{
-		LL_WARNS("AudioEngine") << "Bogus vorbis decode state for " << getUUID() << ", aborting!" << LL_ENDL;
+		ALOG_AUDIO_WARN("Bogus vorbis decode state for {}, aborting!", getUUID());
 		return TRUE; // We've finished
 	}
 
@@ -494,7 +494,7 @@ BOOL LLVorbisDecodeState::finishDecode()
 
 		if (36 == data_length)
 		{
-			LL_WARNS("AudioEngine") << "BAD Vorbis decode in finishDecode!" << LL_ENDL;
+			ALOG_AUDIO_WARN("BAD Vorbis decode in finishDecode!");
 			mValid = FALSE;
 			return TRUE; // we've finished
 		}
@@ -509,7 +509,7 @@ BOOL LLVorbisDecodeState::finishDecode()
 		{
 			if (mBytesRead == 0)
 			{
-				LL_WARNS("AudioEngine") << "Unable to write file in LLVorbisDecodeState::finishDecode" << LL_ENDL;
+				ALOG_AUDIO_WARN("Unable to write file in LLVorbisDecodeState::finishDecode");
 				mValid = FALSE;
 				return TRUE; // we've finished
 			}
@@ -531,7 +531,7 @@ void LLVorbisDecodeState::flushBadFile()
 {
 	if (mInFilep)
 	{
-		LL_WARNS("AudioEngine") << "Flushing bad vorbis file from cache for " << mUUID << LL_ENDL;
+		ALOG_AUDIO_WARN("Flushing bad vorbis file from cache for {}", mUUID);
 		mInFilep->remove();
 	}
 }
@@ -573,7 +573,7 @@ void LLAudioDecodeMgr::Impl::processQueue(const F32 num_secs)
 			if (mCurrentDecodep->isDone() && !mCurrentDecodep->isValid())
 			{
 				// We had an error when decoding, abort.
-				LL_WARNS("AudioEngine") << mCurrentDecodep->getUUID() << " has invalid vorbis data, aborting decode" << LL_ENDL;
+				ALOG_AUDIO_WARN("{} has invalid vorbis data, aborting decode", mCurrentDecodep->getUUID());
 				mCurrentDecodep->flushBadFile();
 
 				if (gAudiop)
@@ -600,7 +600,7 @@ void LLAudioDecodeMgr::Impl::processQueue(const F32 num_secs)
 					LLAudioData *adp = gAudiop->getAudioData(mCurrentDecodep->getUUID());
 					if (!adp)
 					{
-						LL_WARNS("AudioEngine") << "Missing LLAudioData for decode of " << mCurrentDecodep->getUUID() << LL_ENDL;
+						ALOG_AUDIO_WARN("Missing LLAudioData for decode of {}", mCurrentDecodep->getUUID());
 					}
 					else if (mCurrentDecodep->isValid() && mCurrentDecodep->isDone())
 					{
@@ -616,7 +616,7 @@ void LLAudioDecodeMgr::Impl::processQueue(const F32 num_secs)
 					else
 					{
 						adp->setHasCompletedDecode(true);
-						LL_INFOS("AudioEngine") << "Vorbis decode failed for " << mCurrentDecodep->getUUID() << LL_ENDL;
+						ALOG_AUDIO_INFO("Vorbis decode failed for {}", mCurrentDecodep->getUUID());
 					}
 					mCurrentDecodep = NULL;
 				}

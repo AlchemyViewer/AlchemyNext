@@ -990,7 +990,7 @@ void LLAudioEngine::cleanupAudioSource(LLAudioSource *asp)
 	auto iter = mAllSources.find(asp->getID());
 	if (iter == mAllSources.end())
 	{
-		LL_WARNS() << "Cleaning up unknown audio source!" << LL_ENDL;
+		ALOG_AUDIO_WARN("Cleaning up unknown audio source!");
 		return;
 	}
 	else
@@ -1230,13 +1230,13 @@ void LLAudioEngine::assetCallback(const LLUUID &uuid, LLAssetType::EType type, v
 {
 	if (!gAudiop)
 	{
-		LL_WARNS("AudioEngine") << "LLAudioEngine instance doesn't exist!" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine instance doesn't exist!");
 		return;
 	}
 
 	if (result_code)
 	{
-		LL_INFOS() << "Boom, error in audio file transfer: " << LLAssetStorage::getErrorString( result_code ) << " (" << result_code << ")" << LL_ENDL;
+		ALOG_AUDIO_INFO("Error in audio file transfer: {} ({})", LLAssetStorage::getErrorString(result_code), result_code);
 		// Need to mark data as bad to avoid constant rerequests.
 		LLAudioData *adp = gAudiop->getAudioData(uuid);
 		if (adp)
@@ -1253,7 +1253,7 @@ void LLAudioEngine::assetCallback(const LLUUID &uuid, LLAssetType::EType type, v
 		if (!adp)
         {
 			// Should never happen
-			LL_WARNS() << "Got asset callback without audio data for " << uuid << LL_ENDL;
+			ALOG_AUDIO_WARN("Got asset callback without audio data for {}", uuid);
         }
 		else
 		{
@@ -1336,7 +1336,7 @@ void LLAudioSource::update()
 			}
 			else if (adp->hasCompletedDecode())		// Only mark corrupted after decode is done
 			{
-				LL_WARNS() << "Marking LLAudioSource corrupted for " << adp->getID() << LL_ENDL;
+				ALOG_AUDIO_WARN("Marking LLAudioSource corrupted for {}", adp->getID());
 				mCorrupted = true ;
 			}
 		}
@@ -1377,13 +1377,13 @@ bool LLAudioSource::setupChannel()
 	if (!adp->getBuffer())
 	{
 		// We're not ready to play back the sound yet, so don't try and allocate a channel for it.
-		//LL_WARNS() << "Aborting, no buffer" << LL_ENDL;
+		//ALOG_AUDIO_WARN("Aborting, no buffer");
 		return false;
 	}
 
 	if (!gAudiop)
 	{
-		LL_WARNS("AudioEngine") << "LLAudioEngine instance doesn't exist!" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine instance doesn't exist!");
 		return false;
 	}
 
@@ -1400,7 +1400,7 @@ bool LLAudioSource::setupChannel()
 		// Ugh, we don't have any free channels.
 		// Now we have to reprioritize.
 		// For now, just don't play the sound.
-		//LL_WARNS() << "Aborting, no free channels" << LL_ENDL;
+		//ALOG_AUDIO_WARN("Aborting, no free channels");
 		return false;
 	}
 
@@ -1431,7 +1431,7 @@ bool LLAudioSource::play(const LLUUID &audio_uuid)
 
 	if (!gAudiop)
 	{
-		LL_WARNS("AudioEngine") << "LLAudioEngine instance doesn't exist!" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine instance doesn't exist!");
 		return false;
 	}
 
@@ -1545,7 +1545,7 @@ void LLAudioSource::addAudioData(LLAudioData *adp, const bool set_current)
 
 	if (!gAudiop)
 	{
-		LL_WARNS("AudioEngine") << "LLAudioEngine instance doesn't exist!" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine instance doesn't exist!");
 		return;
 	}
 
@@ -1720,7 +1720,7 @@ bool LLAudioChannel::updateBuffer()
 {
 	if (!gAudiop)
 	{
-		LL_WARNS("AudioEngine") << "LLAudioEngine instance doesn't exist!" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine instance doesn't exist!");
 		return false;
 	}
 
@@ -1792,7 +1792,7 @@ LLAudioData::LLAudioData(const LLUUID &uuid) :
 
 	if (!gAudiop)
 	{
-		LL_WARNS("AudioEngine") << "LLAudioEngine instance doesn't exist!" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine instance doesn't exist!");
 		return;
 	}
 	
@@ -1816,13 +1816,13 @@ bool LLAudioData::load()
 	if (mBufferp)
 	{
 		// We already have this sound in a buffer, don't do anything.
-		LL_INFOS() << "Already have a buffer for this sound, don't bother loading!" << LL_ENDL;
+		ALOG_AUDIO_INFO("Already have a buffer for this sound, don't bother loading!");
 		return true;
 	}
 
 	if (!gAudiop)
 	{
-		LL_WARNS("AudioEngine") << "LLAudioEngine instance doesn't exist!" << LL_ENDL;
+		ALOG_AUDIO_WARN("LLAudioEngine instance doesn't exist!");
 		return false;
 	}
 	
@@ -1830,7 +1830,7 @@ bool LLAudioData::load()
 	if (!mBufferp)
 	{
 		// No free buffers, abort.
-		LL_INFOS() << "Not able to allocate a new audio buffer, aborting." << LL_ENDL;
+		ALOG_AUDIO_INFO("Not able to allocate a new audio buffer, aborting.");
 		return true;
 	}
 

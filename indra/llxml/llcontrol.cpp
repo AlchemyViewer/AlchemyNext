@@ -51,9 +51,9 @@
 #include "lldir.h"
 
 #if LL_RELEASE_WITH_DEBUG_INFO || LL_DEBUG
-#define CONTROL_ERRS LL_ERRS("ControlErrors")
+#define CONTROL_ERRS(...) ALOG_CRITICAL(__VA_ARGS__)
 #else
-#define CONTROL_ERRS LL_WARNS("ControlErrors")
+#define CONTROL_ERRS(...) ALOG_WARN(__VA_ARGS__)
 #endif
 
 
@@ -426,7 +426,7 @@ void LLControlGroup::cleanup()
 		LLFILE* out = LLFile::fopen(file, "w"); /* Flawfinder: ignore */
 		if(!out)
 		{
-			LL_WARNS("SettingsProfile") << "Error opening " << SETTINGS_PROFILE << LL_ENDL;
+			ALOG_WARN("Failed to open for write: {}", file);
 		}
 		else
 		{
@@ -435,11 +435,11 @@ void LLControlGroup::cleanup()
 			F64 end_time = LLTimer::getTotalSeconds();
 			U32 total_seconds = (U32)(end_time - start_time);
 
-			std::string msg = llformat("Runtime (seconds): %d\n\n No. accesses   Avg. accesses/sec  Name\n", total_seconds);
+			std::string msg = fmt::format("Runtime (seconds): {:d}\n\n No. accesses   Avg. accesses/sec  Name\n", total_seconds);
 			size_t data_size = msg.size();
 			if (fwrite(msg.c_str(), 1, data_size, out) != data_size)
 			{
-				LL_WARNS("SettingsProfile") << "Failed to write settings profile header" << LL_ENDL;
+				ALOG_WARN("Failed to write settings profile header");
 			}
 
 			for (const auto& [first, second] : getCount)
@@ -457,11 +457,11 @@ void LLControlGroup::cleanup()
 				}
 				if (access_rate >= 2)
 				{
-					msg = llformat("%13d        %7d       %s\n", iter->second, access_rate, iter->first.c_str());
+					msg = fmt::format("{:13d}        {:7d}       {:s}\n", iter->second, access_rate, iter->first);
 					size_t data_size = msg.size();
 					if (fwrite(msg.c_str(), 1, data_size, out) != data_size)
 					{
-						LL_WARNS("SettingsProfile") << "Failed to write settings profile" << LL_ENDL;
+						ALOG_WARN("Failed to write settings profile");
 					}
 				}
 			}
@@ -504,7 +504,7 @@ LLControlVariable* LLControlGroup::declareControl(const std::string& name, eCont
 		}
 		else
 		{
-			LL_WARNS("Settings") << "Control named " << name << " already exists, ignoring new declaration." << LL_ENDL;
+			ALOG_WARN("Control named {} already exists, ignoring new declaration.", name);
 		}
  		return existing_control;
 	}
@@ -811,7 +811,7 @@ void LLControlGroup::setUntypedValue(std::string_view name, const LLSD& val)
 	}
 	else
 	{
-		CONTROL_ERRS << "Invalid control " << name << LL_ENDL;
+		CONTROL_ERRS("Invalid control {}", name);
 	}
 }
 
@@ -829,14 +829,14 @@ U32 LLControlGroup::loadFromFileLegacy(const std::string& filename, BOOL require
 
 	if (!xml_controls.parseFile(filename))
 	{
-		LL_WARNS("Settings") << "Unable to open control file " << filename << LL_ENDL;
+		ALOG_WARN("Unable to open control file {}", filename);
 		return 0;
 	}
 
 	LLXmlTreeNode* rootp = xml_controls.getRoot();
 	if (!rootp || !rootp->hasAttribute("version"))
 	{
-		LL_WARNS("Settings") << "No valid settings header found in control file " << filename << LL_ENDL;
+		ALOG_WARN("No valid settings header found in control file {}", filename);
 		return 0;
 	}
 
@@ -849,7 +849,7 @@ U32 LLControlGroup::loadFromFileLegacy(const std::string& filename, BOOL require
 	// Check file version
 	if (version != CURRENT_VERSION)
 	{
-		LL_INFOS("Settings") << filename << " does not appear to be a version " << CURRENT_VERSION << " controls file" << LL_ENDL;
+		ALOG_INFO("{} does not appear to be a version {} controls file", filename, CURRENT_VERSION);
 		return 0;
 	}
 
@@ -867,7 +867,7 @@ U32 LLControlGroup::loadFromFileLegacy(const std::string& filename, BOOL require
 			if (!name.empty())
 			{
 				//read in to end of line
-				LL_WARNS("Settings") << "LLControlGroup::loadFromFile() : Trying to set \"" << name << "\", setting doesn't exist." << LL_ENDL;
+				ALOG_WARN("Trying to set \"{}\", setting doesn't exist.", name);
 			}
 			child_nodep = rootp->getNextChild();
 			continue;
@@ -1089,14 +1089,14 @@ U32 LLControlGroup::loadFromFile(const std::string& filename, bool set_default_v
 	infile.open(filename);
 	if(!infile.is_open())
 	{
-		LL_WARNS("Settings") << "Cannot find file " << filename << " to load." << LL_ENDL;
+		ALOG_WARN("Cannot find file {} to load.", filename);
 		return 0;
 	}
 
 	if (LLSDParser::PARSE_FAILURE == LLSDSerialize::fromXML(settings, infile))
 	{
 		infile.close();
-		LL_WARNS("Settings") << "Unable to parse LLSD control file " << filename << ". Trying Legacy Method." << LL_ENDL;
+		ALOG_WARN("Unable to parse LLSD control file {}. Trying Legacy Method.", filename);
 		return loadFromFileLegacy(filename, TRUE, TYPE_STRING);
 	}
 
@@ -1212,8 +1212,7 @@ U32 LLControlGroup::loadFromFile(const std::string& filename, bool set_default_v
 				// LLControlGroup whose name is "Global".
 				if (getKey() == "Global")
 				{
-					LL_INFOS("LLControlGroup") << "preserving unrecognized " << getKey()
-											   << " settings variable " << name << LL_ENDL;
+					ALOG_INFO("preserving unrecognized {} settings variable {}", getKey(), name);
 				}
 			}
 
@@ -1229,7 +1228,7 @@ U32 LLControlGroup::loadFromFile(const std::string& filename, bool set_default_v
 		++validitems;
 	}
 
-	LL_DEBUGS("Settings") << "Loaded " << validitems << " settings from " << filename << LL_ENDL;
+	ALOG_DEBUG("Loaded {} settings from {}", validitems, filename);
 	return validitems;
 }
 
@@ -1266,7 +1265,7 @@ void main()
 	BOOL_CONTROL baz;
 
 	U32 count = gGlobals.loadFromFile("controls.ini");
-	LL_INFOS("Settings") << "Loaded " << count << " controls" << LL_ENDL;
+	ALOG_INFO("Loaded {} controls", count);
 
 	// test insertion
 	foo = new LLControlVariable<F32>("gFoo", 5.f, 1.f, 20.f);
@@ -1448,7 +1447,7 @@ bool convert_from_llsd<bool>(const LLSD& sd, eControlType type, std::string_view
 		return sd.asBoolean();
 	else
 	{
-		CONTROL_ERRS << "Invalid BOOL value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid BOOL value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return FALSE;
 	}
 }
@@ -1460,7 +1459,7 @@ S32 convert_from_llsd<S32>(const LLSD& sd, eControlType type, std::string_view c
 		return sd.asInteger();
 	else
 	{
-		CONTROL_ERRS << "Invalid S32 value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid S32 value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return 0;
 	}
 }
@@ -1472,7 +1471,7 @@ U32 convert_from_llsd<U32>(const LLSD& sd, eControlType type, std::string_view c
 		return sd.asInteger();
 	else
 	{
-		CONTROL_ERRS << "Invalid U32 value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid U32 value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return 0;
 	}
 }
@@ -1484,7 +1483,7 @@ F32 convert_from_llsd<F32>(const LLSD& sd, eControlType type, std::string_view c
 		return (F32) sd.asReal();
 	else
 	{
-		CONTROL_ERRS << "Invalid F32 value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid F32 value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return 0.0f;
 	}
 }
@@ -1496,7 +1495,7 @@ std::string convert_from_llsd<std::string>(const LLSD& sd, eControlType type, st
 		return sd.asString();
 	else
 	{
-		CONTROL_ERRS << "Invalid string value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid string value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLStringUtil::null;
 	}
 }
@@ -1514,7 +1513,7 @@ LLVector3 convert_from_llsd<LLVector3>(const LLSD& sd, eControlType type, std::s
 		return (LLVector3)sd;
 	else
 	{
-		CONTROL_ERRS << "Invalid LLVector3 value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid LLVector3 value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLVector3::zero;
 	}
 }
@@ -1526,7 +1525,7 @@ LLVector3d convert_from_llsd<LLVector3d>(const LLSD& sd, eControlType type, std:
 		return (LLVector3d)sd;
 	else
 	{
-		CONTROL_ERRS << "Invalid LLVector3d value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid LLVector3d value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLVector3d::zero;
 	}
 }
@@ -1538,7 +1537,7 @@ LLVector4 convert_from_llsd<LLVector4>(const LLSD& sd, eControlType type, std::s
 		return (LLVector4)sd;
 	else
 	{
-		CONTROL_ERRS << "Invalid LLVector4 value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid LLVector4 value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLVector4::zero;
 	}
 }
@@ -1550,7 +1549,7 @@ LLQuaternion convert_from_llsd<LLQuaternion>(const LLSD& sd, eControlType type, 
 		return (LLQuaternion)sd;
 	else
 	{
-		CONTROL_ERRS << "Invalid LLQuaternion value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid LLQuaternion value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLQuaternion();
 	}
 }
@@ -1562,7 +1561,7 @@ LLRect convert_from_llsd<LLRect>(const LLSD& sd, eControlType type, std::string_
 		return LLRect(sd);
 	else
 	{
-		CONTROL_ERRS << "Invalid rect value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid rect value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLRect::null;
 	}
 }
@@ -1576,26 +1575,26 @@ LLColor4 convert_from_llsd<LLColor4>(const LLSD& sd, eControlType type, std::str
 		LLColor4 color(sd);
 		if (color.mV[VRED] < 0.f || color.mV[VRED] > 1.f)
 		{
-			LL_WARNS("Settings") << "Color " << control_name << " red value out of range: " << color << LL_ENDL;
+			ALOG_WARN("Color {} red value out of range: {}", control_name, color);
 		}
 		else if (color.mV[VGREEN] < 0.f || color.mV[VGREEN] > 1.f)
 		{
-			LL_WARNS("Settings") << "Color " << control_name << " green value out of range: " << color << LL_ENDL;
+			ALOG_WARN("Color {} green value out of range: {}", control_name, color);
 		}
 		else if (color.mV[VBLUE] < 0.f || color.mV[VBLUE] > 1.f)
 		{
-			LL_WARNS("Settings") << "Color " << control_name << " blue value out of range: " << color << LL_ENDL;
+			ALOG_WARN("Color {} blue value out of range: {}" , control_name, color);
 		}
 		else if (color.mV[VALPHA] < 0.f || color.mV[VALPHA] > 1.f)
 		{
-			LL_WARNS("Settings") << "Color " << control_name << " alpha value out of range: " << color << LL_ENDL;
+			ALOG_WARN("Color {} alpha value out of range: {}", control_name, color);
 		}
 
 		return LLColor4(sd);
 	}
 	else
 	{
-		CONTROL_ERRS << "Control " << control_name << " not a color" << LL_ENDL;
+		CONTROL_ERRS("Control {} not a color", control_name);
 		return LLColor4::white;
 	}
 }
@@ -1607,7 +1606,7 @@ LLColor3 convert_from_llsd<LLColor3>(const LLSD& sd, eControlType type, std::str
 		return sd;
 	else
 	{
-		CONTROL_ERRS << "Invalid LLColor3 value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid LLColor3 value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLColor3::white;
 	}
 }
@@ -1619,7 +1618,7 @@ LLUUID convert_from_llsd<LLUUID>(const LLSD& sd, eControlType type, std::string_
 		return sd.asUUID();
 	else
 	{
-		CONTROL_ERRS << "Invalid LLUUID value for " << control_name << ": " << LLControlGroup::typeEnumToString(type) << " " << sd << LL_ENDL;
+		CONTROL_ERRS("Invalid LLUUID value for {}: {} {}", control_name, LLControlGroup::typeEnumToString(type), sd);
 		return LLUUID::null;
 	}
 }
