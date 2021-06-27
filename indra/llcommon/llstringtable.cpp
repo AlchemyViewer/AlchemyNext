@@ -313,7 +313,7 @@ void LLStringTable::removeString(const char *str)
 						mUniqueEntries--;
 						if (mUniqueEntries < 0)
 						{
-							LL_ERRS() << "LLStringTable:removeString trying to remove too many strings!" << LL_ENDL;
+							ALOG_CRITICAL("LLStringTable:removeString trying to remove too many strings!");
 						}
 						delete iter->second;
 						mStringHash.erase(iter);
@@ -336,7 +336,7 @@ void LLStringTable::removeString(const char *str)
 						mUniqueEntries--;
 						if (mUniqueEntries < 0)
 						{
-							LL_ERRS() << "LLStringTable:removeString trying to remove too many strings!" << LL_ENDL;
+							ALOG_CRITICAL("LLStringTable:removeString trying to remove too many strings!");
 						}
 						strlist->remove(entry);
 						delete entry;

@@ -143,7 +143,7 @@ S32 cache_seek(void *datasource, ogg_int64_t offset, S32 whence)
 		origin = -1;
 		break;
 	default:
-		LL_ERRS("AudioEngine") << "Invalid whence argument to cache_seek" << LL_ENDL;
+		ALOG_AUDIO_CRITICAL("Invalid whence argument to cache_seek");
 		return -1;
 	}
 

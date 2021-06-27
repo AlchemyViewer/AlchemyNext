@@ -43,7 +43,7 @@ void LLThreadLocalPointerBase::set( void* value )
 	if (result != APR_SUCCESS)
 	{
 		ll_apr_warn_status(result);
-		LL_ERRS() << "Failed to set thread local data" << LL_ENDL;
+		ALOG_CRITICAL("Failed to set thread local data");
 	}
 }
 
@@ -56,7 +56,7 @@ void* LLThreadLocalPointerBase::get() const
 	if (result != APR_SUCCESS)
 	{
 		ll_apr_warn_status(result);
-		LL_ERRS() << "Failed to get thread local data" << LL_ENDL;
+		ALOG_CRITICAL("Failed to get thread local data");
 	}
 	return ptr;
 }
@@ -68,7 +68,7 @@ void LLThreadLocalPointerBase::initStorage( )
 	if (result != APR_SUCCESS)
 	{
 		ll_apr_warn_status(result);
-		LL_ERRS() << "Failed to allocate thread local data" << LL_ENDL;
+		ALOG_CRITICAL("Failed to allocate thread local data");
 	}
 }
 
@@ -82,7 +82,7 @@ void LLThreadLocalPointerBase::destroyStorage()
 			if (result != APR_SUCCESS)
 			{
 				ll_apr_warn_status(result);
-				LL_ERRS() << "Failed to delete thread local data" << LL_ENDL;
+				ALOG_CRITICAL("Failed to delete thread local data");
 			}
 		}
 	}

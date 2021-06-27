@@ -772,8 +772,7 @@ namespace LLError
 		// huh, that's odd, we should see one or the other prefix -- but don't
 		// try to log unless logging is already initialized
 		// in Python, " or ".join(vector) -- but in C++, a PITB
-		LL_DEBUGS() << "Did not see 'class' or 'struct' prefix on '"
-			<< mangled << "'" << LL_ENDL;
+		ALOG_DEBUG("Did not see 'class' or 'struct' prefix on '{}'", mangled);
 		return std::string(mangled);
 
 #else  // neither GCC nor Visual Studio

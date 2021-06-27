@@ -49,7 +49,7 @@ LLRefCount::~LLRefCount()
 { 
 	if (mRef != 0)
 	{
-		LL_ERRS() << "deleting non-zero reference" << LL_ENDL;
+		ALOG_CRITICAL("deleting non-zero reference");
 	}
 }
 

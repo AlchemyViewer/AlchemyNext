@@ -439,7 +439,7 @@ LLThreadSafeRefCount::~LLThreadSafeRefCount()
 { 
     if (mRef != 0)
     {
-		LL_ERRS() << "deleting referenced object mRef = " << mRef << LL_ENDL;
+        ALOG_CRITICAL("deleting referenced object mRef = {}", mRef);
     }
 }
 

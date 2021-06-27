@@ -116,7 +116,7 @@ nlohmann::json LlsdToJson(const LLSD &val)
         break;
     case LLSD::TypeBinary:
     default:
-        LL_ERRS("LlsdToJson") << "Unsupported conversion to JSON from LLSD type (" << val.type() << ")." << LL_ENDL;
+        ALOG_CRITICAL("Unsupported conversion to JSON from LLSD type ({}).", val.type());
         break;
     }
 

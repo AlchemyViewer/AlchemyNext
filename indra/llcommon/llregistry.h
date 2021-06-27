@@ -308,7 +308,7 @@ public:
 		{
 			if (singleton_t::instance().exists(key))
 			{
-				LL_ERRS() << "Duplicate registry entry under key \"" << key << "\"" << LL_ENDL;
+				ALOG_CRITICAL("Duplicate registry entry under key \"{}\"", key);
 			}
 			singleton_t::instance().mStaticScope->add(key, value);
 		}

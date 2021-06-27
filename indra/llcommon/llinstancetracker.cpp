@@ -36,6 +36,5 @@
 void LLInstanceTrackerPrivate::logerrs(const char* cls, const std::string& arg1,
                                        const std::string& arg2, const std::string& arg3)
 {
-    LL_ERRS("LLInstanceTracker") << LLError::Log::demangle(cls)
-                                 << arg1 << arg2 << arg3 << LL_ENDL;
+    ALOG_CRITICAL("{}{}{}{}", LLError::Log::demangle(cls), arg1, arg2, arg3);
 }

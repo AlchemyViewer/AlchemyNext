@@ -175,7 +175,7 @@ void* LLMemory::tryToAlloc(void* address, U32 size)
 	{
 		if(!VirtualFree(address, 0, MEM_RELEASE))
 		{
-			LL_ERRS() << "error happens when free some memory reservation." << LL_ENDL ;
+			ALOG_CRITICAL("error happens when free some memory reservation.");
 		}
 	}
 	return address ;
