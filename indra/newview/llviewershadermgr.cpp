@@ -925,7 +925,7 @@ BOOL LLViewerShaderMgr::loadBasicShaders()
 		// Note usage of GL_VERTEX_SHADER
 		if (loadShaderFile(shaders[i].first, shaders[i].second, GL_VERTEX_SHADER, &attribs) == 0)
 		{
-			LL_SHADER_LOADING_WARNS() << "Failed to load vertex shader " << shaders[i].first << LL_ENDL;
+			LL_SHADER_LOADING_WARNS("Failed to load vertex shader {}", shaders[i].first);
 			return FALSE;
 		}
 	}
@@ -985,7 +985,7 @@ BOOL LLViewerShaderMgr::loadBasicShaders()
 		// Note usage of GL_FRAGMENT_SHADER
 		if (loadShaderFile(shaders[i].first, shaders[i].second, GL_FRAGMENT_SHADER, &attribs, index_channels[i]) == 0)
 		{
-			LL_SHADER_LOADING_WARNS() << "Failed to load fragment shader " << shaders[i].first << LL_ENDL;
+			LL_SHADER_LOADING_WARNS("Failed to load fragment shader {}", shaders[i].first);
 			return FALSE;
 		}
 	}

@@ -586,15 +586,14 @@ void LLShaderMgr::dumpShaderSource(U32 shader_code_count, GLchar** shader_code_t
 {
 	char num_str[16]; // U32 = max 10 digits
 
-	LL_SHADER_LOADING_WARNS() << "\n";
-
+	std::ostringstream outstream;
 	for (U32 i = 0; i < shader_code_count; i++)
 	{
 		snprintf(num_str, sizeof(num_str), "%4d: ", i+1);
 		std::string line_number(num_str);
-		LL_CONT << line_number << shader_code_text[i];
+		outstream << line_number << shader_code_text[i];
 	}
-    LL_CONT << LL_ENDL;
+	LL_SHADER_LOADING_WARNS("\n{}", outstream.str());
 }
 
 void LLShaderMgr::dumpObjectLog(bool is_program, GLuint ret, BOOL warns, const std::string& filename)
@@ -608,8 +607,7 @@ void LLShaderMgr::dumpObjectLog(bool is_program, GLuint ret, BOOL warns, const s
 
 	if (log.length() > 0)
 	{
-        LL_SHADER_LOADING_WARNS() << "Shader loading from " << fname << LL_ENDL;
-        LL_SHADER_LOADING_WARNS() << "\n" << log << LL_ENDL;
+		LL_SHADER_LOADING_WARNS("Shader loading from {}\n{}", fname, log);
 	}
  }
 
@@ -629,7 +627,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 	error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
-		LL_SHADER_LOADING_WARNS() << "GL ERROR entering loadShaderFile(): " << error << " for file: " << filename << LL_ENDL;
+		LL_SHADER_LOADING_WARNS("GL ERROR entering loadShaderFile(): {} for file: {}", error, filename);
 	}
 	
 	if (filename.empty()) 
@@ -648,11 +646,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 	//find the most relevant file
 	for (gpu_class = try_gpu_class; gpu_class > 0; gpu_class--)
 	{	//search from the current gpu class down to class 1 to find the most relevant shader
-		std::stringstream fname;
-		fname << getShaderDirPrefix();
-		fname << gpu_class << "/" << filename;
-		
-        open_file_name = fname.str();
+        open_file_name = fmt::format("{}{}/{}", getShaderDirPrefix(), gpu_class, filename);
 
         /*
         Would be awesome, if we didn't have shaders that re-use files
@@ -678,7 +672,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 	
 	if (file == NULL)
 	{
-		LL_SHADER_LOADING_WARNS() << "GLSL Shader file not found: " << open_file_name << LL_ENDL;
+		LL_SHADER_LOADING_WARNS("GLSL Shader file not found: {}", open_file_name);
 		return 0;
 	}
 
@@ -700,7 +694,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 		{
 			//should NEVER get here -- if major version is 1 and minor version is less than 10, 
 			// viewer should never attempt to use shaders, continuing will result in undefined behavior
-			LL_ERRS() << "Unsupported GLSL Version." << LL_ENDL;
+			ALOG_RNDR_CRITICAL("Unsupported GLSL Version.");
 		}
 
 		if (minor_version <= 19)
@@ -891,7 +885,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 		else
 		{ //should never get here.  Indexed texture rendering requires GLSL 1.30 or later 
 			// (for passing integers between vertex and fragment shaders)
-			LL_ERRS() << "Indexed texture rendering requires GLSL 1.30 or later." << LL_ENDL;
+			ALOG_RNDR_CRITICAL("Indexed texture rendering requires GLSL 1.30 or later.");
 		}
 	}
     
@@ -982,7 +976,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 	error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
-		LL_WARNS("ShaderLoading") << "GL ERROR in glCreateShader: " << error << " for file: " << open_file_name << LL_ENDL;
+		ALOG_RNDR_WARN("GL ERROR in glCreateShader: {} for file: {}", error, open_file_name);
 	}
 
 	//load source
@@ -991,7 +985,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 	error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
-		LL_WARNS("ShaderLoading") << "GL ERROR in glShaderSource: " << error << " for file: " << open_file_name << LL_ENDL;
+		ALOG_RNDR_WARN("GL ERROR in glShaderSource: {} for file: {}", error, open_file_name);
 	}
 
 	//compile source
@@ -1000,7 +994,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 	error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
-		LL_WARNS("ShaderLoading") << "GL ERROR in glCompileShader: " << error << " for file: " << open_file_name << LL_ENDL;
+		ALOG_RNDR_WARN("GL ERROR in glCompileShader: {} for file: {}", error, open_file_name);
 	}
 
 	if (error == GL_NO_ERROR)
@@ -1013,8 +1007,8 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 		if (error != GL_NO_ERROR || success == GL_FALSE) 
 		{
 			//an error occured, print log
-			LL_WARNS("ShaderLoading") << "GLSL Compilation Error:" << LL_ENDL;
-				dumpObjectLog(false, ret, TRUE, open_file_name);
+			ALOG_RNDR_WARN("GLSL Compilation Error:");
+			dumpObjectLog(false, ret, TRUE, open_file_name);
 			dumpShaderSource(shader_code_count, shader_code_text);
 			ret = 0;
 		}
@@ -1050,7 +1044,7 @@ GLuint LLShaderMgr::loadShaderFile(const std::string& filename, S32 & shader_lev
 			shader_level--;
 			return loadShaderFile(filename, shader_level, type, defines, texture_index_channels);
 		}
-		LL_WARNS("ShaderLoading") << "Failed to load " << filename << LL_ENDL;	
+		ALOG_RNDR_WARN("Failed to load {}", filename);	
 	}
 	return ret;
 }
@@ -1064,7 +1058,7 @@ BOOL LLShaderMgr::linkProgramObject(GLuint obj, BOOL suppress_errors)
 	if (!suppress_errors && success == GL_FALSE) 
 	{
 		//an error occured, print log
-		LL_SHADER_LOADING_WARNS() << "GLSL Linker Error:" << LL_ENDL;
+		LL_SHADER_LOADING_WARNS("GLSL Linker Error:");
 	}
 
 #if LL_DARWIN
@@ -1108,7 +1102,7 @@ BOOL LLShaderMgr::linkProgramObject(GLuint obj, BOOL suppress_errors)
 	LLStringUtil::toLower(log);
 	if (log.find("software") != std::string::npos)
 	{
-		LL_SHADER_LOADING_WARNS() << "GLSL Linker: Running in Software:" << LL_ENDL;
+		LL_SHADER_LOADING_WARNS("GLSL Linker: Running in Software");
 		success = GL_FALSE;
 		suppress_errors = FALSE;
 	}
@@ -1124,7 +1118,7 @@ BOOL LLShaderMgr::validateProgramObject(GLuint obj)
 	glGetProgramiv(obj, GL_VALIDATE_STATUS, &success);
 	if (success == GL_FALSE)
 	{
-		LL_SHADER_LOADING_WARNS() << "GLSL program not valid: " << LL_ENDL;
+		LL_SHADER_LOADING_WARNS("GLSL program not valid: ");
 		dumpObjectLog(true, obj);
 	}
 	else

@@ -742,7 +742,7 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
 
 		if (closest_refresh == 0)
 		{
-			LL_WARNS("Window") << "Couldn't find display mode " << width << " by " << height << " at " << BITS_PER_PIXEL << " bits per pixel" << LL_ENDL;
+			ALOG_WARN("Couldn't find display mode {} by {} at {} bits per pixel", width, height, BITS_PER_PIXEL);
 			//success = FALSE;
 
 			if (!EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dev_mode))
@@ -753,14 +753,14 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
 			{
 				if (dev_mode.dmBitsPerPel == BITS_PER_PIXEL)
 				{
-					LL_WARNS("Window") << "Current BBP is OK falling back to that" << LL_ENDL;
+					ALOG_WARN("Current BPP is OK falling back to that");
 					window_rect.right=width=dev_mode.dmPelsWidth;
 					window_rect.bottom=height=dev_mode.dmPelsHeight;
 					success = TRUE;
 				}
 				else
 				{
-					LL_WARNS("Window") << "Current BBP is BAD" << LL_ENDL;
+					ALOG_WARN("Current BPP is BAD");
 					success = FALSE;
 				}
 			}
@@ -785,11 +785,11 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
 			mFullscreenBits    = dev_mode.dmBitsPerPel;
 			mFullscreenRefresh = dev_mode.dmDisplayFrequency;
 
-			LL_INFOS("Window") << "Running at " << dev_mode.dmPelsWidth
-				<< "x"   << dev_mode.dmPelsHeight
-				<< "x"   << dev_mode.dmBitsPerPel
-				<< " @ " << dev_mode.dmDisplayFrequency
-				<< LL_ENDL;
+			ALOG_INFO("Running at {}x{}x{} @ {}", 
+				dev_mode.dmPelsWidth, 
+				dev_mode.dmPelsHeight, 
+				dev_mode.dmBitsPerPel, 
+				dev_mode.dmDisplayFrequency);
 		}
 		else
 		{
@@ -830,16 +830,13 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
         {
             // CHAR DeviceName  [ 32] Adapter name
             // CHAR DeviceString[128]
-            WCHAR text[256];
-
             size_t name_len = wcslen(display_device.DeviceName  );
             size_t desc_len = wcslen(display_device.DeviceString);
 
             const WCHAR* name = name_len ? display_device.DeviceName   : TEXT("???");
 			const WCHAR* desc = desc_len ? display_device.DeviceString : TEXT("???");
 
-			_snwprintf(text, 256, TEXT("Display Device %d: %s, %s"), display_index, name, desc);
-            LL_INFOS("Window") << ll_convert_wide_to_string(text) << LL_ENDL;
+			ALOG_INFO(TEXT("Display Device {:d}: {:s}, {:s}"), display_index, name, desc);
         }
 
         ::ZeroMemory(&display_device, display_bytes);
@@ -848,7 +845,7 @@ LLWindowWin32::LLWindowWin32(LLWindowCallbacks* callbacks,
         display_index++;
     }  while( EnumDisplayDevicesW(NULL, display_index, &display_device, display_flags ));
 
-    LL_INFOS("Window") << "Total Display Devices: " << display_index << LL_ENDL;
+	ALOG_INFO("Total Display Devices: {}", display_index);
 
 	//-----------------------------------------------------------------------
 	// Create GL drawing context
@@ -1295,11 +1292,11 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 			mFullscreenBits    = dev_mode.dmBitsPerPel;
 			mFullscreenRefresh = dev_mode.dmDisplayFrequency;
 
-			LL_INFOS("Window") << "Running at " << dev_mode.dmPelsWidth
-				<< "x"   << dev_mode.dmPelsHeight
-				<< "x"   << dev_mode.dmBitsPerPel
-				<< " @ " << dev_mode.dmDisplayFrequency
-				<< LL_ENDL;
+			ALOG_INFO("Running at {}x{}x{} @ {}", 
+				dev_mode.dmPelsWidth, 
+				dev_mode.dmPelsHeight, 
+				dev_mode.dmBitsPerPel, 
+				dev_mode.dmDisplayFrequency);
 
 			window_rect.left = (long) 0;
 			window_rect.right = (long) width;			// Windows GDI rects don't include rightmost pixel
@@ -1321,7 +1318,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 			mFullscreenBits    = -1;
 			mFullscreenRefresh = -1;
 
-			LL_INFOS("Window") << "Unable to run fullscreen at " << width << "x" << height << LL_ENDL;
+			ALOG_WARN("Unable to run fullscreen at {}x{}", width, height);
 			return FALSE;
 		}
 	}
@@ -1350,7 +1347,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
         << LL_ENDL;
     if (mWindowHandle && !destroy_window_handler(mWindowHandle))
     {
-        LL_WARNS("Window") << "Failed to properly close window before recreating it!" << LL_ENDL;
+		ALOG_WARN("Failed to properly close window before recreating it!");
     }	
 	mWindowHandle = CreateWindowEx(dw_ex_style,
 		mWindowClassName,
@@ -1367,11 +1364,11 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 
 	if (mWindowHandle)
 	{
-		LL_INFOS("Window") << "window is created." << LL_ENDL ;
+		ALOG_INFO("window is created.");
 	}
 	else
 	{
-		LL_WARNS("Window") << "Window creation failed, code: " << GetLastError() << LL_ENDL;
+		ALOG_WARN("Window creation failed, code: {}", std::system_category().message(GetLastError()));
 	}
 
 	//-----------------------------------------------------------------------
@@ -1412,7 +1409,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
         // Looks like ChoosePixelFormat can crash in case of faulty driver
         if (!(pixel_format = SafeChoosePixelFormat(mhDC, &pfd)))
 	{
-            LL_WARNS("Window") << "ChoosePixelFormat failed, code: " << GetLastError() << LL_ENDL;
+			ALOG_WARN("ChoosePixelFormat failed, code: {}", std::system_category().message(GetLastError()));
             OSMessageBox(mCallbacks->translateString("MBPixelFmtErr"),
                 mCallbacks->translateString("MBError"), OSMB_OK);
 		close();
@@ -1441,35 +1438,41 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 	}
 
 	// (EXP-1765) dump pixel data to see if there is a pattern that leads to unreproducible crash
-	LL_INFOS("Window") << "--- begin pixel format dump ---" << LL_ENDL ;
-	LL_INFOS("Window") << "pixel_format is " << pixel_format << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.nSize:            " << pfd.nSize << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.nVersion:         " << pfd.nVersion << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.dwFlags:          0x" << std::hex << pfd.dwFlags << std::dec << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.iPixelType:       " << (int)pfd.iPixelType << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cColorBits:       " << (int)pfd.cColorBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cRedBits:         " << (int)pfd.cRedBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cRedShift:        " << (int)pfd.cRedShift << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cGreenBits:       " << (int)pfd.cGreenBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cGreenShift:      " << (int)pfd.cGreenShift << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cBlueBits:        " << (int)pfd.cBlueBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cBlueShift:       " << (int)pfd.cBlueShift << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAlphaBits:       " << (int)pfd.cAlphaBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAlphaShift:      " << (int)pfd.cAlphaShift << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAccumBits:       " << (int)pfd.cAccumBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAccumRedBits:    " << (int)pfd.cAccumRedBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAccumGreenBits:  " << (int)pfd.cAccumGreenBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAccumBlueBits:   " << (int)pfd.cAccumBlueBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAccumAlphaBits:  " << (int)pfd.cAccumAlphaBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cDepthBits:       " << (int)pfd.cDepthBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cStencilBits:     " << (int)pfd.cStencilBits << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.cAuxBuffers:      " << (int)pfd.cAuxBuffers << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.iLayerType:       " << (int)pfd.iLayerType << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.bReserved:        " << (int)pfd.bReserved << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.dwLayerMask:      " << pfd.dwLayerMask << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.dwVisibleMask:    " << pfd.dwVisibleMask << LL_ENDL ;
-	LL_INFOS("Window") << "pfd.dwDamageMask:     " << pfd.dwDamageMask << LL_ENDL ;
-	LL_INFOS("Window") << "--- end pixel format dump ---" << LL_ENDL ;
+	ALOG_INFO("\n--- begin pixel format dump ---\n"
+			  "pixel_format is {}\n"
+	          "pfd.nSize:            {}\n"
+	          "pfd.nVersion:         {}\n"
+	          "pfd.dwFlags:          {:#X}\n"
+	          "pfd.iPixelType:       {}\n"
+	          "pfd.cColorBits:       {}\n"
+	          "pfd.cRedBits:         {}\n"
+	          "pfd.cRedShift:        {}\n"
+	          "pfd.cGreenBits:       {}\n"
+	          "pfd.cGreenShift:      {}\n"
+	          "pfd.cBlueBits:        {}\n"
+	          "pfd.cBlueShift:       {}\n"
+	          "pfd.cAlphaBits:       {}\n"
+	          "pfd.cAlphaShift:      {}\n"
+	          "pfd.cAccumBits:       {}\n"
+	          "pfd.cAccumRedBits:    {}\n"
+	          "pfd.cAccumGreenBits:  {}\n"
+	          "pfd.cAccumBlueBits:   {}\n"
+	          "pfd.cAccumAlphaBits:  {}\n"
+	          "pfd.cDepthBits:       {}\n"
+	          "pfd.cStencilBits:     {}\n"
+	          "pfd.cAuxBuffers:      {}\n"
+	          "pfd.iLayerType:       {}\n"
+	          "pfd.bReserved:        {}\n"
+	          "pfd.dwLayerMask:      {}\n"
+	          "pfd.dwVisibleMask:    {}\n"
+	          "pfd.dwDamageMask:     {}\n"
+			  "--- end pixel format dump ---", 
+				  pixel_format, pfd.nSize, pfd.nVersion, pfd.dwFlags, (int)pfd.iPixelType, 
+				  (int)pfd.cColorBits, (int)pfd.cRedBits, (int)pfd.cRedShift, (int)pfd.cGreenBits, 
+				  (int)pfd.cGreenShift, (int)pfd.cBlueBits, (int)pfd.cBlueShift, (int)pfd.cAlphaBits, 
+				  (int)pfd.cAlphaShift, (int)pfd.cAccumBits, (int)pfd.cAccumRedBits, (int)pfd.cAccumGreenBits, 
+				  (int)pfd.cAccumBlueBits, (int)pfd.cAccumAlphaBits, (int)pfd.cDepthBits, (int)pfd.cStencilBits, 
+				  (int)pfd.cAuxBuffers, (int)pfd.iLayerType, (int)pfd.bReserved, pfd.dwLayerMask, pfd.dwVisibleMask, pfd.dwDamageMask);
 
 	if (pfd.cColorBits < 32)
 	{
@@ -1512,7 +1515,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 		return FALSE;
 	}
 
-	LL_INFOS("Window") << "Drawing context is created." << LL_ENDL ;
+	ALOG_INFO("Drawing context is created.");
 
 	
 	gGLManager.initWGL(mhDC);
@@ -1573,7 +1576,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 		
 		while(!result && mFSAASamples > 0) 
 		{
-			LL_WARNS() << "FSAASamples: " << mFSAASamples << " not supported." << LL_ENDL ;
+			ALOG_WARN("FSAASamples: {} not supported.", mFSAASamples);
 
 			mFSAASamples /= 2 ; //try to decrease sample pixel number until to disable anti-aliasing
 			if(mFSAASamples < 2)
@@ -1595,13 +1598,13 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 
 			if(result)
 			{
-				LL_WARNS() << "Only support FSAASamples: " << mFSAASamples << LL_ENDL ;
+				ALOG_WARN("Only support FSAASamples: {}", mFSAASamples);
 			}
 		}
 
 		if (!result)
 		{
-			LL_WARNS() << "mFSAASamples: " << mFSAASamples << LL_ENDL ;
+			ALOG_WARN("mFSAASamples: {}", mFSAASamples);
 
 			close();
 			show_window_creation_error("Error after wglChoosePixelFormatARB 32-bit");
@@ -1612,7 +1615,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 		{
 			if (end_attrib > 0)
 			{
-				LL_INFOS("Window") << "No valid pixel format for " << mFSAASamples << "x anti-aliasing." << LL_ENDL;
+				ALOG_INFO("No valid pixel format for {}x anti-aliasing.", mFSAASamples);
 				attrib_list[end_attrib] = 0;
 
 				BOOL result = wglChoosePixelFormatARB(mhDC, attrib_list, NULL, 256, pixel_formats, &num_formats);
@@ -1626,7 +1629,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 
 			if (!num_formats)
 			{
-				LL_INFOS("Window") << "No 32 bit z-buffer, trying 24 bits instead" << LL_ENDL;
+				ALOG_INFO("No 32 bit z - buffer, trying 24 bits instead");
 				// Try 24-bit format
 				attrib_list[1] = 24;
 				BOOL result = wglChoosePixelFormatARB(mhDC, attrib_list, NULL, 256, pixel_formats, &num_formats);
@@ -1639,7 +1642,7 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 
 				if (!num_formats)
 				{
-					LL_WARNS("Window") << "Couldn't get 24 bit z-buffer,trying 16 bits instead!" << LL_ENDL;
+					ALOG_WARN("Couldn't get 24 bit z-buffer,trying 16 bits instead!");
 					attrib_list[1] = 16;
 					BOOL result = wglChoosePixelFormatARB(mhDC, attrib_list, NULL, 256, pixel_formats, &num_formats);
 					if (!result || !num_formats)
@@ -1651,10 +1654,10 @@ BOOL LLWindowWin32::switchContext(BOOL fullscreen, const LLCoordScreen &size, BO
 				}
 			}
 
-			LL_INFOS("Window") << "Choosing pixel formats: " << num_formats << " pixel formats returned" << LL_ENDL;
+			ALOG_INFO("Choosing pixel formats: {} pixel formats returned", num_formats);
 		}
 
-		LL_INFOS("Window") << "pixel formats done." << LL_ENDL ;
+		ALOG_INFO("pixel formats done.");
 
 		S32 swap_method = 0;
 		S32   cur_format  = 0;
@@ -1714,12 +1717,12 @@ const	S32   max_format  = (S32)num_formats - 1;
 
 		if (mWindowHandle)
 		{
-			LL_INFOS("Window") << "recreate window done." << LL_ENDL ;
+			ALOG_INFO("recreate window done.");
 		}
 		else
 		{
 			// Note: if value is NULL GetDC retrieves the DC for the entire screen.
-			LL_WARNS("Window") << "Window recreation failed, code: " << GetLastError() << LL_ENDL;
+			ALOG_WARN("Window recreation failed, code: {}", std::system_category().message(GetLastError()));
 		}
 
 		if (!(mhDC = GetDC(mWindowHandle)))
@@ -1762,7 +1765,7 @@ const	S32   max_format  = (S32)num_formats - 1;
 	}
 	else
 	{
-		LL_WARNS("Window") << "No wgl_ARB_pixel_format extension, using default ChoosePixelFormat!" << LL_ENDL;
+		ALOG_WARN("No wgl_ARB_pixel_format extension, using default ChoosePixelFormat!");
 	}
 
 	// Verify what pixel format we actually received.
@@ -1774,10 +1777,7 @@ const	S32   max_format  = (S32)num_formats - 1;
 		return FALSE;
 	}
 
-	LL_INFOS("Window") << "GL buffer: Color Bits " << S32(pfd.cColorBits) 
-		<< " Alpha Bits " << S32(pfd.cAlphaBits)
-		<< " Depth Bits " << S32(pfd.cDepthBits) 
-		<< LL_ENDL;
+	ALOG_INFO("GL buffer: Color Bits {} Alpha Bits {} Depth Bits {}", pfd.cColorBits, pfd.cAlphaBits, pfd.cDepthBits);
 
 	// make sure we have 32 bits per pixel
 	if (pfd.cColorBits < 32 || GetDeviceCaps(mhDC, BITSPIXEL) < 32)
@@ -1829,8 +1829,7 @@ const	S32   max_format  = (S32)num_formats - 1;
 			}
 			else
 			{
-				LL_INFOS() << "Created OpenGL " << llformat("%d.%d", attribs[1], attribs[3]) << 
-					(LLRender::sGLCoreProfile ? " core" : " compatibility") << " context." << LL_ENDL;
+				ALOG_INFO("Created OpenGL {}.{} {} context.", attribs[1], attribs[3], (LLRender::sGLCoreProfile ? "core" : "compatibility"));
 				done = true;
 
 			// force sNoFixedFunction iff we're trying to use nsight debugging which does not support many legacy API uses
@@ -1887,12 +1886,12 @@ const	S32   max_format  = (S32)num_formats - 1;
 	{
 		if (disable_vsync)
 		{
-			LL_INFOS("Window") << "Disabling vertical sync" << LL_ENDL;
+			ALOG_INFO("Disabling vertical sync");
 			wglSwapIntervalEXT(0);
 		}
 		else
 		{
-			LL_INFOS("Window") << "Keeping vertical sync" << LL_ENDL;
+			ALOG_INFO("Keeping vertical sync");
 			wglSwapIntervalEXT(1);
 		}
 	}

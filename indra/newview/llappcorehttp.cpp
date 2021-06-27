@@ -386,7 +386,7 @@ void LLAppCoreHttp::refreshSettings(bool initial)
 			mPipelined = pipelined;
 			pipeline_changed = true;
 		}
-        LL_INFOS("Init") << "HTTP Pipelining " << (mPipelined ? "enabled" : "disabled") << "!" << LL_ENDL;
+        ALOG_NET_INFO("HTTP Pipelining {}!", (mPipelined ? "enabled" : "disabled"));
 	}
 	
 	for (int i(0); i < LL_ARRAY_SIZE(init_data); ++i)
@@ -406,9 +406,7 @@ void LLAppCoreHttp::refreshSettings(bool initial)
 																	NULL);
 				if (! status)
 				{
-					LL_WARNS("Init") << "Unable to set " << init_data[i].mUsage
-									 << " throttle rate.  Reason:  " << status.toString()
-									 << LL_ENDL;
+					ALOG_NET_WARN("Unable to set {} throttle rate.  Reason:  {}", init_data[i].mUsage, status.toString());
 				}
 			}
 

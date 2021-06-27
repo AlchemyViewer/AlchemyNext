@@ -401,7 +401,7 @@ BOOL LLGLSLShader::createShader(std::vector<LLStaticHashedString> * attributes,
     if (mProgramObject == 0)
     {
         // Shouldn't happen if shader related extensions, like ARB_vertex_shader, exist.
-        LL_SHADER_LOADING_WARNS() << "Failed to create handle for shader: " << mName << LL_ENDL;
+        LL_SHADER_LOADING_WARNS("Failed to create handle for shader: {}", mName);
         unloadInternal();
         return FALSE;
     }
@@ -422,7 +422,7 @@ BOOL LLGLSLShader::createShader(std::vector<LLStaticHashedString> * attributes,
     for ( ; fileIter != mShaderFiles.end(); fileIter++ )
     {
         GLuint shaderhandle = LLShaderMgr::instance()->loadShaderFile((*fileIter).first, mShaderLevel, (*fileIter).second, &mDefines, mFeatures.mIndexedTextureChannels);
-        LL_DEBUGS("ShaderLoading") << "SHADER FILE: " << (*fileIter).first << " mShaderLevel=" << mShaderLevel << LL_ENDL;
+        ALOG_RNDR_DEBUG("SHADER FILE: {} mShaderLevel={}", (*fileIter).first, mShaderLevel);
         if (shaderhandle)
         {
             attachObject(shaderhandle);
@@ -456,12 +456,12 @@ BOOL LLGLSLShader::createShader(std::vector<LLStaticHashedString> * attributes,
     }
     if( !success )
     {
-        LL_SHADER_LOADING_WARNS() << "Failed to link shader: " << mName << LL_ENDL;
+        LL_SHADER_LOADING_WARNS("Failed to link shader: {}", mName);
 
         // Try again using a lower shader level;
         if (mShaderLevel > 0)
         {
-            LL_SHADER_LOADING_WARNS() << "Failed to link using shader level " << mShaderLevel << " trying again using shader level " << (mShaderLevel - 1) << LL_ENDL;
+            LL_SHADER_LOADING_WARNS("Failed to link using shader level {} trying again using shader level {}", mShaderLevel,(mShaderLevel - 1));
             mShaderLevel--;
             return createShader(attributes,uniforms);
         }
@@ -505,7 +505,7 @@ BOOL LLGLSLShader::attachVertexObject(std::string object_path)
     }
     else
     {
-        LL_SHADER_LOADING_WARNS() << "Attempting to attach shader object: '" << object_path << "' that hasn't been compiled." << LL_ENDL;
+        LL_SHADER_LOADING_WARNS("Attempting to attach shader object: '{}' that hasn't been compiled.", object_path);
         return FALSE;
     }
 }
@@ -524,7 +524,7 @@ BOOL LLGLSLShader::attachFragmentObject(std::string object_path)
     }
     else
     {
-        LL_SHADER_LOADING_WARNS() << "Attempting to attach shader object: '" << object_path << "' that hasn't been compiled." << LL_ENDL;
+        LL_SHADER_LOADING_WARNS("Attempting to attach shader object: '{}' that hasn't been compiled.", object_path);
         return FALSE;
     }
 }
@@ -543,7 +543,7 @@ void LLGLSLShader::attachObject(GLuint object)
     }
     else
     {
-        LL_SHADER_LOADING_WARNS() << "Attempting to attach non existing shader object. " << LL_ENDL;
+        LL_SHADER_LOADING_WARNS("Attempting to attach non existing shader object.");
     }
 }
 
@@ -593,7 +593,7 @@ BOOL LLGLSLShader::mapAttributes(const std::vector<LLStaticHashedString> * attri
                 mAttribute[i] = index;
 #endif
                 mAttributeMask |= 1 << i;
-                LL_DEBUGS("ShaderUniform") << "Attribute " << name << " assigned to channel " << index << LL_ENDL;
+                ALOG_RNDR_DEBUG("Attribute {} assigned to channel {}", name, index);
             }
         }
         if (attributes != NULL)
@@ -605,7 +605,7 @@ BOOL LLGLSLShader::mapAttributes(const std::vector<LLStaticHashedString> * attri
                 if (index != -1)
                 {
                     mAttribute[LLShaderMgr::instance()->mReservedAttribs.size() + i] = index;
-                    LL_DEBUGS("ShaderUniform") << "Attribute " << name << " assigned to channel " << index << LL_ENDL;
+                    ALOG_RNDR_DEBUG("Attribute {} assigned to channel {}", name, index);
                 }
             }
         }
@@ -679,7 +679,7 @@ void LLGLSLShader::mapUniform(const gl_uniform_data_t& gl_uniform, const std::ve
         mUniformNameMap[location] = name;
         mUniformMap[hashedName] = location;
 
-        LL_DEBUGS("ShaderUniform") << "Uniform " << name << " is at location " << location << LL_ENDL;
+        ALOG_RNDR_DEBUG("Uniform {} is at location {}", name, location);
     
         // Indexed textures are referenced by hardcoded tex unit index. This is where that mapping happens.
         if (gl_uniform.texunit_priority < (U32)mFeatures.mIndexedTextureChannels)
@@ -742,7 +742,7 @@ GLint LLGLSLShader::mapUniformTextureChannel(GLint location, GLenum type)
         type == GL_SAMPLER_2D_MULTISAMPLE)
     {   //this here is a texture
         glUniform1i(location, mActiveTextureChannels);
-        LL_DEBUGS("ShaderUniform") << "Assigned " << mUniformNameMap[location] << " to texture channel " << mActiveTextureChannels << " in shader " << mName << LL_ENDL;
+        ALOG_RNDR_DEBUG("Assigned {} to texture channel {} in shader {}", mUniformNameMap[location], mActiveTextureChannels, mName);
         return mActiveTextureChannels++;
     }
     return -1;
@@ -832,7 +832,7 @@ BOOL LLGLSLShader::mapUniforms(const vector<LLStaticHashedString> * uniforms)
 
 	unbind();
 
-	LL_DEBUGS("ShaderUniform") << "Total Uniform Size: " << mTotalUniformSize << LL_ENDL;
+	ALOG_RNDR_DEBUG("Total Uniform Size: {}", mTotalUniformSize);
 	return res;
 }
 
@@ -911,7 +911,7 @@ S32 LLGLSLShader::bindTexture(S32 uniform, LLTexture *texture, LLTexUnit::eTextu
 {
     if (uniform < 0 || uniform >= (S32)mTexture.size())
     {
-        LL_SHADER_UNIFORM_ERRS() << "Uniform out of range: " << uniform << LL_ENDL;
+        LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Uniform out of range", mName, uniform);
         return -1;
     }
     
@@ -938,7 +938,7 @@ S32 LLGLSLShader::unbindTexture(S32 uniform, LLTexUnit::eTextureType mode)
 {
     if (uniform < 0 || uniform >= (S32)mTexture.size())
     {
-        LL_SHADER_UNIFORM_ERRS() << "Uniform out of range: " << uniform << LL_ENDL;
+        LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Uniform out of range", mName, uniform);
         return -1;
     }
     
@@ -956,7 +956,7 @@ S32 LLGLSLShader::enableTexture(S32 uniform, LLTexUnit::eTextureType mode, LLTex
 {
     if (uniform < 0 || uniform >= (S32)mTexture.size())
     {
-        LL_SHADER_UNIFORM_ERRS() << "Uniform out of range: " << uniform << LL_ENDL;
+        LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Uniform out of range", mName, uniform);
         return -1;
     }
     S32 index = mTexture[uniform];
@@ -973,7 +973,7 @@ S32 LLGLSLShader::disableTexture(S32 uniform, LLTexUnit::eTextureType mode, LLTe
 {
     if (uniform < 0 || uniform >= (S32)mTexture.size())
     {
-        LL_SHADER_UNIFORM_ERRS() << "Uniform out of range: " << uniform << LL_ENDL;
+        LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Uniform out of range", mName, uniform);
         return -1;
     }
     S32 index = mTexture[uniform];
@@ -988,7 +988,7 @@ S32 LLGLSLShader::disableTexture(S32 uniform, LLTexUnit::eTextureType mode, LLTe
             }
             else
             {
-                LL_ERRS() << "Texture channel " << index << " texture type corrupted." << LL_ENDL;
+                ALOG_RNDR_CRITICAL("Texture channel {} texture type corrupted.", index);
             }
         }
         gGL.getTexUnit(index)->disable();
@@ -1002,7 +1002,7 @@ void LLGLSLShader::uniform1i(U32 index, GLint x)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1024,7 +1024,7 @@ void LLGLSLShader::uniform1f(U32 index, GLfloat x)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1046,7 +1046,7 @@ void LLGLSLShader::uniform2f(U32 index, GLfloat x, GLfloat y)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1069,7 +1069,7 @@ void LLGLSLShader::uniform3f(U32 index, GLfloat x, GLfloat y, GLfloat z)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1092,7 +1092,7 @@ void LLGLSLShader::uniform4f(U32 index, GLfloat x, GLfloat y, GLfloat z, GLfloat
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1115,7 +1115,7 @@ void LLGLSLShader::uniform1iv(U32 index, U32 count, const GLint* v)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1138,7 +1138,7 @@ void LLGLSLShader::uniform1fv(U32 index, U32 count, const GLfloat* v)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1161,7 +1161,7 @@ void LLGLSLShader::uniform2fv(U32 index, U32 count, const GLfloat* v)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1184,7 +1184,7 @@ void LLGLSLShader::uniform3fv(U32 index, U32 count, const GLfloat* v)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1207,7 +1207,7 @@ void LLGLSLShader::uniform4fv(U32 index, U32 count, const GLfloat* v)
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1230,7 +1230,7 @@ void LLGLSLShader::uniformMatrix2fv(U32 index, U32 count, GLboolean transpose, c
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1247,7 +1247,7 @@ void LLGLSLShader::uniformMatrix3fv(U32 index, U32 count, GLboolean transpose, c
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1264,7 +1264,7 @@ void LLGLSLShader::uniformMatrix3x4fv(U32 index, U32 count, GLboolean transpose,
 	{	
 		if (mUniform.size() <= index)
 		{
-			LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
 			return;
 		}
 
@@ -1281,7 +1281,7 @@ void LLGLSLShader::uniformMatrix4fv(U32 index, U32 count, GLboolean transpose, c
     {   
         if (mUniform.size() <= index)
         {
-            LL_SHADER_UNIFORM_ERRS() << "Uniform index out of bounds." << LL_ENDL;
+            LL_SHADER_UNIFORM_ERRS("Shader: {} Uniform: {} Index out of bounds.", mName, index);
             return;
         }
 
@@ -1305,7 +1305,7 @@ GLint LLGLSLShader::getUniformLocation(const LLStaticHashedString& uniform)
                 stop_glerror();
                 if (iter->second != glGetUniformLocation(mProgramObject, uniform.String().c_str()))
                 {
-                    LL_ERRS() << "Uniform does not match." << LL_ENDL;
+                    ALOG_RNDR_CRITICAL("Uniform does not match.");
                 }
                 stop_glerror();
             }
