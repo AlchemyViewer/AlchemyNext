@@ -49,7 +49,7 @@ enum
 	U64_BUFFER_LEN = 64
 };
 
-LLStringTable	gNVNameTable(256);
+ALStringTable	gNVNameTable(1024);
 
 char NameValueTypeStrings[NVT_EOF][NAME_VALUE_TYPE_STRING_LENGTH] = /*Flawfinder: Ignore*/
 {

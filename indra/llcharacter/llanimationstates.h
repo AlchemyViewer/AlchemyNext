@@ -202,7 +202,7 @@ extern S32 NUM_AGENT_STAND_ANIMS;
 class LLAnimationLibrary
 {
 private:
-	LLStringTable mAnimStringTable;
+    ALStringTable mAnimStringTable;
 
 	typedef absl::flat_hash_map<LLUUID, char *> anim_map_t;
 	anim_map_t mAnimMap;

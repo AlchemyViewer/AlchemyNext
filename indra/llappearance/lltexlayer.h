@@ -303,7 +303,7 @@ public:
 protected:
 	BOOL				loadImageRaw(const std::string& file_name, LLImageRaw* image_raw);
 private:
-	LLStringTable 		mImageNames;
+	ALStringTable 		mImageNames;
 	typedef std::map<const char*, LLPointer<LLGLTexture> > texture_map_t;
 	texture_map_t 		mStaticImageList;
 	typedef std::map<const char*, LLPointer<LLImageTGA> > image_tga_map_t;

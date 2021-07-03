@@ -195,7 +195,7 @@ LLAnimationLibrary gAnimLibrary;
 // LLAnimationLibrary()
 //-----------------------------------------------------------------------------
 LLAnimationLibrary::LLAnimationLibrary() :
-	mAnimStringTable(16384)
+	mAnimStringTable(4096)
 {
 	//add animation names to animmap
 	mAnimMap[ANIM_AGENT_AFRAID]=			mAnimStringTable.addString("express_afraid");
@@ -361,12 +361,12 @@ const char *LLAnimationLibrary::animStateToString( const LLUUID& state )
 //-----------------------------------------------------------------------------
 // Return the animation state for a given name
 //-----------------------------------------------------------------------------
-LLUUID LLAnimationLibrary::stringToAnimState( const std::string& name, BOOL allow_ids )
+LLUUID LLAnimationLibrary::stringToAnimState(const std::string& name, BOOL allow_ids )
 {
 	std::string lower_case_name(name);
 	LLStringUtil::toLower(lower_case_name);
 
-	char *true_name = mAnimStringTable.checkString(lower_case_name.c_str());
+	char *true_name = mAnimStringTable.checkString(lower_case_name);
 
 	LLUUID id;
 	id.setNull();

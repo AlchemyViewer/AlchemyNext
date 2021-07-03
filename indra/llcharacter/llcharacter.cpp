@@ -36,7 +36,7 @@
 
 #define SKEL_HEADER "Linden Skeleton 1.0"
 
-LLStringTable LLCharacter::sVisualParamNames(1024);
+ALStringTable LLCharacter::sVisualParamNames(1024);
 
 std::vector< LLCharacter* > LLCharacter::sInstances;
 BOOL LLCharacter::sAllowInstancesChange = TRUE ;
@@ -321,7 +321,7 @@ BOOL LLCharacter::setVisualParamWeight(const char* param_name, F32 weight)
 		name_iter->second->setWeight(weight);
 		return TRUE;
 	}
-	LL_WARNS() << "LLCharacter::setVisualParamWeight() Invalid visual parameter: " << param_name << LL_ENDL;
+    LL_WARNS() << "LLCharacter::setVisualParamWeight() Invalid visual parameter: " << param_name << " " << tableptr << LL_ENDL;
 	return FALSE;
 }
 
@@ -420,7 +420,7 @@ LLVisualParam*	LLCharacter::getVisualParam(const char *param_name)
 	{
 		return name_iter->second;
 	}
-	LL_WARNS() << "LLCharacter::getVisualParam() Invalid visual parameter: " << param_name << LL_ENDL;
+    LL_WARNS() << "LLCharacter::getVisualParam() Invalid visual parameter: " << param_name << LL_ENDL;
 	return NULL;
 }
 
@@ -482,8 +482,7 @@ void LLCharacter::addVisualParam(LLVisualParam *param)
 		std::string tname(param->getName());
 		LLStringUtil::toLower(tname);
 		char *tableptr = sVisualParamNames.addString(tname);
-		std::pair<visual_param_name_map_t::iterator, bool> nameres;
-		nameres = mVisualParamNameMap.emplace(tableptr, param);
+		auto nameres = mVisualParamNameMap.emplace(tableptr, param);
 		if (!nameres.second)
 		{
 			// Already exists, copy param

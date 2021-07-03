@@ -1893,7 +1893,7 @@ void LLTexLayerSet::cloneTemplates(LLLocalTextureObject *lto, LLAvatarAppearance
 LLTexLayerStaticImageList::LLTexLayerStaticImageList() :
 	mGLBytes(0),
 	mTGABytes(0),
-	mImageNames(16384)
+	mImageNames(64)
 {
 }
 

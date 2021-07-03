@@ -30,7 +30,6 @@
 #include <map>
 #include <boost/function.hpp>
 
-#include "llstringtable.h"
 #include "lltimer.h"
 #include "indra_constants.h"
 

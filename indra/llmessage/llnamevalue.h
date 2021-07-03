@@ -47,7 +47,7 @@
 #include "lldbstrings.h"
 
 class LLNameValue;
-class LLStringTable;
+class ALStringTable;
 
 typedef enum e_name_value_types
 {
@@ -170,14 +170,14 @@ public:
 	char						*mStringType;
 	char						*mStringClass;
 	char						*mStringSendto;
-	LLStringTable				*mNVNameTable;
+    ALStringTable*               mNVNameTable;
 	ENameValueType				mType;
 	ENameValueClass				mClass;
 	ENameValueSendto			mSendto;
 
 };
 
-extern LLStringTable	gNVNameTable;
+extern ALStringTable gNVNameTable;
 
 
 #endif

@@ -286,7 +286,7 @@ private:
 	visual_param_index_hashmap_t				mVisualParamIndexHashmap;
 	visual_param_name_map_t  					mVisualParamNameMap;
 
-	static LLStringTable sVisualParamNames;	
+	static ALStringTable sVisualParamNames;	
 
 	LLVector3 mHoverOffset;
 };

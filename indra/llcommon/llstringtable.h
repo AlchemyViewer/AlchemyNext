@@ -29,69 +29,211 @@
 #define LL_STRING_TABLE_H
 
 #include "lldefs.h"
-#include "llformat.h"
 #include "llstl.h"
-#include <list>
-#include <set>
 
-#if LL_WINDOWS
-# if (_MSC_VER >= 1300 && _MSC_VER < 1400)
-#  define STRING_TABLE_HASH_MAP 1
-# endif
-#else
-//# define STRING_TABLE_HASH_MAP 1
-#endif
+#include <absl/container/node_hash_set.h>
 
-const U32 MAX_STRINGS_LENGTH = 256;
+constexpr U32 MAX_STRINGS_LENGTH = 256;
 
 class LL_COMMON_API LLStringTableEntry
 {
 public:
-	LLStringTableEntry(const char *str);
+    LLStringTableEntry() = default;
+	LLStringTableEntry(std::string_view str);
+	LLStringTableEntry(const LLStringTableEntry& other)
+	{
+        mString = strdup(other.mString);
+        incRef();
+	}
+
+    LLStringTableEntry(LLStringTableEntry&& other) noexcept
+	{
+		mString       = other.mString;
+        other.mString = nullptr;
+        mRef          = other.mRef;
+        other.mRef    = 0;
+	}
 	~LLStringTableEntry();
 
-	void incCount()		{ mCount++; }
-	BOOL decCount()		{ return --mCount; }
+	LLStringTableEntry& operator=(const LLStringTableEntry& rhs)
+	{
+        if (this != &rhs)
+        {
+            if (mString)
+            {
+                free(mString);
+            }
+            mString = strdup(rhs.mString);
+            mRef    = 1;
+            return *this;
+        }
+	}
 
-	char *mString;
-	S32  mCount;
+	LLStringTableEntry& operator=(LLStringTableEntry&& rhs) noexcept
+	{
+        if (this != &rhs)
+        {
+            if (mString)
+            {
+                free(mString);
+            }
+            mString     = rhs.mString;
+            rhs.mString = nullptr;
+            mRef        = rhs.mRef;
+            rhs.mRef    = 0;
+            return *this;
+        }
+	}
+
+	void incRef() const { ++mRef; }
+    S32  decRef() const { return --mRef; }
+    S32  numRefs() const { return mRef; }
+
+    friend bool operator==(const LLStringTableEntry& lhs, const LLStringTableEntry& rhs);
+
+	template <typename H> 
+	friend H AbslHashValue(H h, const LLStringTableEntry& m);
+
+	struct StringPoolEntryHash
+    {
+	  using is_transparent = void;
+
+	  size_t operator()(std::string_view v) const {
+		return absl::Hash<std::string_view>{}(v);
+	  }
+      size_t operator()(const LLStringTableEntry& v) const {
+		return absl::Hash<LLStringTableEntry>{}(v);
+	  }
+	};
+
+	// Supports heterogeneous lookup for string-like elements.
+	struct StringPoolEntryEq {
+		using is_transparent = void;
+		bool operator()(std::string_view lhs, std::string_view rhs) const 
+		{
+		  return lhs == rhs;
+		}
+        bool operator()(const LLStringTableEntry& lhs, const LLStringTableEntry& rhs) const 
+		{
+            return strcmp(lhs.mString, rhs.mString) == 0;
+		}
+        bool operator()(const LLStringTableEntry& lhs, std::string_view rhs) const 
+		{
+		  return lhs.mString == rhs;
+		}
+        bool operator()(std::string_view lhs, const LLStringTableEntry& rhs) const 
+		{
+		  return lhs == rhs.mString;
+		}
+	};
+
+	char* mString = nullptr;
+    mutable S32 mRef = 0;
 };
 
-class LL_COMMON_API LLStringTable
+inline bool operator==(const LLStringTableEntry& lhs, const LLStringTableEntry& rhs)
 {
-public:
-	LLStringTable(U32 tablesize);
-	~LLStringTable();
+    return strcmp(lhs.mString, rhs.mString) == 0;
+}
 
-	char *checkString(const char *str);
-	char *checkString(const std::string& str);
-	LLStringTableEntry *checkStringEntry(const char *str);
-	LLStringTableEntry *checkStringEntry(const std::string& str);
+template <typename H>
+inline H AbslHashValue(H h, const LLStringTableEntry& m) 
+{
+	return H::combine(std::move(h), std::string_view(m.mString));
+}
 
-	char *addString(const char *str);
-	char *addString(const std::string& str);
-	LLStringTableEntry *addStringEntry(const char *str);
-	LLStringTableEntry *addStringEntry(const std::string& str);
-	void  removeString(const char *str);
+class LL_COMMON_API ALStringTable
+{
+  public:
+    ALStringTable(size_t tablesize) { mStringHash.reserve(tablesize); };
+    ~ALStringTable() { mStringHash.clear(); };
 
-	U32 mMaxEntries;
-	S32 mUniqueEntries;
-	
-#if STRING_TABLE_HASH_MAP
-#if LL_WINDOWS
-	typedef std::hash_multimap<U32, LLStringTableEntry *> string_hash_t;
-#else
-	typedef __gnu_cxx::hash_multimap<U32, LLStringTableEntry *> string_hash_t;
-#endif
-	string_hash_t mStringHash;
-#else
-	typedef std::list<LLStringTableEntry *> string_list_t;
-	typedef string_list_t * string_list_ptr_t;
-	string_list_ptr_t	*mStringList;
-#endif	
+    char* checkString(std::string_view str)
+    {
+        auto entry = checkStringEntry(str);
+        if (entry)
+        {
+            return entry->mString;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    LLStringTableEntry* checkStringEntry(std::string_view str)
+    {
+        if (!str.empty())
+        {
+            auto it = mStringHash.find(str);
+            if (it != mStringHash.end())
+            {
+                return const_cast<LLStringTableEntry*>(&(*it));
+            }
+        }
+        return nullptr;
+    }
+
+    char* addString(std::string_view str)
+    {
+        auto entry = addStringEntry(str);
+        if (entry)
+        {
+            return entry->mString;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    LLStringTableEntry* addStringEntry(std::string_view str)
+    {
+        if (str.empty())
+        {
+            return nullptr;
+        }
+
+        auto it = mStringHash.find(str);
+        if (it != mStringHash.end())
+        {
+            it->incRef();
+            return const_cast<LLStringTableEntry*>(&(*it));
+        }
+        else
+        {
+            mUniqueEntries++;
+
+            auto ret = mStringHash.emplace(str);
+            return const_cast<LLStringTableEntry*>(&(*ret.first));
+        }
+    }
+
+    void removeString(std::string_view str)
+    {
+        if (!str.empty())
+        {
+            auto it = mStringHash.find(str);
+            if (it != mStringHash.end())
+            {
+                if (it->decRef() <= 0)
+                {
+                    mStringHash.erase(it);
+                    mUniqueEntries--;
+                    if (mUniqueEntries < 0)
+                    {
+                        LL_ERRS() << "LLStringTable:removeString trying to remove too many strings!" << LL_ENDL;
+                    }
+                }
+            }
+        }
+    }
+
+  private:
+    S64 mUniqueEntries = 0;
+
+    absl::node_hash_set<LLStringTableEntry, LLStringTableEntry::StringPoolEntryHash, LLStringTableEntry::StringPoolEntryEq> mStringHash;
 };
-
-extern LL_COMMON_API LLStringTable gStringTable;
 
 //============================================================================
 
@@ -122,88 +264,56 @@ public:
 				break;
 			}
 		}
-		mTableSize = tablesize;
-		mStringList = new string_set_t[tablesize];
+        mStringList.reserve(tablesize);
 	}
 	~LLStdStringTable()
 	{
 		cleanup();
-		delete[] mStringList;
 	}
 	void cleanup()
 	{
 		// remove strings
-		for (S32 i = 0; i<mTableSize; i++)
-		{
-			string_set_t& stringset = mStringList[i];
-			for (string_set_t::iterator iter = stringset.begin(); iter != stringset.end(); iter++)
-			{
-				delete *iter;
-			}
-			stringset.clear();
-		}
+        mStringList.clear();
 	}
 
-	LLStdStringHandle lookup(const std::string& s)
+	LLStdStringHandle lookup(std::string_view s)
 	{
-		U32 hashval = makehash(s);
-		return lookup(hashval, s);
+        string_set_t::iterator iter = mStringList.find(s);  // compares actual strings
+        if (iter != mStringList.end())
+        {
+            return &(*iter);
+        }
+        else
+        {
+            return NULL;
+        };
 	}
 	
-	LLStdStringHandle checkString(const std::string& s)
+	LLStdStringHandle checkString(std::string_view s)
 	{
-		U32 hashval = makehash(s);
-		return lookup(hashval, s);
+		return lookup(s);
 	}
 
-	LLStdStringHandle insert(const std::string& s)
+	LLStdStringHandle insert(std::string_view s)
 	{
-		U32 hashval = makehash(s);
-		LLStdStringHandle result = lookup(hashval, s);
+		LLStdStringHandle result = lookup(s);
 		if (result == NULL)
 		{
-			result = new std::string(s);
-			mStringList[hashval].insert(result);
+			auto it = mStringList.emplace(std::string(s));
+            result  = &(*it.first);
 		}
 		return result;
 	}
-	LLStdStringHandle addString(const std::string& s)
+    LLStdStringHandle addString(std::string_view s)
 	{
 		return insert(s);
 	}
 	
 private:
-	U32 makehash(const std::string& s)
-	{
-		S32 len = (S32)s.size();
-		const char* c = s.c_str();
-		U32 hashval = 0;
-		for (S32 i=0; i<len; i++)
-		{
-			hashval = ((hashval<<5) + hashval) + *c++;
-		}
-		return hashval & (mTableSize-1);
-	}
-	LLStdStringHandle lookup(U32 hashval, const std::string& s)
-	{
-		string_set_t& stringset = mStringList[hashval];
-		LLStdStringHandle handle = &s;
-		string_set_t::iterator iter = stringset.find(handle); // compares actual strings
-		if (iter != stringset.end())
-		{
-			return *iter;
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-	
-private:
-	S32 mTableSize;
-	typedef std::set<LLStdStringHandle, compare_pointer_contents<std::string> > string_set_t;
-	string_set_t* mStringList; // [mTableSize]
+	typedef absl::node_hash_set<std::string> string_set_t;
+	string_set_t mStringList;
 };
 
+extern LL_COMMON_API ALStringTable gStringTable;
 
 #endif
