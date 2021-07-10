@@ -174,13 +174,13 @@ public:
 	//if given texture uniform is active in the shader, 
 	//the corresponding channel will be active upon return
 	//returns channel texture is enabled in from [0-MAX)
-	S32 enableTexture(S32 uniform, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_LINEAR);
-    S32 disableTexture(S32 uniform, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_LINEAR);
+	S32 enableTexture(S32 uniform, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_SRGB);
+    S32 disableTexture(S32 uniform, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_SRGB);
 	
 	// bindTexture returns the texture unit we've bound the texture to.
 	// You can reuse the return value to unbind a texture when required.
-	S32 bindTexture(const std::string& uniform, LLTexture *texture, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_LINEAR);
-	S32 bindTexture(S32 uniform, LLTexture *texture, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_LINEAR);
+	S32 bindTexture(const std::string& uniform, LLTexture *texture, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_SRGB);
+	S32 bindTexture(S32 uniform, LLTexture *texture, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE, LLTexUnit::eTextureColorSpace space = LLTexUnit::TCS_SRGB);
 	S32 unbindTexture(const std::string& uniform, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE);
 	S32 unbindTexture(S32 uniform, LLTexUnit::eTextureType mode = LLTexUnit::TT_TEXTURE);
 	

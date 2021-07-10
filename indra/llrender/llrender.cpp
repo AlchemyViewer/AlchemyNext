@@ -261,7 +261,7 @@ bool LLTexUnit::bind(LLTexture* texture, bool for_rendering, bool forceBind)
 						setTextureAddressMode(gl_tex->mAddressMode);
 						setTextureFilteringOption(gl_tex->mFilterOption);
                     }
-                    setTextureColorSpace(mTexColorSpace);
+                    setTextureColorSpace(TCS_SRGB);
 				}
 			}
 			else
