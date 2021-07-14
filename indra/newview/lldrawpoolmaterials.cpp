@@ -171,7 +171,7 @@ void LLDrawPoolMaterials::bindNormalMap(LLViewerTexture* tex)
 	mShader->bindTexture(LLShaderMgr::BUMP_MAP, tex);
 }
 
-void LLDrawPoolMaterials::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures)
+void LLDrawPoolMaterials::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures, BOOL linear_diffuse)
 {
 	applyModelMatrix(params);
 	

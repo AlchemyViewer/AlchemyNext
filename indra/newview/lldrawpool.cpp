@@ -396,24 +396,24 @@ void LLRenderPass::renderGroup(LLSpatialGroup* group, U32 type, U32 mask, BOOL t
 	}
 }
 
-void LLRenderPass::renderTexture(U32 type, U32 mask, BOOL batch_textures)
+void LLRenderPass::renderTexture(U32 type, U32 mask, BOOL batch_textures, BOOL linear_diffuse)
 {
-	pushBatches(type, mask, true, batch_textures);
+    pushBatches(type, mask, true, batch_textures, linear_diffuse);
 }
 
-void LLRenderPass::pushBatches(U32 type, U32 mask, BOOL texture, BOOL batch_textures)
+void LLRenderPass::pushBatches(U32 type, U32 mask, BOOL texture, BOOL batch_textures, BOOL linear_diffuse)
 {
 	for (LLCullResult::drawinfo_iterator i = gPipeline.beginRenderMap(type), end = gPipeline.endRenderMap(type); i != end; ++i)
 	{
 		LLDrawInfo* pparams = *i;
 		if (pparams) 
 		{
-			pushBatch(*pparams, mask, texture, batch_textures);
+            pushBatch(*pparams, mask, texture, batch_textures, linear_diffuse);
 		}
 	}
 }
 
-void LLRenderPass::pushMaskBatches(U32 type, U32 mask, BOOL texture, BOOL batch_textures)
+void LLRenderPass::pushMaskBatches(U32 type, U32 mask, BOOL texture, BOOL batch_textures, BOOL linear_diffuse)
 {
 	for (LLCullResult::drawinfo_iterator i = gPipeline.beginRenderMap(type), end = gPipeline.endRenderMap(type); i != end; ++i)
 	{
@@ -429,7 +429,7 @@ void LLRenderPass::pushMaskBatches(U32 type, U32 mask, BOOL texture, BOOL batch_
 				gGL.setAlphaRejectSettings(LLRender::CF_GREATER, pparams->mAlphaMaskCutoff);
 			}
 			
-			pushBatch(*pparams, mask, texture, batch_textures);
+			pushBatch(*pparams, mask, texture, batch_textures, linear_diffuse);
 		}
 	}
 }
@@ -449,7 +449,7 @@ void LLRenderPass::applyModelMatrix(const LLDrawInfo& params)
 	}
 }
 
-void LLRenderPass::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures)
+void LLRenderPass::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures, BOOL linear_diffuse)
 {
     if (!params.mCount)
     {
@@ -471,6 +471,10 @@ void LLRenderPass::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL ba
 				if (texture)
 				{
 					gGL.getTexUnit(i)->bind(texture, TRUE);
+                    if (linear_diffuse)
+                    {
+                        gGL.getTexUnit(i)->setTextureColorSpace(LLTexUnit::TCS_LINEAR);
+                    }
 				}
 			}
 		}
@@ -480,6 +484,10 @@ void LLRenderPass::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL ba
 			{
 				params.mTexture->addTextureStats(params.mVSize);
 				gGL.getTexUnit(0)->bind(params.mTexture, TRUE) ;
+                if (linear_diffuse)
+                {
+                    gGL.getTexUnit(0)->setTextureColorSpace(LLTexUnit::TCS_LINEAR);
+                }
 				if (params.mTextureMatrix)
 				{
 					tex_setup = true;

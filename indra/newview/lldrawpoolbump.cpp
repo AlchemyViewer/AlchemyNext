@@ -1498,7 +1498,7 @@ void LLDrawPoolBump::renderBump(U32 type, U32 mask)
 	}
 }
 
-void LLDrawPoolBump::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures)
+void LLDrawPoolBump::pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures, BOOL linear_diffuse)
 {
 	applyModelMatrix(params);
 

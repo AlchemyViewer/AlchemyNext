@@ -186,8 +186,8 @@ public:
 
 	/*virtual*/ S32 getNumPasses();
 
-	void render(S32 pass = 0);
-	void pushBatch(LLDrawInfo& params, U32 mask, BOOL texture = TRUE, BOOL batch_textures = FALSE);
+	void render(S32 pass = 0) override;
+    void pushBatch(LLDrawInfo& params, U32 mask, BOOL texture = TRUE, BOOL batch_textures = FALSE, BOOL linear_diffuse = FALSE) override;
 
 };
 

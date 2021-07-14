@@ -168,12 +168,12 @@ public:
 	void resetDrawOrders() { }
 
 	static void applyModelMatrix(const LLDrawInfo& params);
-	virtual void pushBatches(U32 type, U32 mask, BOOL texture = TRUE, BOOL batch_textures = FALSE);
-	virtual void pushMaskBatches(U32 type, U32 mask, BOOL texture = TRUE, BOOL batch_textures = FALSE);
-	virtual void pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures = FALSE);
+    virtual void pushBatches(U32 type, U32 mask, BOOL texture = TRUE, BOOL batch_textures = FALSE, BOOL linear_diffuse = FALSE);
+    virtual void pushMaskBatches(U32 type, U32 mask, BOOL texture = TRUE, BOOL batch_textures = FALSE, BOOL linear_diffuse = FALSE);
+    virtual void pushBatch(LLDrawInfo& params, U32 mask, BOOL texture, BOOL batch_textures = FALSE, BOOL linear_diffuse = FALSE);
 	virtual void renderGroup(LLSpatialGroup* group, U32 type, U32 mask, BOOL texture = TRUE);
 	virtual void renderGroups(U32 type, U32 mask, BOOL texture = TRUE);
-	virtual void renderTexture(U32 type, U32 mask, BOOL batch_textures = TRUE);
+    virtual void renderTexture(U32 type, U32 mask, BOOL batch_textures = TRUE, BOOL linear_diffuse = FALSE);
 
 };
 
@@ -214,7 +214,7 @@ public:
 
 	void printDebugInfo() const;
 	
-	BOOL isFacePool() { return TRUE; }
+	BOOL isFacePool() final override { return TRUE; }
 
 	friend class LLFace;
 	friend class LLPipeline;
