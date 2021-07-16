@@ -319,11 +319,6 @@ void LLInventoryPanel::initFromParams(const LLInventoryPanel::Params& params)
 		setSortOrder(gSavedSettings.getU32(DEFAULT_SORT_ORDER));
 	}
 
-	// hide inbox
-	if (!gSavedSettings.getBOOL("InventoryOutboxMakeVisible"))
-	{
-		getFilter().setFilterCategoryTypes(getFilter().getFilterCategoryTypes() & ~(1ULL << LLFolderType::FT_INBOX));
-	}
     // hide marketplace listing box, unless we are a marketplace panel
 	if (!gSavedSettings.getBOOL("InventoryOutboxMakeVisible") && !mParams.use_marketplace_folders)
 	{
