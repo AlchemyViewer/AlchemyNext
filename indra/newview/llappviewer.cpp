@@ -274,6 +274,10 @@
 #include "glib.h"
 #endif // (LL_LINUX) && LL_GTK
 
+#if USE_DISCORD_RPC
+#include "aldiscordrichpresence.h"
+#endif
+
 static LLAppViewerListener sAppViewerListener(LLAppViewer::instance);
 
 ////// Windows-specific includes to the bottom - nasty defines in these pollute the preprocessor
@@ -5415,6 +5419,10 @@ void LLAppViewer::disconnectViewer()
 	// Save snapshot for next time, if we made it through initialization
 
 	LL_INFOS() << "Disconnecting viewer!" << LL_ENDL;
+	
+	#if USE_DISCORD_RPC
+	ALRichPresenceManager::shutdown();
+	#endif
 
 	// Dump our frame statistics
 

@@ -14,6 +14,7 @@ include(BuildVersion)
 include(CMakeCopyIfDifferent)
 include(CubemapToEquirectangularJS)
 include(DBusGlib)
+include(Discord)
 include(DragDrop)
 include(Epoxy)
 include(EXPAT)
@@ -105,6 +106,10 @@ include_directories(
 if(USE_FMODSTUDIO)
   include_directories(${FMODSTUDIO_INCLUDE_DIR})
 endif(USE_FMODSTUDIO)
+
+if(USE_DISCORD_RPC)
+  include_directories(${DISCORDRPC_INCLUDE_DIR})
+endif(USE_DISCORD_RPC)
 
 include_directories(SYSTEM
     ${LLCOMMON_SYSTEM_INCLUDE_DIRS}
@@ -1534,6 +1539,11 @@ if (DARWIN)
   list(APPEND viewer_SOURCE_FILES ${viewer_RESOURCE_FILES})
 endif (DARWIN)
 
+  if(USE_DISCORD_RPC)
+    list(APPEND viewer_SOURCE_FILES aldiscordrichpresence.cpp)
+    list(APPEND viewer_HEADER_FILES aldiscordrichpresence.h)
+  endif(USE_DISCORD_RPC)
+
 if (LINUX)
     LIST(APPEND viewer_SOURCE_FILES llappviewerlinux.cpp)
     LIST(APPEND viewer_SOURCE_FILES llappviewerlinux_api_dbus.cpp)
@@ -2155,6 +2165,7 @@ target_link_libraries(${VIEWER_BINARY_NAME}
     absl::strings
     nlohmann_json::nlohmann_json
     fmt::fmt
+    ${DISCORDRPC_LIBRARY}
     )
 
 set(ARTWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH

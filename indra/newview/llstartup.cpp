@@ -215,6 +215,10 @@
 #include "lldxhardware.h"
 #endif
 
+#if USE_DISCORD_RPC
+#include "aldiscordrichpresence.h"
+#endif
+
 //
 // exported globals
 //
@@ -2309,6 +2313,10 @@ bool idle_startup()
 		LLPathfindingManager::getInstance()->initSystem();
 
 		gAgentAvatarp->sendHoverHeight();
+		
+		#if USE_DISCORD_RPC
+		ALRichPresenceManager::startup();
+		#endif
 
 		// look for parcels we own
 		send_places_query(LLUUID::null,

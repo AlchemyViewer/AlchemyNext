@@ -673,6 +673,50 @@
       <key>Value</key>
       <boolean>0</boolean>
     </map>
+    <key>DiscordRichPresenceEnabled</key>
+    <map>
+      <key>Comment</key>
+      <string>Enable Discord Rich Presence API</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>DiscordRichPresenceShowGridName</key>
+    <map>
+      <key>Comment</key>
+      <string>Show the grid you are connected to in Discord's Rich Presence</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>DiscordRichPresenceShowRegion</key>
+    <map>
+      <key>Comment</key>
+      <string>Show your current location in Discord's Rich Presence</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>DiscordRichPresenceShowStatus</key>
+    <map>
+      <key>Comment</key>
+      <string>Show your current status in Discord's Rich Presence</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>GroupSnoozeTime</key>
     <map>
       <key>Comment</key>
