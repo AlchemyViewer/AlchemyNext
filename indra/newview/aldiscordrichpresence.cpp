@@ -50,27 +50,6 @@ namespace DiscordDataStrings
 	constexpr char statusStringIdle[] = "Idle";
 }
 
-static void handleDiscordReady(const DiscordUser* connectedUser)
-{
-#if 0
-	LL_INFOS("DiscordRPC") << llformat("Discord: connected to user %s#%s - %s",
-		connectedUser->username,
-		connectedUser->discriminator,
-		connectedUser->userId) << LL_ENDL;
-#endif
-	LL_INFOS("DiscordRPC") << "Discord: ready" << LL_ENDL;
-	ALRichPresenceManager::instance()->discordReady();
-}
-
-static void handleDiscordError(int errcode, const char* message)
-{
-	LL_WARNS("DiscordRPC") << "Discord: error (" << errcode << ": " << message << ")" << LL_ENDL;
-}
-
-static void handleDiscordDisconnected(int errcode, const char* message)
-{
-	LL_WARNS("DiscordRPC") << "Discord: disconnected (" << errcode << ": " << message << ")" << LL_ENDL;
-}
 
 ALRichPresenceManager::ALRichPresenceManager()
 {
@@ -407,4 +386,28 @@ bool ALRichPresenceManager::idleUpdateState()
 		updatePresence();
 	}
 	return false;
+}
+
+// ---------- Discord API Hooks
+
+static void handleDiscordReady(const DiscordUser* connectedUser)
+{
+#ifndef LL_RELEASE_FOR_DOWNLOAD
+	LL_INFOS("DiscordRPC") << llformat("Discord: connected to user %s#%s - %s",
+		connectedUser->username,
+		connectedUser->discriminator,
+		connectedUser->userId) << LL_ENDL;
+#endif
+	LL_INFOS("DiscordRPC") << "Discord: ready" << LL_ENDL;
+	ALRichPresenceManager::instance()->discordReady();
+}
+
+static void handleDiscordError(int errcode, const char* message)
+{
+	LL_WARNS("DiscordRPC") << "Discord: error (" << errcode << ": " << message << ")" << LL_ENDL;
+}
+
+static void handleDiscordDisconnected(int errcode, const char* message)
+{
+	LL_WARNS("DiscordRPC") << "Discord: disconnected (" << errcode << ": " << message << ")" << LL_ENDL;
 }
