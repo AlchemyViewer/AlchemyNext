@@ -441,6 +441,52 @@
         <key>version</key>
         <string>1.0.0</string>
       </map>
+      <key>discord_rpc</key>
+      <map>
+        <key>canonical_repo</key>
+        <string>https://git.alchemyviewer.org/alchemy/thirdparty/3p-discord-rpc</string>
+        <key>copyright</key>
+        <string>Copyright (c) 2017, Discord, Inc.</string>
+        <key>license</key>
+        <string>MIT</string>
+        <key>license_file</key>
+        <string>LICENSES/discord_rpc.txt</string>
+        <key>name</key>
+        <string>discord_rpc</string>
+        <key>platforms</key>
+        <map>
+          <key>linux64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>0a6de9837c5e2d7359f51050281d939a9712aab90323b9413d48cdce59422842c1ffec32ed08733e9a4df88932e74d27a27a67d371b97a76e8ed1686a01822b7</string>
+              <key>hash_algorithm</key>
+              <string>blake2b</string>
+              <key>url</key>
+              <string>https://git.alchemyviewer.org/api/v4/projects/173/packages/generic/discord_rpc/3.4.0.1250/discord_rpc-3.4.0-linux64-1250.tar.zst</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
+          </map>
+          <key>windows64</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>55ec17ca0e81d0f8f64a44b170a53e9d9f2d669db9a4ae1a45e823d964333b12d934b0475326df24c50484a4fc9aa90e9809a05a04a96c2128518551e5cccf66</string>
+              <key>hash_algorithm</key>
+              <string>blake2b</string>
+              <key>url</key>
+              <string>https://git.alchemyviewer.org/api/v4/projects/173/packages/generic/discord_rpc/3.4.0.1250/discord_rpc-3.4.0-windows64-1250.tar.zst</string>
+            </map>
+            <key>name</key>
+            <string>windows64</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>3.4.0</string>
+      </map>
       <key>dullahan</key>
       <map>
         <key>copyright</key>
