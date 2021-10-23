@@ -56,6 +56,10 @@ private:
 	bool idleDiscordCallbacks();
 	bool idleUpdateState();
 
+	static void handleDiscordReady(const DiscordUser* connectedUser);
+	static void handleDiscordError(int errcode, const char* message);
+	static void handleDiscordDisconnected(int errcode, const char* message);
+
 public:
 	// Static Callbacks
 	static bool handleDiscordGridNameChanged(const LLSD& new_value);

@@ -390,7 +390,7 @@ bool ALRichPresenceManager::idleUpdateState()
 
 // ---------- Discord API Hooks
 
-static void handleDiscordReady(const DiscordUser* connectedUser)
+void ALRichPresenceManager::handleDiscordReady(const DiscordUser* connectedUser)
 {
 #ifndef LL_RELEASE_FOR_DOWNLOAD
 	LL_INFOS("DiscordRPC") << llformat("Discord: connected to user %s#%s - %s",
@@ -402,12 +402,12 @@ static void handleDiscordReady(const DiscordUser* connectedUser)
 	ALRichPresenceManager::instance()->discordReady();
 }
 
-static void handleDiscordError(int errcode, const char* message)
+void ALRichPresenceManager::handleDiscordError(int errcode, const char* message)
 {
 	LL_WARNS("DiscordRPC") << "Discord: error (" << errcode << ": " << message << ")" << LL_ENDL;
 }
 
-static void handleDiscordDisconnected(int errcode, const char* message)
+void ALRichPresenceManager::handleDiscordDisconnected(int errcode, const char* message)
 {
 	LL_WARNS("DiscordRPC") << "Discord: disconnected (" << errcode << ": " << message << ")" << LL_ENDL;
 }
