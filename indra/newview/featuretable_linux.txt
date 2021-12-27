@@ -242,7 +242,7 @@ RenderVolumeLODFactor		1	1.125
 WindLightUseAtmosShaders	1	1
 RenderDeferred				1	1
 RenderDeferredSSAO			1	1
-RenderShadowDetail			1	0
+RenderShadowDetail			1	1
 WLSkyDetail					1	48
 RenderFSAASamples			1	2
 
@@ -271,7 +271,7 @@ RenderVolumeLODFactor		1	1.125
 WindLightUseAtmosShaders	1	1
 RenderDeferred				1	1
 RenderDeferredSSAO			1	1
-RenderShadowDetail			1	0
+RenderShadowDetail			1	2
 WLSkyDetail					1	48
 RenderFSAASamples			1	2
 
