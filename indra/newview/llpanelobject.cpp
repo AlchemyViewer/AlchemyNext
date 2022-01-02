@@ -2451,10 +2451,9 @@ void LLPanelObject::onCopyParams()
     mClipboardParams["volume_params"] = params.asLLSD();
 
     // Sculpted Prim
-    if (objectp->getParameterEntryInUse(LLNetworkData::PARAMS_SCULPT))
+	const LLSculptParams* sculpt_params = objectp->getSculptParams();
+    if (objectp->getSculptParams())
     {
-        LLSculptParams *sculpt_params = (LLSculptParams *)objectp->getParameterEntry(LLNetworkData::PARAMS_SCULPT);
-
         LLUUID texture_id = sculpt_params->getSculptTexture();
         if (get_can_copy_texture(texture_id))
         {
@@ -2489,7 +2488,7 @@ void LLPanelObject::onPasteParams()
     }
     else
     {
-        LLSculptParams *sculpt_params = (LLSculptParams *)objectp->getParameterEntry(LLNetworkData::PARAMS_SCULPT);
+        const LLSculptParams *sculpt_params = objectp->getSculptParams();
         if (sculpt_params)
         {
             objectp->setParameterEntryInUse(LLNetworkData::PARAMS_SCULPT, FALSE, TRUE);
