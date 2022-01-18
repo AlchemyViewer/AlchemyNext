@@ -75,8 +75,8 @@ build() {
 package() {
     mkdir -p "${pkgdir}/opt"
     mkdir -p "${pkgdir}/usr/local/share/applications"
-    mv "${pkgname}/build-linux-64/newview/packaged" "${pkgdir}/opt/${pkgname}"
     # Patch shortcut to avoid duplicated entries
-    sed -i 's;Name=Alchemy;Name=Alchemy (source build);' "$pkgdir/opt/$pkgname/etc/refresh_desktop_app_entry.sh"
-    sed -i 's;alchemy-.*\.desktop;'"${pkgname}-git\.desktop"';' "$pkgdir/opt/$pkgname/etc/refresh_desktop_app_entry.sh"
+    sed -i 's;alchemy-.*\.desktop;'"${pkgname}-git\.desktop"';' "${pkgname}/build-linux-64/newview/packaged/etc/refresh_desktop_app_entry.sh"
+    sed -i 's;Name=Alchemy;Name=Alchemy (source build);' "${pkgname}/build-linux-64/newview/packaged/etc/refresh_desktop_app_entry.sh"
+    mv "${pkgname}/build-linux-64/newview/packaged" "${pkgdir}/opt/${pkgname}"
 }
