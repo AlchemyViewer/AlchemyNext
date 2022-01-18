@@ -28,20 +28,21 @@ source=('alchemy-next'::"git+file:///$(pwd)/../../../")
 md5sums=('SKIP')
 sha256sums=('SKIP')
 b2sums=('SKIP')
+_current_branch="$(git rev-parse --abbrev-ref HEAD)"
 
 pkgver() {
-    _current_branch="$(git rev-parse --abbrev-ref HEAD | sed 's;[\/-];.;g')"
     cd "${pkgname}" || exit 1
     ( set -o pipefail
         git describe --long 2>/dev/null | sed 's/\([^-]*-g\)/r\1/;s/-/./g' ||
-        printf "%s.%s.%s.%s" "$(cat indra/newview/VIEWER_VERSION.txt)" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)" "${_current_branch}"
+        printf "%s.%s.%s.%s" "$(cat indra/newview/VIEWER_VERSION.txt)" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)" "$(echo ${_current_branch} | sed 's;[\/-];.;g')"
     )
 }
 
 prepare() {
     cd "${pkgname}" || exit 1
+    git checkout "${_current_branch}"
     git fetch --prune
-    git checkout HEAD
+    git pull
 }
 
 build() {
