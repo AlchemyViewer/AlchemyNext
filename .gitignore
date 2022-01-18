@@ -62,6 +62,9 @@ indra/web/doc/asset-upload/plugins/verify-notecard
 indra/web/doc/asset-upload/plugins/verify-texture
 installed.xml
 libraries
+scripts/package_managers/pacman/*
+!scripts/package_managers/pacman/PKGBUILD
+!scripts/package_managers/pacman/alchemy.install
 tarfile_tmp
 trivial_change_force_build
 web/config.*
