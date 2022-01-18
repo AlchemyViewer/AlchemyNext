@@ -24,10 +24,13 @@ optdepends=(
 provides=('alchemy-viewer')
 options=(!emptydirs !makeflags !strip !lto)
 install=alchemy.install
-source=('alchemy-next'::"git+file:///$(pwd)/../../../")
-md5sums=('SKIP')
-sha256sums=('SKIP')
-b2sums=('SKIP')
+source=('alchemy-next'::"git+file:///$(pwd)/../../../" 'alchemy.install')
+md5sums=('SKIP'
+         '92c89552ecebd8b222e259e01e641cb8')
+sha256sums=('SKIP'
+            '6cb0af521d1c3d7e67c985231e2d4cb102c5c861d1bcfbbb7d861204c1037f0b')
+b2sums=('SKIP'
+        'dfb64d69d48fb9659dba3b4fd2006eea58e55ff71fb99024df9c02ef772ebbf04ff6af1d4851b1115162c241419339eee2bd6579c3c6128f0fc620af3c46143d')
 
 # extract() {
     # mkdir -p src/$pkgname/indra
