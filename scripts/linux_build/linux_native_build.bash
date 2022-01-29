@@ -1,5 +1,4 @@
 #!/bin/bash
-
 do_build() {
     # TODO: build inside a chroot?
     cd "${pkgname}" || exit 1
@@ -32,7 +31,8 @@ then
         fi
     else
         eval "$(</etc/lsb-release)"
-        echo "Distribution \'${DISTRIB_DESCRIPTION}\' is not currently supported by the native build script. Merge requests are welcome."
+        echo "Distribution '${DISTRIB_DESCRIPTION}' is not currently supported by the native build script. Merge requests are welcome."
+        exit 2
     fi
 fi
 do_build;
