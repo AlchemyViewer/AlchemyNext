@@ -18,7 +18,14 @@ do_build() {
     # shellcheck disable=SC2153
     autobuild configure -A 64 -c ReleaseOS -- -DLL_TESTS:BOOL=OFF -DDISABLE_FATAL_WARNINGS=ON -DUSE_LTO:BOOL="$(grep -cq '[^!]lto' <<< "${OPTIONS}" && echo 'ON' || echo 'OFF')" -DVIEWER_CHANNEL="Alchemy Test" ${AL_EXTRA_CMAKE_FLAGS}
     cd "build-linux-64" || exit
-    ninja -j"$(nproc)"
+    loadavg=$(nproc)
+    if [[ $loadavg -gt 1 ]]; then
+        if [[ $loadavg -le 8 ]]; then loadavg=$((loadavg - 1))
+        else
+            loadavg=$((loadavg - 2))
+        fi
+    fi
+    time ninja -j"${ICECC_PARALLEL_MAKE}" -l"${loadavg}"
 }
 if [[ -z "${IS_PKGBUILD}" ]]
 then
