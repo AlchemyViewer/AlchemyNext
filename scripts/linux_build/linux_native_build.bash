@@ -1,7 +1,6 @@
 #!/bin/bash
 do_build() {
     # TODO: build inside a chroot?
-    cd "${pkgname}" || exit 1
     virtualenv ".venv" -p python3
     source ".venv/bin/activate"
     if command -v autobuild; then
