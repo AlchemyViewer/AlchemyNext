@@ -464,9 +464,6 @@ class WindowsManifest(ViewerManifest):
             self.path("libapriconv-1.dll")
             self.path("libaprutil-1.dll")
 
-            # Mesh 3rd party libs needed for auto LOD and collada reading
-            self.path("glod.dll")
-
             # For image support
             self.path("openjp2.dll")
 
@@ -838,7 +835,6 @@ class DarwinManifest(ViewerManifest):
                                 'libapr-1.*.dylib',
                                 'libaprutil-1.*.dylib',
                                 'libepoxy.*.dylib',
-                                'libGLOD.dylib',
                                 'libhunspell-*.dylib',
                                 'libndofdev.dylib',
                                 'libxmlrpc-epi.*.dylib',
@@ -1217,7 +1213,6 @@ class Linux_i686_Manifest(LinuxManifest):
             self.path("libaprutil-1.so*")
             self.path("libdb*.so")
             self.path("libexpat.so.*")
-            self.path("libGLOD.so")
             self.path("libSDL2*.so*")
             self.path("libopenjp2.*so*")
             self.path("libepoxy.so")
@@ -1259,7 +1254,6 @@ class Linux_x86_64_Manifest(LinuxManifest):
             self.path("libapr-1.so*")
             self.path("libaprutil-1.so*")
             self.path("libexpat.so.*")
-            self.path("libGLOD.so")
             self.path("libSDL2*.so*")
             self.path("libopenjp2.*so*")
             self.path("libepoxy.so")
