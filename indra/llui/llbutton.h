@@ -99,7 +99,7 @@ public:
 								image_overlay_color,
 								image_overlay_selected_color,
 								image_overlay_disabled_color,
-								flash_color;
+								flash_color; // FIXME ALCHEMY: Could replace BeaconColor with ButtonFlashBgColor and override where needed (toybox entry not necessary, investigate button.xml)
 
 		// layout
 		Optional<S32>			pad_right;
@@ -130,7 +130,7 @@ public:
 		Optional<F32>				hover_glow_amount;
 		Optional<TimeIntervalParam>	held_down_delay;
 
-		Optional<bool>				use_draw_context_alpha;
+		Optional<bool>				use_draw_context_alpha; // FIXME ALCHEMY: False everywhere but in button.xml and icon.xml
 		
 		Optional<LLBadge::Params>	badge;
 

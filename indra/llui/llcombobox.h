@@ -257,8 +257,8 @@ public:
 	struct Params
 	:	public LLInitParam::Block<Params, LLComboBox::Params>
 	{
-		Optional<S32>		icon_column,
-							label_column;
+		Optional<S32>		icon_column, // FIXME ALCHEMY: Unused
+							label_column; // FIXME ALCHEMY: Unused
 		Params();
 	};
 

@@ -55,7 +55,7 @@ public:
 	 : public LLInitParam::Block<Params, LLUICtrl::Params>
 	{
 		Optional<bool>			display_children, //expanded or collapsed after initialization
-								collapsible;
+								collapsible; // FIXME ALCHEMY: Remove
 
 		Optional<std::string>	title;
 
@@ -83,7 +83,7 @@ public:
 
 		Optional<bool>			fit_panel;
 
-		Optional<bool>			selection_enabled;
+		Optional<bool>			selection_enabled; // FIXME ALCHEMY: This is only set to true in outfit_accordion_tab
 
 		Optional<S32>			padding_left,
 								padding_right,

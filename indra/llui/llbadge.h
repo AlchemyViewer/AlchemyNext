@@ -109,10 +109,10 @@ public:
 		Optional< S32 >					label_offset_vert;
 
 		Optional< LLRelPos::Location >	location;
-		Optional< S32 >					location_offset_hcenter;
-		Optional< S32 >					location_offset_vcenter;
-		Optional< U32 >					location_percent_hcenter;
-		Optional< U32 >					location_percent_vcenter;
+		Optional< S32 >					location_offset_hcenter; // FIXME ALCHEMY: Only used in inbox_folder_*.xml
+		Optional< S32 >					location_offset_vcenter; // FIXME ALCHEMY: Unused
+		Optional< U32 >					location_percent_hcenter; // FIXME ALCHEMY: Only used in Badge.xml
+		Optional< U32 >					location_percent_vcenter; // FIXME ALCHEMY: Only used in Badge.xml
 
 		Optional< F32 >					padding_horiz;
 		Optional< F32 >					padding_vert;

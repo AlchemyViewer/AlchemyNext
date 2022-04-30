@@ -71,9 +71,9 @@ public:
 		Optional<LLTextBox::Params> label_text;
 		Optional<LLButton::Params> check_button;
 
-		Optional<EWordWrap, WordWrap>	word_wrap;
+		Optional<EWordWrap, WordWrap>	word_wrap; // FIXME ALCHEMY: True almost everywhere in XML. Set as default.
 
-		Ignored					radio_style;
+		Ignored					radio_style; // FIXME ALCHEMY: Why does this exist?
 
 		Params();
 	};

@@ -40,10 +40,10 @@ public:
 
 	struct Params : public LLInitParam::Block<Params, LLTextEditor::Params>
 	{
-		Optional<bool>		has_history,
+		Optional<bool>		has_history, // FIXME ALCHEMY: unused in XML
 							is_expandable;
 
-		Optional<int>		expand_lines_count;
+		Optional<int>		expand_lines_count; // FIXME ALCHEMY: always set to 5 when defined in XML
 
 		Params();
 	};

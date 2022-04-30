@@ -76,8 +76,8 @@ public:
 		Optional<LLTextBox::Params>	no_visible_tabs_text;
 
 		Params()
-			: single_expansion("single_expansion",false)
-			, fit_parent("fit_parent", false)
+			: single_expansion("single_expansion",false) // FIXME ALCHEMY: Only false in particle editor. Try removing.
+			, fit_parent("fit_parent", false) // FIXME ALCHEMY: Investigate removing/setting to true
 			, no_matched_tabs_text("no_matched_tabs_text")
 			, no_visible_tabs_text("no_visible_tabs_text")
 		{};
