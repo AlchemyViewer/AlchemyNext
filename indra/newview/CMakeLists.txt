@@ -2200,7 +2200,12 @@ target_link_libraries(${VIEWER_BINARY_NAME}
     meshoptimizer
     nlohmann_json::nlohmann_json
     fmt::fmt
+    nfd
     )
+
+if (LINUX)
+  target_link_libraries(${VIEWER_BINARY_NAME} nfd)
+endif()
 
 set(ARTWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH
     "Path to artwork files.")

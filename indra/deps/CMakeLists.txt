@@ -34,33 +34,35 @@ FetchContent_Declare(
   GIT_REPOSITORY https://git.alchemyviewer.org/alchemy/mirrors/meshoptimizer.git
   GIT_TAG        v0.18
   )
-# FetchContent_Declare(
-#   Catch2
-#   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-#   GIT_TAG        v2.13.7
-#   )
+set(MESHOPT_BUILD_SHARED_LIBS OFF)
+FetchContent_MakeAvailable(meshoptimizer)
+
 FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
   GIT_TAG        9.1.0
   )
+FetchContent_MakeAvailable(fmt)
+
 FetchContent_Declare(
   nlohmann_json
   GIT_REPOSITORY https://git.alchemyviewer.org/alchemy/mirrors/modernjson.git
   GIT_TAG        v3.11.2
   )
-
-# #Download the rest of the libraries
-FetchContent_MakeAvailable(fmt)
-
-set(MESHOPT_BUILD_SHARED_LIBS OFF)
-FetchContent_MakeAvailable(meshoptimizer)
-
 # If you only include this third party in PRIVATE source files, you do not
 # need to install it when your main project gets installed.
 set(JSON_Install OFF CACHE INTERNAL "")
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(nlohmann_json)
+
+if(LINUX)
+  FetchContent_Declare(
+    nfd
+    GIT_REPOSITORY https://github.com/btzy/nativefiledialog-extended.git
+    GIT_TAG        v1.0.1
+    )
+  FetchContent_MakeAvailable(nfd)
+endif()
 
 unset(CMAKE_FOLDER)
 unset(CMAKE_POSITION_INDEPENDENT_CODE)

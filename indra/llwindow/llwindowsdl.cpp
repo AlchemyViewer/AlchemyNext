@@ -66,6 +66,7 @@ extern "C" {
 # include "fontconfig/fontconfig.h"
 }
 
+#include <nfd.hpp>
 
 // not necessarily available on random SDL platforms, so #if LL_LINUX
 // for execv(), waitpid(), fork()
@@ -272,6 +273,9 @@ LLWindowSDL::LLWindowSDL(LLWindowCallbacks* callbacks,
 		LL_WARNS() << "Failed to initialize OpenGL Library due to error: " << SDL_GetError() << LL_ENDL;
 		return;
 	}
+
+	// Init filepickers
+	NFD::Init();
 
 	// Initialize the keyboard
 	gKeyboard = new LLKeyboardSDL();
@@ -966,6 +970,12 @@ LLWindowSDL::~LLWindowSDL()
 	}
 
 	gWindowImplementation = NULL;
+
+	// Shut down filepicker
+	NFD::Quit();
+
+	// Shutdown SDL
+	SDL_Quit();
 }
 
 

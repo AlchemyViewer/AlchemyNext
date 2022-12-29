@@ -53,6 +53,7 @@
 #include <commdlg.h>
 #endif
 
+#if LL_LINUX
 #if LL_GTK
 extern "C" {
 // mostly for Linux, possible on others
@@ -60,7 +61,10 @@ extern "C" {
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
 }
+#else
+#include "nfd.hpp"
 #endif // LL_GTK
+#endif
 
 class LLFilePicker
 {
@@ -174,6 +178,7 @@ private:
     std::vector<std::string>* navOpenFilterProc(ELoadFilter filter);
 #endif
 
+#if LL_LINUX
 #if LL_GTK
 	static void add_to_selectedfiles(gpointer data, gpointer user_data);
 	static void chooser_responder(GtkWidget *widget, gint response, gpointer user_data);
@@ -182,6 +187,9 @@ private:
 	std::string mCurContextName;
 	// we also remember the extension of the last added file.
 	std::string mCurrentExtension;
+#else
+	std::vector<nfdfilteritem_t> setupFilter(ELoadFilter filter);
+#endif
 #endif
 
 	std::vector<std::string> mFiles;
